@@ -112,6 +112,10 @@ export function buildCardNewsHtml(data: CardNewsData): string {
   --text: #1e293b;
   --dim: rgba(30, 41, 59, 0.75);
   --sans: 'Noto Sans KR', sans-serif;
+  --fs-xl: clamp(28px,7.5vw,52px);
+  --fs-lg: clamp(22px,6vw,42px);
+  --fs-body: clamp(12px,2.8vw,15px);
+  --title-col: #0f172a;
 }
 *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
 html, body { height:100%; overflow:hidden; }
@@ -168,18 +172,20 @@ body {
  color:var(--accent); backdrop-filter:blur(8px);
  margin-bottom:clamp(10px,2.5%,18px);
 }
-.s-deep .tag, .s-accent .tag, .s-mid .tag { background:rgba(255,255,255,0.12); border-color:rgba(255,255,255,0.25); color:rgba(255,255,255,0.9); }
+.s-deep .tag { background:rgba(255,255,255,0.12); border-color:rgba(255,255,255,0.25); color:rgba(255,255,255,0.9); }
+.s-accent .tag, .s-mid .tag { background:rgba(255,255,255,0.55); border-color:rgba(255,255,255,0.8); color:var(--accent); }
 
-.t-xl { font-size:clamp(28px,7.5vw,52px); font-weight:900; line-height:1.1; letter-spacing:-0.02em; word-break:keep-all; }
-.t-lg { font-size:clamp(22px,6vw,42px); font-weight:700; line-height:1.2; word-break:keep-all; }
-.t-body { font-size:clamp(12px,2.8vw,15px); font-weight:400; line-height:1.85; color:var(--dim); margin-top:12px; }
+.t-xl { font-size:var(--fs-xl); font-weight:900; line-height:1.1; letter-spacing:-0.02em; word-break:keep-all; color:var(--title-col); }
+.t-lg { font-size:var(--fs-lg); font-weight:700; line-height:1.2; word-break:keep-all; color:var(--title-col); }
+.t-body { font-size:var(--fs-body); font-weight:400; line-height:1.85; color:var(--dim); margin-top:12px; }
 .s-deep .t-body { color:rgba(255,255,255,0.85); }
 .s-accent .t-body, .s-mid .t-body { color:rgba(15,23,42,0.75); }
 .s-deep .t-xl, .s-deep .t-lg { color:#fff; }
-.s-accent .t-xl, .s-accent .t-lg, .s-mid .t-xl, .s-mid .t-lg { color:#0f172a; }
+.s-accent .t-xl, .s-accent .t-lg, .s-mid .t-xl, .s-mid .t-lg { color:var(--title-col); }
 
 .rule { width:100%; height:1px; background:linear-gradient(90deg,rgba(255,255,255,0.7),rgba(255,255,255,0)); margin:clamp(16px,4%,28px) 0; }
-.s-deep .rule, .s-accent .rule, .s-mid .rule { background:linear-gradient(90deg,rgba(255,255,255,0.2),rgba(255,255,255,0)); }
+.s-deep .rule { background:linear-gradient(90deg,rgba(255,255,255,0.2),rgba(255,255,255,0)); }
+.s-accent .rule, .s-mid .rule { background:linear-gradient(90deg,rgba(0,0,0,0.1),rgba(0,0,0,0)); }
 
 .big-num { font-size:clamp(60px,18vw,110px); font-weight:900; line-height:.9; letter-spacing:-0.03em; }
 .big-unit { font-size:clamp(11px,2.5vw,15px); font-weight:400; letter-spacing:.2em; color:rgba(255,255,255,0.7); margin-top:8px; display:block; }
@@ -205,22 +211,22 @@ body {
 .list { list-style:none; margin-top:clamp(10px,2.5%,18px); padding:0; }
 .list li { display:flex; gap:clamp(8px,2%,14px); align-items:flex-start; padding:clamp(9px,2.5%,16px) 0; border-bottom:1px solid rgba(0,0,0,0.06); }
 .list li:last-child { border:none; }
-.s-deep .list li, .s-mid .list li { border-color:rgba(255,255,255,0.12); }
+.s-deep .list li { border-color:rgba(255,255,255,0.12); }
 .list-dot { width:7px; height:7px; border-radius:50%; background:var(--accent); flex-shrink:0; margin-top:6px; }
-.s-deep .list-dot, .s-mid .list-dot { background:#fff; box-shadow:0 0 6px rgba(255,255,255,0.5); }
+.s-deep .list-dot { background:#fff; box-shadow:0 0 6px rgba(255,255,255,0.5); }
 .list-txt { flex:1; font-size:clamp(12px,2.2vw,14px); color:var(--text); line-height:1.6; }
-.s-deep .list-txt, .s-mid .list-txt { color:rgba(255,255,255,0.9); }
+.s-deep .list-txt { color:rgba(255,255,255,0.9); }
 .list-em { font-weight:700; color:var(--accent); margin-right:4px; }
 .s-deep .list-em { color:#fff; }
 .list-sub { font-size:.82em; color:var(--dim); display:block; margin-top:2px; font-weight:400; }
-.s-deep .list-sub, .s-mid .list-sub { color:rgba(255,255,255,0.62); }
+.s-deep .list-sub { color:rgba(255,255,255,0.62); }
 
 .free-row { display:flex; gap:clamp(6px,1.8%,10px); flex-wrap:wrap; margin-top:clamp(12px,3%,20px); }
 .free-pill { background:rgba(255,255,255,0.5); border:1px solid rgba(255,255,255,0.75); border-radius:100px; padding:6px 14px; font-size:clamp(11px,2.2vw,13px); font-weight:600; color:var(--text); display:inline-flex; align-items:center; gap:6px; backdrop-filter:blur(8px); }
-.s-deep .free-pill, .s-accent .free-pill, .s-mid .free-pill { background:rgba(255,255,255,0.15); border-color:rgba(255,255,255,0.3); color:#fff; }
+.s-deep .free-pill { background:rgba(255,255,255,0.15); border-color:rgba(255,255,255,0.3); color:#fff; }
 
 .loc { margin-top:clamp(12px,3%,20px); font-size:clamp(10px,2.2vw,12px); color:var(--dim); font-weight:500; display:flex; align-items:center; gap:4px; }
-.s-deep .loc, .s-accent .loc, .s-mid .loc { color:rgba(255,255,255,0.55); }
+.s-deep .loc { color:rgba(255,255,255,0.55); }
 
 .nav-wrap { position:fixed; bottom:clamp(14px,3vh,26px); left:50%; transform:translateX(-50%); display:flex; gap:12px; align-items:center; z-index:10; }
 .nav-btn { width:36px; height:36px; border-radius:50%; border:1px solid rgba(255,255,255,0.6); background:rgba(255,255,255,0.25); backdrop-filter:blur(8px); color:var(--text); cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all .2s; }
@@ -296,6 +302,31 @@ body {
 }
 .save-btn:hover { background: rgba(255,255,255,0.8); }
 .save-btn.saving { opacity: 0.6; cursor: wait; }
+
+/* Settings Panel */
+.settings-panel {
+  position:fixed; left:-268px; top:50%; transform:translateY(-50%);
+  width:248px; max-height:82vh; overflow-y:auto;
+  background:rgba(248,250,252,0.96); border:1px solid rgba(255,255,255,0.9);
+  backdrop-filter:blur(24px); -webkit-backdrop-filter:blur(24px);
+  border-radius:20px; padding:20px; z-index:24;
+  transition:left 0.35s cubic-bezier(.4,0,.2,1);
+}
+.settings-panel.open { left:10px; }
+.sp-head { font-size:11px; font-weight:700; color:var(--accent); letter-spacing:.12em; text-transform:uppercase; margin-bottom:16px; }
+.sp-sec { margin-bottom:14px; }
+.sp-sec:last-child { margin-bottom:0; }
+.sp-lbl { font-size:10px; font-weight:600; color:rgba(30,41,59,0.4); letter-spacing:.08em; text-transform:uppercase; margin-bottom:8px; }
+.sp-swatches { display:flex; gap:7px; flex-wrap:wrap; align-items:center; }
+.sp-sw { width:22px; height:22px; border-radius:50%; cursor:pointer; border:2.5px solid transparent; transition:all 0.2s; flex-shrink:0; }
+.sp-sw.on { border-color:rgba(30,41,59,0.5); transform:scale(1.2); }
+.sp-sw:hover:not(.on) { transform:scale(1.1); }
+.sp-custom { width:22px; height:22px; border-radius:50%; cursor:pointer; border:2px solid rgba(200,210,220,0.6); padding:0; overflow:hidden; flex-shrink:0; background:none; }
+.sp-row3 { display:flex; gap:5px; }
+.sp-chip { flex:1; padding:6px 4px; font-size:11px; font-weight:600; background:rgba(255,255,255,0.6); border:1px solid rgba(255,255,255,0.8); border-radius:9px; cursor:pointer; color:rgba(30,41,59,0.5); transition:all 0.2s; text-align:center; }
+.sp-chip.on { background:var(--accent); color:#fff; border-color:var(--accent); }
+.sp-chip:hover:not(.on) { background:rgba(255,255,255,0.9); }
+.sp-divider { height:1px; background:rgba(0,0,0,0.07); margin:12px 0; }
 </style>
 </head>
 <body>
@@ -316,6 +347,50 @@ body {
 <div class="save-bar">
   <button class="save-btn" id="saveCurrent" onclick="saveCurrentSlide()">📷 현재</button>
   <button class="save-btn" id="saveAll" onclick="saveAllSlides()">💾 전체</button>
+  <button class="save-btn" onclick="toggleSettings()">✏ 스타일</button>
+</div>
+
+<div class="settings-panel" id="settingsPanel">
+  <div class="sp-head">스타일 설정</div>
+  <div class="sp-sec">
+    <div class="sp-lbl">주요 색상</div>
+    <div class="sp-swatches">
+      <div class="sp-sw on" style="background:linear-gradient(135deg,#38bdf8,#0284c7)" onclick="setAccentPreset(0,this)" title="하늘"></div>
+      <div class="sp-sw" style="background:linear-gradient(135deg,#f472b6,#db2777)" onclick="setAccentPreset(1,this)" title="핑크"></div>
+      <div class="sp-sw" style="background:linear-gradient(135deg,#fb923c,#ea580c)" onclick="setAccentPreset(2,this)" title="오렌지"></div>
+      <div class="sp-sw" style="background:linear-gradient(135deg,#34d399,#059669)" onclick="setAccentPreset(3,this)" title="민트"></div>
+      <div class="sp-sw" style="background:linear-gradient(135deg,#a78bfa,#7c3aed)" onclick="setAccentPreset(4,this)" title="보라"></div>
+      <div class="sp-sw" style="background:linear-gradient(135deg,#fbbf24,#ca8a04)" onclick="setAccentPreset(5,this)" title="골드"></div>
+      <input type="color" class="sp-custom" id="customColorPicker" value="#38bdf8" oninput="setCustomColor(this.value)" title="직접 선택">
+    </div>
+  </div>
+  <div class="sp-divider"></div>
+  <div class="sp-sec">
+    <div class="sp-lbl">글자 크기</div>
+    <div class="sp-row3">
+      <button class="sp-chip" data-fs="sm" onclick="setFontSize('sm')">작게</button>
+      <button class="sp-chip on" data-fs="md" onclick="setFontSize('md')">보통</button>
+      <button class="sp-chip" data-fs="lg" onclick="setFontSize('lg')">크게</button>
+    </div>
+  </div>
+  <div class="sp-divider"></div>
+  <div class="sp-sec">
+    <div class="sp-lbl">제목 색상</div>
+    <div class="sp-row3">
+      <button class="sp-chip on" data-tc="dark" onclick="setTitleColor('dark')">진하게</button>
+      <button class="sp-chip" data-tc="mid" onclick="setTitleColor('mid')">중간</button>
+      <button class="sp-chip" data-tc="light" onclick="setTitleColor('light')">연하게</button>
+    </div>
+  </div>
+  <div class="sp-divider"></div>
+  <div class="sp-sec">
+    <div class="sp-lbl">본문 색상</div>
+    <div class="sp-row3">
+      <button class="sp-chip on" data-bc="dark" onclick="setBodyColor('dark')">진하게</button>
+      <button class="sp-chip" data-bc="mid" onclick="setBodyColor('mid')">중간</button>
+      <button class="sp-chip" data-bc="light" onclick="setBodyColor('light')">연하게</button>
+    </div>
+  </div>
 </div>
 
   <div class="deck" id="deck">
@@ -540,6 +615,68 @@ function setTheme(name) {
   try { localStorage.setItem('cardNewsTheme', name); } catch(e) {}
 }
 setTheme(currentTheme);
+
+// Style settings panel
+function toggleSettings() {
+  document.getElementById('settingsPanel').classList.toggle('open');
+}
+const accentList = [
+  ['#38bdf8','#0284c7'],['#f472b6','#db2777'],['#fb923c','#ea580c'],
+  ['#34d399','#059669'],['#a78bfa','#7c3aed'],['#fbbf24','#ca8a04']
+];
+function applyAccent(a, d) {
+  document.documentElement.style.setProperty('--accent', a);
+  document.documentElement.style.setProperty('--deep', d);
+}
+function setAccentPreset(i, el) {
+  applyAccent(...accentList[i]);
+  document.querySelectorAll('.sp-sw').forEach(s => s.classList.remove('on'));
+  el.classList.add('on');
+  try { localStorage.setItem('cn_acc', JSON.stringify({i, a:accentList[i][0], d:accentList[i][1]})); } catch(e){}
+}
+function setCustomColor(hex) {
+  const r2=parseInt(hex.slice(1,3),16), g2=parseInt(hex.slice(3,5),16), b2=parseInt(hex.slice(5,7),16);
+  const deep='rgb('+Math.floor(r2*.72)+','+Math.floor(g2*.72)+','+Math.floor(b2*.72)+')';
+  applyAccent(hex, deep);
+  document.querySelectorAll('.sp-sw').forEach(s => s.classList.remove('on'));
+  try { localStorage.setItem('cn_acc', JSON.stringify({a:hex, d:deep})); } catch(e){}
+}
+const fsSizes = {
+  sm:['clamp(22px,6vw,40px)','clamp(18px,5vw,32px)','clamp(11px,2.2vw,13px)'],
+  md:['clamp(28px,7.5vw,52px)','clamp(22px,6vw,42px)','clamp(12px,2.8vw,15px)'],
+  lg:['clamp(34px,9vw,64px)','clamp(26px,7vw,50px)','clamp(13px,3.2vw,17px)']
+};
+function setFontSize(sz) {
+  const [xl,lg,bd] = fsSizes[sz];
+  const r = document.documentElement;
+  r.style.setProperty('--fs-xl', xl);
+  r.style.setProperty('--fs-lg', lg);
+  r.style.setProperty('--fs-body', bd);
+  document.querySelectorAll('.sp-chip[data-fs]').forEach(c => c.classList.toggle('on', c.dataset.fs===sz));
+  try { localStorage.setItem('cn_fs', sz); } catch(e){}
+}
+const titleCols = { dark:'#0f172a', mid:'#334155', light:'#64748b' };
+function setTitleColor(k) {
+  document.documentElement.style.setProperty('--title-col', titleCols[k]);
+  document.querySelectorAll('.sp-chip[data-tc]').forEach(c => c.classList.toggle('on', c.dataset.tc===k));
+  try { localStorage.setItem('cn_tc', k); } catch(e){}
+}
+const bodyCols = { dark:'rgba(30,41,59,0.85)', mid:'rgba(30,41,59,0.65)', light:'rgba(30,41,59,0.45)' };
+function setBodyColor(k) {
+  document.documentElement.style.setProperty('--dim', bodyCols[k]);
+  document.querySelectorAll('.sp-chip[data-bc]').forEach(c => c.classList.toggle('on', c.dataset.bc===k));
+  try { localStorage.setItem('cn_bc', k); } catch(e){}
+}
+(function loadStyleSettings() {
+  try {
+    const acc = JSON.parse(localStorage.getItem('cn_acc') || 'null');
+    if(acc) { applyAccent(acc.a, acc.d); if(acc.i!=null) document.querySelectorAll('.sp-sw')[acc.i]?.classList.add('on'); }
+    else document.querySelectorAll('.sp-sw')[0]?.classList.add('on');
+    setFontSize(localStorage.getItem('cn_fs') || 'md');
+    setTitleColor(localStorage.getItem('cn_tc') || 'dark');
+    setBodyColor(localStorage.getItem('cn_bc') || 'dark');
+  } catch(e) { document.querySelectorAll('.sp-sw')[0]?.classList.add('on'); setFontSize('md'); setTitleColor('dark'); setBodyColor('dark'); }
+})();
 
 // Image save
 async function saveCurrentSlide() {
