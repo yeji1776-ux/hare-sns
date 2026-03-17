@@ -599,6 +599,25 @@ function copyText() {
 }
 update();
 
+// ── iframe 임베딩 감지: save-bar 숨김 + deck 크기 재계산 ──
+(function fixEmbeddedView() {
+  const isEmbedded = window.self !== window.top;
+  if (!isEmbedded) return;
+  // save-bar 숨김 (다운로드 후 standalone에서만 사용)
+  const bar = document.querySelector('.save-bar');
+  if (bar) bar.style.display = 'none';
+  // deck 크기를 clientWidth/clientHeight 기준으로 재계산 (vw/vh가 device-width 기준일 경우 보정)
+  function resizeDeck() {
+    const vw = document.documentElement.clientWidth;
+    const vh = document.documentElement.clientHeight;
+    const size = Math.min(vw * 0.96, vh * 0.96);
+    const deck = document.getElementById('deck');
+    if (deck) { deck.style.width = size + 'px'; deck.style.height = size + 'px'; }
+  }
+  resizeDeck();
+  window.addEventListener('resize', resizeDeck);
+})();
+
 // Theme switcher
 let currentTheme = localStorage.getItem('cardNewsTheme') || 'sky';
 function setTheme(name) {
