@@ -1,0 +1,244 @@
+'use client'
+
+import { useState } from 'react'
+
+interface CarouselSlide { slideNumber: number; headline: string; bodyText: string }
+interface InstagramOutput { hook: string; caption: string; hashtags: string[]; carouselSlides: CarouselSlide[] }
+interface Scene { sceneNumber: number; sceneDescription: string; narration: string; estimatedDuration: string }
+interface ClipVideoScript { scenes: Scene[]; totalEstimatedDuration: string }
+interface ClipTextPost { mainText: string; hashtags: string[] }
+interface ConversionResult { instagram: InstagramOutput; clipVideoScript: ClipVideoScript; clipTextPost: ClipTextPost; cardNewsHtml: string }
+
+type ResultTab = 'cardnews' | 'instagram' | 'clip'
+
+export default function Home() {
+  const [url, setUrl] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+  const [result, setResult] = useState<ConversionResult | null>(null)
+  const [tab, setTab] = useState<ResultTab>('cardnews')
+  const [copied, setCopied] = useState('')
+
+  async function handleConvert() {
+    if (!url.trim()) return
+    setLoading(true)
+    setError('')
+    setResult(null)
+    try {
+      const res = await fetch('/api/convert', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: url.trim() }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error ?? '변환 실패')
+      setResult(data)
+      setTab('cardnews')
+    } catch (e) {
+      setError(e instanceof Error ? e.message : '오류가 발생했습니다.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  function copy(text: string, key: string) {
+    navigator.clipboard.writeText(text).then(() => {
+      setCopied(key)
+      setTimeout(() => setCopied(''), 2000)
+    })
+  }
+
+  const tabBtn = (id: ResultTab, label: string) => (
+    <button
+      key={id}
+      onClick={() => setTab(id)}
+      style={{
+        padding: '10px 20px', border: 'none', background: 'transparent',
+        borderBottom: tab === id ? '2px solid #0284c7' : '2px solid transparent',
+        color: tab === id ? '#0284c7' : '#64748b', fontWeight: tab === id ? 700 : 500,
+        fontSize: '14px', cursor: 'pointer', marginBottom: '-2px',
+      }}
+    >{label}</button>
+  )
+
+  const glass = { background: 'rgba(255,255,255,0.55)', backdropFilter: 'blur(16px)', border: '1px solid rgba(255,255,255,0.7)', borderRadius: '16px', boxShadow: '0 4px 24px rgba(0,0,0,0.06)' }
+
+  return (
+    <div style={{ maxWidth: '800px', margin: '0 auto', padding: '24px 16px' }}>
+      {/* Header */}
+      <div style={{ textAlign: 'center', marginBottom: '32px' }}>
+        <h1 style={{ fontSize: '28px', fontWeight: 900, color: '#0f172a', margin: '0 0 8px' }}>hare_table</h1>
+        <p style={{ color: '#64748b', fontSize: '14px', margin: 0 }}>네이버 블로그 URL → 인스타그램 & 네이버 클립 자동 변환</p>
+      </div>
+
+      {/* Input */}
+      <div style={{ ...glass, padding: '20px', marginBottom: '24px' }}>
+        <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+          <input
+            value={url}
+            onChange={e => setUrl(e.target.value)}
+            onKeyDown={e => e.key === 'Enter' && handleConvert()}
+            placeholder="https://blog.naver.com/..."
+            style={{
+              flex: 1, minWidth: '200px', padding: '12px 16px', borderRadius: '10px',
+              border: '1px solid rgba(255,255,255,0.8)', background: 'rgba(255,255,255,0.7)',
+              fontSize: '14px', outline: 'none', color: '#1e293b',
+            }}
+          />
+          <button
+            onClick={handleConvert}
+            disabled={loading || !url.trim()}
+            style={{
+              padding: '12px 24px', borderRadius: '10px', border: 'none',
+              background: loading || !url.trim() ? '#94a3b8' : 'linear-gradient(145deg, #38bdf8, #0284c7)',
+              color: '#fff', fontWeight: 700, fontSize: '14px',
+              cursor: loading || !url.trim() ? 'not-allowed' : 'pointer',
+              whiteSpace: 'nowrap', boxShadow: '0 4px 12px rgba(2,132,199,0.3)',
+            }}
+          >
+            {loading ? '변환 중...' : '✨ 변환하기'}
+          </button>
+        </div>
+        {error && <p style={{ color: '#ef4444', fontSize: '13px', marginTop: '12px', marginBottom: 0 }}>⚠️ {error}</p>}
+      </div>
+
+      {/* Loading */}
+      {loading && (
+        <div style={{ ...glass, padding: '48px', textAlign: 'center' }}>
+          <div style={{ fontSize: '32px', marginBottom: '12px' }}>⏳</div>
+          <p style={{ color: '#64748b', fontWeight: 500 }}>AI가 콘텐츠를 생성하고 있어요...</p>
+          <p style={{ color: '#94a3b8', fontSize: '13px' }}>보통 20-40초 정도 걸려요</p>
+        </div>
+      )}
+
+      {/* Results */}
+      {result && !loading && (
+        <div style={glass}>
+          {/* Tabs */}
+          <div style={{ display: 'flex', borderBottom: '1px solid rgba(255,255,255,0.6)', padding: '0 20px' }}>
+            {tabBtn('cardnews', '🖼 카드뉴스')}
+            {tabBtn('instagram', '📸 인스타그램')}
+            {tabBtn('clip', '🎬 네이버 클립')}
+          </div>
+
+          <div style={{ padding: '24px' }}>
+            {/* 카드뉴스 */}
+            {tab === 'cardnews' && (
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '12px' }}>
+                  <button
+                    onClick={() => {
+                      const blob = new Blob([result.cardNewsHtml], { type: 'text/html' })
+                      const a = document.createElement('a')
+                      a.href = URL.createObjectURL(blob)
+                      a.download = 'cardnews.html'
+                      a.click()
+                    }}
+                    style={{ padding: '8px 16px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.7)', background: 'rgba(255,255,255,0.5)', fontSize: '13px', fontWeight: 600, cursor: 'pointer', color: '#334155' }}
+                  >⬇️ HTML 다운로드</button>
+                </div>
+                <iframe
+                  srcDoc={result.cardNewsHtml}
+                  style={{ width: '100%', height: '500px', border: 'none', borderRadius: '12px', background: '#fff' }}
+                  title="카드뉴스 미리보기"
+                />
+              </div>
+            )}
+
+            {/* 인스타그램 */}
+            {tab === 'instagram' && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                {/* Hook */}
+                <div style={{ background: 'rgba(255,255,255,0.4)', borderRadius: '12px', padding: '16px', border: '1px solid rgba(255,255,255,0.6)' }}>
+                  <div style={{ fontSize: '12px', fontWeight: 700, color: '#0284c7', marginBottom: '8px', letterSpacing: '0.1em' }}>HOOK</div>
+                  <p style={{ fontSize: '16px', fontWeight: 700, color: '#0f172a', margin: 0 }}>{result.instagram.hook}</p>
+                </div>
+
+                {/* Caption */}
+                <div style={{ background: 'rgba(255,255,255,0.4)', borderRadius: '12px', padding: '16px', border: '1px solid rgba(255,255,255,0.6)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                    <div style={{ fontSize: '12px', fontWeight: 700, color: '#0284c7', letterSpacing: '0.1em' }}>CAPTION</div>
+                    <button onClick={() => copy(result.instagram.caption, 'caption')} style={{ padding: '5px 12px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.7)', background: 'rgba(255,255,255,0.5)', fontSize: '12px', fontWeight: 600, cursor: 'pointer', color: copied === 'caption' ? '#059669' : '#334155' }}>
+                      {copied === 'caption' ? '✓ 복사됨' : '복사'}
+                    </button>
+                  </div>
+                  <p style={{ fontSize: '14px', color: '#334155', lineHeight: 1.8, whiteSpace: 'pre-wrap', margin: 0 }}>{result.instagram.caption}</p>
+                </div>
+
+                {/* Hashtags */}
+                <div style={{ background: 'rgba(255,255,255,0.4)', borderRadius: '12px', padding: '16px', border: '1px solid rgba(255,255,255,0.6)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                    <div style={{ fontSize: '12px', fontWeight: 700, color: '#0284c7', letterSpacing: '0.1em' }}>HASHTAGS</div>
+                    <button onClick={() => copy(result.instagram.hashtags.join(' '), 'hashtags')} style={{ padding: '5px 12px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.7)', background: 'rgba(255,255,255,0.5)', fontSize: '12px', fontWeight: 600, cursor: 'pointer', color: copied === 'hashtags' ? '#059669' : '#334155' }}>
+                      {copied === 'hashtags' ? '✓ 복사됨' : '복사'}
+                    </button>
+                  </div>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                    {result.instagram.hashtags.map((tag, i) => (
+                      <span key={i} style={{ background: 'rgba(2,132,199,0.1)', color: '#0284c7', padding: '4px 10px', borderRadius: '100px', fontSize: '12px', fontWeight: 600 }}>{tag}</span>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Carousel */}
+                <div style={{ background: 'rgba(255,255,255,0.4)', borderRadius: '12px', padding: '16px', border: '1px solid rgba(255,255,255,0.6)' }}>
+                  <div style={{ fontSize: '12px', fontWeight: 700, color: '#0284c7', marginBottom: '12px', letterSpacing: '0.1em' }}>CAROUSEL SLIDES</div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                    {result.instagram.carouselSlides.map((slide) => (
+                      <div key={slide.slideNumber} style={{ background: 'rgba(255,255,255,0.5)', borderRadius: '10px', padding: '12px', border: '1px solid rgba(255,255,255,0.7)' }}>
+                        <div style={{ fontSize: '11px', fontWeight: 700, color: '#94a3b8', marginBottom: '4px' }}>SLIDE {slide.slideNumber}</div>
+                        <div style={{ fontSize: '14px', fontWeight: 700, color: '#0f172a', marginBottom: '4px' }}>{slide.headline}</div>
+                        <div style={{ fontSize: '13px', color: '#475569' }}>{slide.bodyText}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* 네이버 클립 */}
+            {tab === 'clip' && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                {/* Video Script */}
+                <div style={{ background: 'rgba(255,255,255,0.4)', borderRadius: '12px', padding: '16px', border: '1px solid rgba(255,255,255,0.6)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                    <div style={{ fontSize: '12px', fontWeight: 700, color: '#0284c7', letterSpacing: '0.1em' }}>영상 스크립트</div>
+                    <span style={{ fontSize: '12px', color: '#64748b', fontWeight: 500 }}>총 {result.clipVideoScript.totalEstimatedDuration}</span>
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                    {result.clipVideoScript.scenes.map((scene) => (
+                      <div key={scene.sceneNumber} style={{ background: 'rgba(255,255,255,0.5)', borderRadius: '10px', padding: '12px', border: '1px solid rgba(255,255,255,0.7)' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
+                          <span style={{ fontSize: '11px', fontWeight: 700, color: '#94a3b8' }}>SCENE {scene.sceneNumber}</span>
+                          <span style={{ fontSize: '11px', color: '#64748b' }}>{scene.estimatedDuration}</span>
+                        </div>
+                        <div style={{ fontSize: '12px', color: '#64748b', marginBottom: '6px' }}>🎥 {scene.sceneDescription}</div>
+                        <div style={{ fontSize: '13px', color: '#1e293b', fontWeight: 500 }}>💬 {scene.narration}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Text Post */}
+                <div style={{ background: 'rgba(255,255,255,0.4)', borderRadius: '12px', padding: '16px', border: '1px solid rgba(255,255,255,0.6)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                    <div style={{ fontSize: '12px', fontWeight: 700, color: '#0284c7', letterSpacing: '0.1em' }}>텍스트 게시글</div>
+                    <button onClick={() => copy(result.clipTextPost.mainText + '\n\n' + result.clipTextPost.hashtags.join(' '), 'cliptext')} style={{ padding: '5px 12px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.7)', background: 'rgba(255,255,255,0.5)', fontSize: '12px', fontWeight: 600, cursor: 'pointer', color: copied === 'cliptext' ? '#059669' : '#334155' }}>
+                      {copied === 'cliptext' ? '✓ 복사됨' : '복사'}
+                    </button>
+                  </div>
+                  <p style={{ fontSize: '14px', color: '#334155', lineHeight: 1.8, whiteSpace: 'pre-wrap', margin: '0 0 12px' }}>{result.clipTextPost.mainText}</p>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                    {result.clipTextPost.hashtags.map((tag, i) => (
+                      <span key={i} style={{ background: 'rgba(2,132,199,0.1)', color: '#0284c7', padding: '4px 10px', borderRadius: '100px', fontSize: '12px', fontWeight: 600 }}>{tag}</span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}

@@ -1,0 +1,16 @@
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'hare_table SNS 변환',
+  description: '네이버 블로그 → 인스타그램 & 네이버 클립 자동 변환',
+}
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="ko">
+      <body style={{ margin: 0, fontFamily: 'system-ui, -apple-system, sans-serif', background: 'linear-gradient(135deg, #f0f9ff 0%, #e2e8f0 40%, #cbd5e1 100%)', minHeight: '100vh' }}>
+        {children}
+      </body>
+    </html>
+  )
+}
