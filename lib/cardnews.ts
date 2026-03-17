@@ -249,17 +249,6 @@ body {
 .modal-copy:hover { opacity:.85; }
 .modal-close { margin-top:8px; width:100%; padding:9px; background:transparent; color:var(--dim); border:none; font-size:12px; font-weight:600; cursor:pointer; }
 .hare-table { position: absolute; bottom: 32px; right: 36px; font-size: 13px; font-weight: 500; font-family: sans-serif; opacity: 0.6; letter-spacing: 0.05em; color: var(--text); z-index: 5; }
-.closing-heart {
-  position: absolute; bottom: 40px; right: 36px;
-  width: 72px; height: 72px; z-index: 5;
-  filter: drop-shadow(0 4px 12px rgba(16, 185, 129, 0.4));
-  animation: float 3s ease-in-out infinite;
-}
-@keyframes float {
-  0% { transform: translateY(0); }
-  50% { transform: translateY(-8px); }
-  100% { transform: translateY(0); }
-}
 
 /* Themes via hue-rotate */
 [data-theme="food"] .deck { filter: hue-rotate(25deg) saturate(1.1); }
@@ -488,48 +477,6 @@ body {
         <p class="t-body">${data.closingWord}</p>
         <div class="loc" style="margin-top:clamp(14px,3.5%,22px);">${data.closingHashtags}</div>
       </div>
-      <svg class="closing-heart" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
-        <defs>
-          <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%">
-            <feGaussianBlur in="SourceAlpha" stdDeviation="6" result="blur" />
-            <feOffset dx="0" dy="12" result="offsetBlur" />
-            <feComponentTransfer><feFuncA type="linear" slope="0.15" /></feComponentTransfer>
-            <feMerge><feMergeNode /><feMergeNode in="SourceGraphic" /></feMerge>
-          </filter>
-          <linearGradient id="glass" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stop-color="#e0f2fe" />
-            <stop offset="30%" stop-color="#bae6fd" />
-            <stop offset="70%" stop-color="#7dd3fc" />
-            <stop offset="100%" stop-color="#38bdf8" />
-          </linearGradient>
-          <linearGradient id="rim" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stop-color="#ffffff" />
-            <stop offset="100%" stop-color="rgba(255,255,255,0.3)" />
-          </linearGradient>
-          <radialGradient id="highlight" cx="35%" cy="25%" r="45%">
-            <stop offset="0%" stop-color="rgba(255, 255, 255, 0.95)" />
-            <stop offset="30%" stop-color="rgba(255, 255, 255, 0.6)" />
-            <stop offset="100%" stop-color="rgba(255, 255, 255, 0)" />
-          </radialGradient>
-          <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stop-color="#fef08a" />
-            <stop offset="50%" stop-color="#eab308" />
-            <stop offset="100%" stop-color="#ca8a04" />
-          </linearGradient>
-          <filter id="goldGlow" x="-20%" y="-20%" width="140%" height="140%">
-            <feGaussianBlur stdDeviation="1.5" result="blur" />
-            <feComposite in="SourceGraphic" in2="blur" operator="over" />
-          </filter>
-        </defs>
-        <g filter="url(#shadow)">
-          <path d="M60 100 C-20 60, 20-10, 60 30 C100-10, 140 60, 60 100" fill="url(#glass)" stroke="url(#rim)" stroke-width="2"/>
-          <path d="M60 100 C-20 60, 20-10, 60 30 C100-10, 140 60, 60 100" fill="url(#highlight)" opacity="0.9"/>
-          <path d="M25 35 Q30 20 50 22" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" opacity="0.9"/>
-          <path d="M95 38 Q90 23 70 25" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" opacity="0.7"/>
-        </g>
-        <text x="60" y="52" font-size="16" fill="url(#gold)" font-weight="900" font-family="'Brush Script MT', 'Dancing Script', 'Pacifico', cursive, Georgia" font-style="italic" text-anchor="middle" filter="url(#goldGlow)">hare_</text>
-        <text x="60" y="68" font-size="16" fill="url(#gold)" font-weight="900" font-family="'Brush Script MT', 'Dancing Script', 'Pacifico', cursive, Georgia" font-style="italic" text-anchor="middle" filter="url(#goldGlow)">table</text>
-      </svg>
     </div>
 
   </div>
