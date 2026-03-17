@@ -132,7 +132,10 @@ export default function Home() {
     <div style={{ maxWidth: '800px', margin: '0 auto', padding: '24px 16px' }}>
       {/* Header */}
       <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-        <h1 style={{ fontSize: '28px', fontWeight: 900, color: '#0f172a', margin: '0 0 8px' }}>hare_table</h1>
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
+          <img src="/favicon.png" alt="hare" style={{ width: '48px', height: '48px', objectFit: 'contain' }} />
+          <h1 style={{ fontSize: '28px', fontWeight: 900, color: '#0f172a', margin: 0 }}>hare_table</h1>
+        </div>
         <p style={{ color: '#64748b', fontSize: '14px', margin: 0 }}>네이버 블로그 URL → 인스타그램 & 네이버 클립 자동 변환</p>
       </div>
 
