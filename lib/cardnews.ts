@@ -292,6 +292,37 @@ body {
 .save-btn:hover { background: rgba(255,255,255,0.8); }
 .save-btn.saving { opacity: 0.6; cursor: wait; }
 
+/* Edit Mode */
+.edit-mode [contenteditable="true"] {
+  outline: 1.5px dashed rgba(56,189,248,0.55);
+  border-radius: 4px;
+  cursor: text;
+  min-width: 20px;
+  display: inline-block;
+}
+.edit-mode [contenteditable="true"]:hover {
+  outline-color: rgba(56,189,248,0.85);
+  background: rgba(255,255,255,0.12);
+}
+.edit-mode [contenteditable="true"]:focus {
+  outline: 2px solid var(--accent);
+  background: rgba(255,255,255,0.18);
+  border-radius: 4px;
+}
+.edit-mode [contenteditable="true"]:empty::before {
+  content: '입력...'; opacity: 0.35; font-style: italic;
+}
+.edit-badge {
+  position: fixed; top: clamp(10px,2.5vh,18px); left: 50%;
+  transform: translateX(-50%);
+  background: var(--accent); color: #fff;
+  font-size: 11px; font-weight: 700; letter-spacing: .08em;
+  padding: 5px 14px; border-radius: 100px; z-index: 30;
+  display: none; pointer-events: none;
+}
+.edit-mode .edit-badge { display: block; }
+.edit-mode .theme-bar { display: none; }
+
 /* Settings Panel */
 .settings-panel {
   position:fixed; left:-268px; top:50%; transform:translateY(-50%);
@@ -336,8 +367,10 @@ body {
 <div class="save-bar">
   <button class="save-btn" id="saveCurrent" onclick="saveCurrentSlide()">📷 현재</button>
   <button class="save-btn" id="saveAll" onclick="saveAllSlides()">💾 전체</button>
-  <button class="save-btn" onclick="toggleSettings()">✏ 스타일</button>
+  <button class="save-btn" id="editModeBtn" onclick="toggleEditMode()">📝 내용편집</button>
+  <button class="save-btn" onclick="toggleSettings()">🎨 스타일</button>
 </div>
+<div class="edit-badge" id="editBadge">✏ 편집 중 — 텍스트를 클릭해 수정하세요</div>
 
 <div class="settings-panel" id="settingsPanel">
   <div class="sp-head">스타일 설정</div>
@@ -533,11 +566,13 @@ document.addEventListener('keydown', e => {
   if(['ArrowLeft'].includes(e.key)) { e.preventDefault(); go(-1); }
 });
 let tx = 0;
-document.addEventListener('touchstart', e => tx = e.changedTouches[0].screenX);
-document.addEventListener('touchend', e => {
+function txHandler(e) { tx = e.changedTouches[0].screenX; }
+function teHandler(e) {
   const dx = e.changedTouches[0].screenX - tx;
   if(Math.abs(dx) > 40) go(dx < 0 ? 1 : -1);
-});
+}
+document.addEventListener('touchstart', txHandler);
+document.addEventListener('touchend', teHandler);
 function openModal() { document.getElementById('modal').classList.add('open'); }
 function closeModal() { document.getElementById('modal').classList.remove('open'); }
 function copyText() {
@@ -562,6 +597,32 @@ function setTheme(name) {
   try { localStorage.setItem('cardNewsTheme', name); } catch(e) {}
 }
 setTheme(currentTheme);
+
+// Content edit mode
+const editSelectors = ['.t-xl','.t-lg','.t-body','.tag','.card-icon','.card-title','.card-body','.list-txt','.free-pill','.loc','.big-num','.big-unit','.hare-table'];
+let isEditing = false;
+function toggleEditMode() {
+  isEditing = !isEditing;
+  document.body.classList.toggle('edit-mode', isEditing);
+  const btn = document.getElementById('editModeBtn');
+  editSelectors.forEach(sel => {
+    document.querySelectorAll(sel).forEach(el => {
+      el.contentEditable = isEditing ? 'true' : 'false';
+      if(isEditing) el.spellcheck = false;
+    });
+  });
+  if(isEditing) {
+    btn.textContent = '✓ 편집완료';
+    btn.style.cssText = 'background:var(--accent);color:#fff;border-color:var(--accent);';
+    document.removeEventListener('touchstart', txHandler);
+    document.removeEventListener('touchend', teHandler);
+  } else {
+    btn.textContent = '📝 내용편집';
+    btn.style.cssText = '';
+    document.addEventListener('touchstart', txHandler);
+    document.addEventListener('touchend', teHandler);
+  }
+}
 
 // Style settings panel
 function toggleSettings() {
