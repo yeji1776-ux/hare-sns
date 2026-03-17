@@ -289,7 +289,7 @@ export default function Home() {
                   </div>
                 </div>
                 <iframe
-                  srcDoc={result.cardNewsHtml}
+                  srcDoc={result.cardNewsHtml.replace('</head>', '<style>.save-bar{display:none!important}</style></head>')}
                   style={{ width: '100%', height: '500px', border: 'none', borderRadius: '12px', background: '#fff' }}
                   title="카드뉴스 미리보기"
                 />
