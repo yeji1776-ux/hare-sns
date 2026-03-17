@@ -169,7 +169,7 @@ body {
 }
 .s-deep .tag, .s-accent .tag, .s-mid .tag { background:rgba(255,255,255,0.12); border-color:rgba(255,255,255,0.25); color:rgba(255,255,255,0.9); }
 
-.t-xl { font-size:clamp(34px,10vw,68px); font-weight:900; line-height:1.08; letter-spacing:-0.02em; }
+.t-xl { font-size:clamp(28px,7.5vw,52px); font-weight:900; line-height:1.1; letter-spacing:-0.02em; word-break:keep-all; }
 .t-lg { font-size:clamp(22px,6vw,42px); font-weight:700; line-height:1.2; word-break:keep-all; }
 .t-body { font-size:clamp(12px,2.8vw,15px); font-weight:400; line-height:1.85; color:var(--dim); margin-top:12px; }
 .s-deep .t-body, .s-accent .t-body, .s-mid .t-body { color:rgba(255,255,255,0.78); }
