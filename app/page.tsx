@@ -1,6 +1,9 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
+
+const IFRAME_W = 480
+const IFRAME_H = 500
 
 interface CarouselSlide { slideNumber: number; headline: string; bodyText: string }
 interface InstagramOutput { hook: string; caption: string; hashtags: string[]; carouselSlides: CarouselSlide[] }
@@ -37,6 +40,18 @@ export default function Home() {
   const [copied, setCopied] = useState('')
   const [history, setHistory] = useState<HistoryItem[]>([])
   const [historyOpen, setHistoryOpen] = useState(false)
+  const iframeContainerRef = useRef<HTMLDivElement>(null)
+  const [iframeScale, setIframeScale] = useState(1)
+
+  useEffect(() => {
+    const el = iframeContainerRef.current
+    if (!el) return
+    const update = () => setIframeScale(el.getBoundingClientRect().width / IFRAME_W)
+    update()
+    const obs = new ResizeObserver(update)
+    obs.observe(el)
+    return () => obs.disconnect()
+  }, [])
 
   useEffect(() => {
     try {
@@ -288,11 +303,15 @@ export default function Home() {
                     ))}
                   </div>
                 </div>
-                <iframe
-                  srcDoc={result.cardNewsHtml.replace('</head>', '<style>.save-bar{display:none!important}</style></head>')}
-                  style={{ width: '100%', height: '500px', border: 'none', borderRadius: '12px', background: '#fff' }}
-                  title="카드뉴스 미리보기"
-                />
+                <div ref={iframeContainerRef} style={{ overflow: 'hidden', borderRadius: '12px', height: `${Math.round(IFRAME_H * iframeScale)}px` }}>
+                  <iframe
+                    srcDoc={result.cardNewsHtml
+                      .replace('width=device-width', 'width=480')
+                      .replace('</head>', '<style>.save-bar{display:none!important}</style></head>')}
+                    style={{ width: `${IFRAME_W}px`, height: `${IFRAME_H}px`, border: 'none', display: 'block', transformOrigin: '0 0', transform: `scale(${iframeScale})` }}
+                    title="카드뉴스 미리보기"
+                  />
+                </div>
               </div>
             )}
 
