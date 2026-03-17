@@ -48,7 +48,10 @@ export default function Home() {
   }, [])
 
   async function handleConvert() {
-    if (!url.trim()) return
+    const trimmed = url.trim()
+    if (!trimmed) return
+    if (!trimmed.includes('naver.com')) { setError('네이버 블로그 URL만 지원합니다.'); return }
+    if (!/\/\d{5,}/.test(trimmed)) { setError('개별 포스트 URL을 입력해주세요.\n예: blog.naver.com/아이디/포스트번호'); return }
     setLoading(true)
     setError('')
     setResult(null)
@@ -203,7 +206,7 @@ export default function Home() {
             value={url}
             onChange={e => setUrl(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && handleConvert()}
-            placeholder="https://blog.naver.com/..."
+            placeholder="https://blog.naver.com/아이디/포스트번호"
             style={{
               flex: 1, minWidth: '200px', padding: '12px 16px', borderRadius: '10px',
               border: '1px solid rgba(255,255,255,0.8)', background: 'rgba(255,255,255,0.7)',
