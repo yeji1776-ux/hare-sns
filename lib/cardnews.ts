@@ -172,8 +172,10 @@ body {
 .t-xl { font-size:clamp(28px,7.5vw,52px); font-weight:900; line-height:1.1; letter-spacing:-0.02em; word-break:keep-all; }
 .t-lg { font-size:clamp(22px,6vw,42px); font-weight:700; line-height:1.2; word-break:keep-all; }
 .t-body { font-size:clamp(12px,2.8vw,15px); font-weight:400; line-height:1.85; color:var(--dim); margin-top:12px; }
-.s-deep .t-body, .s-accent .t-body, .s-mid .t-body { color:rgba(255,255,255,0.78); }
-.s-deep .t-xl, .s-deep .t-lg, .s-accent .t-xl, .s-accent .t-lg, .s-mid .t-xl, .s-mid .t-lg { color:#fff; }
+.s-deep .t-body { color:rgba(255,255,255,0.85); }
+.s-accent .t-body, .s-mid .t-body { color:rgba(15,23,42,0.75); }
+.s-deep .t-xl, .s-deep .t-lg { color:#fff; }
+.s-accent .t-xl, .s-accent .t-lg, .s-mid .t-xl, .s-mid .t-lg { color:#0f172a; }
 
 .rule { width:100%; height:1px; background:linear-gradient(90deg,rgba(255,255,255,0.7),rgba(255,255,255,0)); margin:clamp(16px,4%,28px) 0; }
 .s-deep .rule, .s-accent .rule, .s-mid .rule { background:linear-gradient(90deg,rgba(255,255,255,0.2),rgba(255,255,255,0)); }
@@ -193,9 +195,12 @@ body {
 .s-deep .card, .s-accent .card, .s-mid .card { background:rgba(255,255,255,0.12); border-color:rgba(255,255,255,0.2); }
 .card-icon { font-size:clamp(18px,4.5vw,26px); margin-bottom:clamp(5px,1.5%,9px); }
 .card-title { font-size:clamp(11px,2.5vw,13px); font-weight:700; color:var(--text); margin-bottom:4px; }
-.card-body { font-size:clamp(10px,2vw,12px); color:var(--dim); line-height:1.55; }
-.s-deep .card-title, .s-accent .card-title, .s-mid .card-title { color:rgba(255,255,255,0.92); }
-.s-deep .card-body, .s-accent .card-body, .s-mid .card-body { color:rgba(255,255,255,0.72); }
+.card-body { font-size:clamp(10px,2vw,12px); color:rgba(30,41,59,0.8); line-height:1.55; }
+.s-deep .card-title { color:rgba(255,255,255,0.95); }
+.s-deep .card-body { color:rgba(255,255,255,0.8); }
+.s-accent .card, .s-mid .card { background:rgba(255,255,255,0.55); border-color:rgba(255,255,255,0.75); }
+.s-accent .card-title, .s-mid .card-title { color:#0f172a; }
+.s-accent .card-body, .s-mid .card-body { color:rgba(15,23,42,0.75); }
 
 .list { list-style:none; margin-top:clamp(10px,2.5%,18px); padding:0; }
 .list li { display:flex; gap:clamp(8px,2%,14px); align-items:flex-start; padding:clamp(9px,2.5%,16px) 0; border-bottom:1px solid rgba(0,0,0,0.06); }
