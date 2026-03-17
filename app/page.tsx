@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 interface CarouselSlide { slideNumber: number; headline: string; bodyText: string }
 interface InstagramOutput { hook: string; caption: string; hashtags: string[]; carouselSlides: CarouselSlide[] }
@@ -9,7 +9,24 @@ interface ClipVideoScript { scenes: Scene[]; totalEstimatedDuration: string }
 interface ClipTextPost { mainText: string; hashtags: string[] }
 interface ConversionResult { instagram: InstagramOutput; clipVideoScript: ClipVideoScript; clipTextPost: ClipTextPost; cardNewsHtml: string }
 
+interface HistoryItem {
+  id: string
+  url: string
+  title: string
+  savedAt: string
+  result: ConversionResult
+}
+
 type ResultTab = 'cardnews' | 'instagram' | 'clip'
+
+function formatDate(iso: string): string {
+  const d = new Date(iso)
+  const mm = String(d.getMonth() + 1).padStart(2, '0')
+  const dd = String(d.getDate()).padStart(2, '0')
+  const hh = String(d.getHours()).padStart(2, '0')
+  const min = String(d.getMinutes()).padStart(2, '0')
+  return `${mm}/${dd} ${hh}:${min}`
+}
 
 export default function Home() {
   const [url, setUrl] = useState('')
@@ -18,6 +35,17 @@ export default function Home() {
   const [result, setResult] = useState<ConversionResult | null>(null)
   const [tab, setTab] = useState<ResultTab>('cardnews')
   const [copied, setCopied] = useState('')
+  const [history, setHistory] = useState<HistoryItem[]>([])
+  const [historyOpen, setHistoryOpen] = useState(false)
+
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem('hare_sns_history')
+      if (stored) setHistory(JSON.parse(stored))
+    } catch {
+      // ignore
+    }
+  }, [])
 
   async function handleConvert() {
     if (!url.trim()) return
@@ -34,10 +62,44 @@ export default function Home() {
       if (!res.ok) throw new Error(data.error ?? '변환 실패')
       setResult(data)
       setTab('cardnews')
+
+      // Save to localStorage history
+      try {
+        const item: HistoryItem = {
+          id: crypto.randomUUID(),
+          url: url.trim(),
+          title: data.instagram?.hook?.slice(0, 30) ?? url.trim().slice(-30),
+          savedAt: new Date().toISOString(),
+          result: data,
+        }
+        const prev = JSON.parse(localStorage.getItem('hare_sns_history') ?? '[]')
+        const updated = [item, ...prev].slice(0, 20)
+        localStorage.setItem('hare_sns_history', JSON.stringify(updated))
+        setHistory(updated)
+      } catch {
+        // ignore localStorage errors
+      }
     } catch (e) {
       setError(e instanceof Error ? e.message : '오류가 발생했습니다.')
     } finally {
       setLoading(false)
+    }
+  }
+
+  function loadHistory(item: HistoryItem) {
+    setUrl(item.url)
+    setResult(item.result)
+    setTab('cardnews')
+    setError('')
+  }
+
+  function deleteHistory(id: string) {
+    try {
+      const updated = history.filter(h => h.id !== id)
+      localStorage.setItem('hare_sns_history', JSON.stringify(updated))
+      setHistory(updated)
+    } catch {
+      // ignore
     }
   }
 
@@ -69,6 +131,69 @@ export default function Home() {
       <div style={{ textAlign: 'center', marginBottom: '32px' }}>
         <h1 style={{ fontSize: '28px', fontWeight: 900, color: '#0f172a', margin: '0 0 8px' }}>hare_table</h1>
         <p style={{ color: '#64748b', fontSize: '14px', margin: 0 }}>네이버 블로그 URL → 인스타그램 & 네이버 클립 자동 변환</p>
+      </div>
+
+      {/* History collapsible panel */}
+      <div style={{ marginBottom: '16px' }}>
+        <button
+          onClick={() => setHistoryOpen(o => !o)}
+          style={{
+            display: 'flex', alignItems: 'center', gap: '8px',
+            padding: '10px 16px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.7)',
+            background: 'rgba(255,255,255,0.45)', backdropFilter: 'blur(12px)',
+            fontSize: '14px', fontWeight: 700, color: '#334155', cursor: 'pointer',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.05)', width: '100%', justifyContent: 'space-between',
+          }}
+        >
+          <span>🗂 기록 {history.length > 0 ? `(${history.length})` : ''}</span>
+          <span style={{ fontSize: '12px', color: '#94a3b8' }}>{historyOpen ? '▲ 접기' : '▼ 펼치기'}</span>
+        </button>
+
+        {historyOpen && (
+          <div style={{ ...glass, marginTop: '8px', padding: '12px', maxHeight: '300px', overflowY: 'auto' }}>
+            {history.length === 0 ? (
+              <p style={{ color: '#94a3b8', fontSize: '13px', textAlign: 'center', margin: '16px 0' }}>저장된 기록이 없습니다.</p>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                {history.map(item => (
+                  <div
+                    key={item.id}
+                    style={{
+                      display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                      background: 'rgba(255,255,255,0.5)', borderRadius: '10px', padding: '10px 12px',
+                      border: '1px solid rgba(255,255,255,0.7)',
+                    }}
+                  >
+                    <div style={{ flex: 1, minWidth: 0, marginRight: '10px' }}>
+                      <div style={{ fontSize: '13px', fontWeight: 600, color: '#1e293b', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {item.title}
+                      </div>
+                      <div style={{ fontSize: '11px', color: '#94a3b8', marginTop: '2px' }}>{formatDate(item.savedAt)}</div>
+                    </div>
+                    <div style={{ display: 'flex', gap: '6px', flexShrink: 0 }}>
+                      <button
+                        onClick={() => loadHistory(item)}
+                        style={{
+                          padding: '5px 10px', borderRadius: '7px', border: '1px solid rgba(2,132,199,0.4)',
+                          background: 'rgba(2,132,199,0.08)', color: '#0284c7', fontSize: '12px',
+                          fontWeight: 700, cursor: 'pointer',
+                        }}
+                      >불러오기</button>
+                      <button
+                        onClick={() => deleteHistory(item.id)}
+                        style={{
+                          padding: '5px 9px', borderRadius: '7px', border: '1px solid rgba(239,68,68,0.3)',
+                          background: 'rgba(239,68,68,0.07)', color: '#ef4444', fontSize: '13px',
+                          fontWeight: 700, cursor: 'pointer', lineHeight: 1,
+                        }}
+                      >×</button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Input */}
