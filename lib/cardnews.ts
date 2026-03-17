@@ -292,6 +292,19 @@ body {
 .save-btn:hover { background: rgba(255,255,255,0.8); }
 .save-btn.saving { opacity: 0.6; cursor: wait; }
 
+@media (max-width: 540px) {
+  .save-bar {
+    flex-direction: row; flex-wrap: wrap; justify-content: center;
+    bottom: 6px; right: auto; left: 50%; transform: translateX(-50%);
+    gap: 4px; padding: 5px 8px;
+    background: rgba(255,255,255,0.55); backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,0.7); border-radius: 12px;
+    width: max-content; max-width: 96vw;
+  }
+  .save-btn { padding: 5px 9px; font-size: 10px; border-radius: 8px; }
+  .nav-wrap { bottom: clamp(50px,10vh,64px); }
+}
+
 /* Edit Mode */
 .edit-mode [contenteditable="true"] {
   outline: 1.5px dashed rgba(56,189,248,0.55);
