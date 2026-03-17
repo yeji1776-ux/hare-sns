@@ -262,6 +262,26 @@ export default function Home() {
                     style={{ padding: '8px 16px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.7)', background: 'rgba(255,255,255,0.5)', fontSize: '13px', fontWeight: 600, cursor: 'pointer', color: '#334155' }}
                   >⬇️ HTML 다운로드</button>
                 </div>
+                <div style={{ background: 'rgba(255,255,255,0.4)', borderRadius: '10px', padding: '12px 16px', marginBottom: '12px', border: '1px solid rgba(255,255,255,0.6)' }}>
+                  <p style={{ fontSize: '11px', fontWeight: 700, color: '#64748b', marginBottom: '10px', letterSpacing: '0.05em' }}>카테고리 테마 가이드 (카드뉴스 내 점 클릭으로 변경)</p>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                    {[
+                      { name: 'sky', label: '📚 스터디/오피스', color: '#0284c7' },
+                      { name: 'food', label: '🍽️ 맛집/음식', color: '#ea580c' },
+                      { name: 'cafe', label: '☕ 카페/디저트', color: '#db2777' },
+                      { name: 'travel', label: '✈️ 여행/나들이', color: '#0d9488' },
+                      { name: 'beauty', label: '💄 뷰티/패션', color: '#7c3aed' },
+                      { name: 'culture', label: '🎭 문화/전시', color: '#4338ca' },
+                      { name: 'life', label: '🏡 라이프/육아', color: '#ca8a04' },
+                      { name: 'health', label: '💪 헬스/운동', color: '#059669' },
+                    ].map(t => (
+                      <div key={t.name} style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'rgba(255,255,255,0.6)', borderRadius: '20px', padding: '4px 10px', border: '1px solid rgba(255,255,255,0.8)' }}>
+                        <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: t.color, flexShrink: 0 }} />
+                        <span style={{ fontSize: '11px', fontWeight: 500, color: '#334155' }}>{t.label}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
                 <iframe
                   srcDoc={result.cardNewsHtml}
                   style={{ width: '100%', height: '500px', border: 'none', borderRadius: '12px', background: '#fff' }}

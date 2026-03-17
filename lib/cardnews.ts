@@ -104,6 +104,7 @@ export function buildCardNewsHtml(data: CardNewsData): string {
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>${data.placeName}</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <style>
 :root {
   --accent: #38bdf8;
@@ -254,10 +255,70 @@ body {
   50% { transform: translateY(-8px); }
   100% { transform: translateY(0); }
 }
+
+/* Themes via hue-rotate */
+[data-theme="food"] .deck { filter: hue-rotate(25deg) saturate(1.1); }
+[data-theme="cafe"] .deck { filter: hue-rotate(330deg) saturate(1.05); }
+[data-theme="travel"] .deck { filter: hue-rotate(150deg) saturate(1.1); }
+[data-theme="beauty"] .deck { filter: hue-rotate(270deg) saturate(1.05); }
+[data-theme="culture"] .deck { filter: hue-rotate(235deg); }
+[data-theme="life"] .deck { filter: hue-rotate(55deg) saturate(1.1); }
+[data-theme="health"] .deck { filter: hue-rotate(130deg) saturate(1.1); }
+[data-theme="sky"] .deck { filter: none; }
+
+.theme-bar {
+  position: fixed; top: clamp(10px,2.5vh,18px); left: 50%; transform: translateX(-50%);
+  display: flex; gap: 8px; align-items: center; z-index: 20;
+  background: rgba(255,255,255,0.4); backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.7); border-radius: 100px;
+  padding: 6px 12px;
+}
+.theme-dot {
+  width: 20px; height: 20px; border-radius: 50%; cursor: pointer;
+  border: 2px solid rgba(255,255,255,0.5); transition: all 0.2s;
+  flex-shrink: 0;
+}
+.theme-dot.active { border-color: white; transform: scale(1.25); box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+.theme-dot:hover { transform: scale(1.15); }
+.theme-label {
+  font-size: 10px; font-weight: 600; color: rgba(30,41,59,0.7);
+  white-space: nowrap; padding: 0 4px;
+}
+
+.save-bar {
+  position: fixed; bottom: clamp(56px,10vh,72px); right: clamp(10px,2.5vw,18px);
+  display: flex; flex-direction: column; gap: 6px; z-index: 20;
+}
+.save-btn {
+  padding: 7px 12px; font-size: 11px; font-weight: 700;
+  background: rgba(255,255,255,0.5); border: 1px solid rgba(255,255,255,0.7);
+  backdrop-filter: blur(8px); border-radius: 10px; cursor: pointer;
+  color: rgba(30,41,59,0.8); transition: all 0.2s; white-space: nowrap;
+}
+.save-btn:hover { background: rgba(255,255,255,0.8); }
+.save-btn.saving { opacity: 0.6; cursor: wait; }
 </style>
 </head>
 <body>
 <div class="stage">
+
+<div class="theme-bar" id="themeBar">
+  <span class="theme-label">테마</span>
+  <div class="theme-dot active" data-theme="sky" style="background:linear-gradient(135deg,#38bdf8,#0284c7)" title="스터디/오피스" onclick="setTheme('sky')"></div>
+  <div class="theme-dot" data-theme="food" style="background:linear-gradient(135deg,#fb923c,#ea580c)" title="맛집/음식" onclick="setTheme('food')"></div>
+  <div class="theme-dot" data-theme="cafe" style="background:linear-gradient(135deg,#f472b6,#db2777)" title="카페/디저트" onclick="setTheme('cafe')"></div>
+  <div class="theme-dot" data-theme="travel" style="background:linear-gradient(135deg,#2dd4bf,#0d9488)" title="여행/나들이" onclick="setTheme('travel')"></div>
+  <div class="theme-dot" data-theme="beauty" style="background:linear-gradient(135deg,#a78bfa,#7c3aed)" title="뷰티/패션" onclick="setTheme('beauty')"></div>
+  <div class="theme-dot" data-theme="culture" style="background:linear-gradient(135deg,#818cf8,#4338ca)" title="문화/전시" onclick="setTheme('culture')"></div>
+  <div class="theme-dot" data-theme="life" style="background:linear-gradient(135deg,#fbbf24,#ca8a04)" title="라이프/육아" onclick="setTheme('life')"></div>
+  <div class="theme-dot" data-theme="health" style="background:linear-gradient(135deg,#34d399,#059669)" title="헬스/운동" onclick="setTheme('health')"></div>
+</div>
+
+<div class="save-bar">
+  <button class="save-btn" id="saveCurrent" onclick="saveCurrentSlide()">📷 현재</button>
+  <button class="save-btn" id="saveAll" onclick="saveAllSlides()">💾 전체</button>
+</div>
+
   <div class="deck" id="deck">
 
     <!-- 01 커버 -->
@@ -468,6 +529,55 @@ function copyText() {
   });
 }
 update();
+
+// Theme switcher
+let currentTheme = localStorage.getItem('cardNewsTheme') || 'sky';
+function setTheme(name) {
+  document.body.dataset.theme = name;
+  document.querySelectorAll('.theme-dot').forEach(d => {
+    d.classList.toggle('active', d.dataset.theme === name);
+  });
+  currentTheme = name;
+  try { localStorage.setItem('cardNewsTheme', name); } catch(e) {}
+}
+setTheme(currentTheme);
+
+// Image save
+async function saveCurrentSlide() {
+  const btn = document.getElementById('saveCurrent');
+  btn.classList.add('saving');
+  btn.textContent = '저장 중...';
+  try {
+    const deck = document.getElementById('deck');
+    const canvas = await html2canvas(deck, { scale: 2, useCORS: true, allowTaint: true, backgroundColor: null });
+    const link = document.createElement('a');
+    link.download = 'slide_' + (cur + 1) + '.png';
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+  } catch(e) { alert('저장 실패: ' + e.message); }
+  btn.classList.remove('saving');
+  btn.textContent = '📷 현재';
+}
+
+async function saveAllSlides() {
+  const btn = document.getElementById('saveAll');
+  btn.classList.add('saving');
+  const total = slides.length;
+  for (let i = 0; i < total; i++) {
+    goTo(i);
+    btn.textContent = (i+1) + '/' + total + ' 저장 중...';
+    await new Promise(r => setTimeout(r, 400));
+    const deck = document.getElementById('deck');
+    const canvas = await html2canvas(deck, { scale: 2, useCORS: true, allowTaint: true, backgroundColor: null });
+    const link = document.createElement('a');
+    link.download = 'slide_' + (i + 1) + '.png';
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+    await new Promise(r => setTimeout(r, 300));
+  }
+  btn.classList.remove('saving');
+  btn.textContent = '💾 전체';
+}
 </script>
 </body>
 </html>`
