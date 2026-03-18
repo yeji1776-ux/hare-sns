@@ -592,6 +592,29 @@ function copyText() {
 }
 update();
 
+// ── 슬라이드 내용 자동 축소 (내용이 카드보다 길면 scale-down) ──
+function fitSlides() {
+  var deck = document.getElementById('deck');
+  if (!deck) return;
+  document.querySelectorAll('.slide').forEach(function(slide) {
+    var inner = slide.querySelector('.inner');
+    if (!inner) return;
+    inner.style.transform = '';
+    inner.style.transformOrigin = '';
+    var cs = getComputedStyle(slide);
+    var padTop = parseFloat(cs.paddingTop) || 28;
+    var padBot = parseFloat(cs.paddingBottom) || 28;
+    var available = deck.offsetHeight - padTop - padBot;
+    if (available > 0 && inner.scrollHeight > available + 2) {
+      var sc = available / inner.scrollHeight;
+      inner.style.transform = 'scale(' + sc.toFixed(4) + ')';
+      inner.style.transformOrigin = 'top center';
+    }
+  });
+}
+fitSlides();
+window.addEventListener('resize', fitSlides);
+
 // ── deck 크기 재계산 (iframe 임베딩 시에만 실행) ──
 (function resizeDeckToFit() {
   var embedded = false;
