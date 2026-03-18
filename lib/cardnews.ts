@@ -612,7 +612,6 @@ function fitSlides() {
     }
   });
 }
-fitSlides();
 window.addEventListener('resize', fitSlides);
 
 // ── deck 크기 재계산 (iframe 임베딩 시에만 실행) ──
@@ -625,7 +624,11 @@ window.addEventListener('resize', fitSlides);
     var vh = document.documentElement.clientHeight;
     var size = Math.min(vw, vh) * 0.96;
     var deck = document.getElementById('deck');
-    if (deck) { deck.style.width = size + 'px'; deck.style.height = size + 'px'; }
+    if (deck) {
+      deck.style.width = size + 'px';
+      deck.style.height = size + 'px';
+      fitSlides();
+    }
   }
   fix();
   window.addEventListener('resize', fix);
@@ -737,6 +740,7 @@ function setBodyColor(k) {
     setBodyColor(localStorage.getItem('cn_bc') || 'dark');
   } catch(e) { document.querySelectorAll('.sp-sw')[0]?.classList.add('on'); setFontSize('md'); setTitleColor('dark'); setBodyColor('dark'); }
 })();
+requestAnimationFrame(fitSlides);
 
 // Image save
 async function saveCurrentSlide() {
