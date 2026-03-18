@@ -115,6 +115,8 @@ export function buildCardNewsHtml(data: CardNewsData): string {
   --fs-xl: clamp(28px,7.5vw,52px);
   --fs-lg: clamp(22px,6vw,42px);
   --fs-body: clamp(12px,2.8vw,15px);
+  --fs-content: clamp(11px,2.2vw,14px);
+  --fs-small: clamp(10px,2vw,12px);
   --title-col: #0f172a;
 }
 *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
@@ -200,8 +202,8 @@ body {
 .card::before { content:''; position:absolute; top:0; left:0; right:0; height:1px; background:linear-gradient(90deg,rgba(255,255,255,0.8),transparent); }
 .s-deep .card, .s-accent .card, .s-mid .card { background:rgba(255,255,255,0.12); border-color:rgba(255,255,255,0.2); }
 .card-icon { font-size:clamp(18px,4.5vw,26px); margin-bottom:clamp(5px,1.5%,9px); }
-.card-title { font-size:clamp(11px,2.5vw,13px); font-weight:700; color:var(--text); margin-bottom:4px; }
-.card-body { font-size:clamp(10px,2vw,12px); color:rgba(30,41,59,0.8); line-height:1.55; }
+.card-title { font-size:var(--fs-content); font-weight:700; color:var(--text); margin-bottom:4px; }
+.card-body { font-size:var(--fs-small); color:rgba(30,41,59,0.8); line-height:1.55; }
 .s-deep .card-title { color:rgba(255,255,255,0.95); }
 .s-deep .card-body { color:rgba(255,255,255,0.8); }
 .s-accent .card, .s-mid .card { background:rgba(255,255,255,0.55); border-color:rgba(255,255,255,0.75); }
@@ -214,7 +216,7 @@ body {
 .s-deep .list li { border-color:rgba(255,255,255,0.12); }
 .list-dot { width:7px; height:7px; border-radius:50%; background:var(--accent); flex-shrink:0; margin-top:6px; }
 .s-deep .list-dot { background:#fff; box-shadow:0 0 6px rgba(255,255,255,0.5); }
-.list-txt { flex:1; font-size:clamp(12px,2.2vw,14px); color:var(--text); line-height:1.6; }
+.list-txt { flex:1; font-size:var(--fs-content); color:var(--text); line-height:1.6; }
 .s-deep .list-txt { color:rgba(255,255,255,0.9); }
 .list-em { font-weight:700; color:var(--accent); margin-right:4px; }
 .s-deep .list-em { color:#fff; }
@@ -222,10 +224,10 @@ body {
 .s-deep .list-sub { color:rgba(255,255,255,0.62); }
 
 .free-row { display:flex; gap:clamp(6px,1.8%,10px); flex-wrap:wrap; margin-top:clamp(12px,3%,20px); }
-.free-pill { background:rgba(255,255,255,0.5); border:1px solid rgba(255,255,255,0.75); border-radius:100px; padding:6px 14px; font-size:clamp(11px,2.2vw,13px); font-weight:600; color:var(--text); display:inline-flex; align-items:center; gap:6px; backdrop-filter:blur(8px); }
+.free-pill { background:rgba(255,255,255,0.5); border:1px solid rgba(255,255,255,0.75); border-radius:100px; padding:6px 14px; font-size:var(--fs-content); font-weight:600; color:var(--text); display:inline-flex; align-items:center; gap:6px; backdrop-filter:blur(8px); }
 .s-deep .free-pill { background:rgba(255,255,255,0.15); border-color:rgba(255,255,255,0.3); color:#fff; }
 
-.loc { margin-top:clamp(12px,3%,20px); font-size:clamp(10px,2.2vw,12px); color:var(--dim); font-weight:500; display:flex; align-items:center; gap:4px; }
+.loc { margin-top:clamp(12px,3%,20px); font-size:var(--fs-small); color:var(--dim); font-weight:500; display:flex; align-items:center; gap:4px; }
 .s-deep .loc { color:rgba(255,255,255,0.55); }
 
 .nav-wrap { position:fixed; bottom:clamp(14px,3vh,26px); left:50%; transform:translateX(-50%); display:flex; gap:12px; align-items:center; z-index:10; }
@@ -725,11 +727,11 @@ const titleSizes = {
   xl:['clamp(54px,15vw,110px)','clamp(42px,11vw,86px)']
 };
 const bodySizes = {
-  xs:'clamp(9px,1.8vw,11px)',
-  sm:'clamp(10px,2vw,12px)',
-  md:'clamp(12px,2.8vw,15px)',
-  lg:'clamp(14px,3.5vw,18px)',
-  xl:'clamp(15px,4vw,20px)'
+  xs:['clamp(9px,1.8vw,11px)','clamp(8px,1.6vw,10px)','clamp(7px,1.4vw,9px)'],
+  sm:['clamp(10px,2vw,12px)','clamp(9px,1.8vw,11px)','clamp(8px,1.6vw,10px)'],
+  md:['clamp(12px,2.8vw,15px)','clamp(11px,2.2vw,14px)','clamp(10px,2vw,12px)'],
+  lg:['clamp(14px,3.5vw,18px)','clamp(13px,3vw,16px)','clamp(11px,2.5vw,14px)'],
+  xl:['clamp(15px,4vw,20px)','clamp(14px,3.5vw,18px)','clamp(12px,3vw,16px)']
 };
 function setTitleSize(sz) {
   const [xl,lg] = titleSizes[sz];
@@ -740,7 +742,11 @@ function setTitleSize(sz) {
   try { localStorage.setItem('cn_tfs', sz); } catch(e){}
 }
 function setBodySize(sz) {
-  document.documentElement.style.setProperty('--fs-body', bodySizes[sz]);
+  const [bd,ct,sm] = bodySizes[sz];
+  const r = document.documentElement;
+  r.style.setProperty('--fs-body', bd);
+  r.style.setProperty('--fs-content', ct);
+  r.style.setProperty('--fs-small', sm);
   document.querySelectorAll('.sp-chip[data-bfs]').forEach(c => c.classList.toggle('on', c.dataset.bfs===sz));
   try { localStorage.setItem('cn_bfs', sz); } catch(e){}
 }
