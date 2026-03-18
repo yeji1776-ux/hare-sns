@@ -394,13 +394,23 @@ body.is-standalone .save-bar { display: flex; }
   </div>
   <div class="sp-divider"></div>
   <div class="sp-sec">
-    <div class="sp-lbl">글자 크기</div>
+    <div class="sp-lbl">제목 크기</div>
     <div class="sp-row3">
-      <button class="sp-chip" data-fs="xs" onclick="setFontSize('xs')">극소</button>
-      <button class="sp-chip" data-fs="sm" onclick="setFontSize('sm')">소</button>
-      <button class="sp-chip on" data-fs="md" onclick="setFontSize('md')">중</button>
-      <button class="sp-chip" data-fs="lg" onclick="setFontSize('lg')">대</button>
-      <button class="sp-chip" data-fs="xl" onclick="setFontSize('xl')">극대</button>
+      <button class="sp-chip" data-tfs="xs" onclick="setTitleSize('xs')">극소</button>
+      <button class="sp-chip" data-tfs="sm" onclick="setTitleSize('sm')">소</button>
+      <button class="sp-chip on" data-tfs="md" onclick="setTitleSize('md')">중</button>
+      <button class="sp-chip" data-tfs="lg" onclick="setTitleSize('lg')">대</button>
+      <button class="sp-chip" data-tfs="xl" onclick="setTitleSize('xl')">극대</button>
+    </div>
+  </div>
+  <div class="sp-sec">
+    <div class="sp-lbl">내용 크기</div>
+    <div class="sp-row3">
+      <button class="sp-chip" data-bfs="xs" onclick="setBodySize('xs')">극소</button>
+      <button class="sp-chip" data-bfs="sm" onclick="setBodySize('sm')">소</button>
+      <button class="sp-chip on" data-bfs="md" onclick="setBodySize('md')">중</button>
+      <button class="sp-chip" data-bfs="lg" onclick="setBodySize('lg')">대</button>
+      <button class="sp-chip" data-bfs="xl" onclick="setBodySize('xl')">극대</button>
     </div>
   </div>
   <div class="sp-divider"></div>
@@ -707,21 +717,32 @@ function setCustomColor(hex) {
   document.querySelectorAll('.sp-sw').forEach(s => s.classList.remove('on'));
   try { localStorage.setItem('cn_acc', JSON.stringify({a:hex, d:deep})); } catch(e){}
 }
-const fsSizes = {
-  xs:['clamp(14px,3.5vw,24px)','clamp(12px,3vw,18px)','clamp(9px,1.8vw,11px)'],
-  sm:['clamp(18px,5vw,34px)','clamp(15px,4vw,26px)','clamp(10px,2vw,12px)'],
-  md:['clamp(28px,7.5vw,52px)','clamp(22px,6vw,42px)','clamp(12px,2.8vw,15px)'],
-  lg:['clamp(40px,11vw,80px)','clamp(32px,8.5vw,64px)','clamp(14px,3.5vw,18px)'],
-  xl:['clamp(54px,15vw,110px)','clamp(42px,11vw,86px)','clamp(15px,4vw,20px)']
+const titleSizes = {
+  xs:['clamp(14px,3.5vw,24px)','clamp(12px,3vw,18px)'],
+  sm:['clamp(18px,5vw,34px)','clamp(15px,4vw,26px)'],
+  md:['clamp(28px,7.5vw,52px)','clamp(22px,6vw,42px)'],
+  lg:['clamp(40px,11vw,80px)','clamp(32px,8.5vw,64px)'],
+  xl:['clamp(54px,15vw,110px)','clamp(42px,11vw,86px)']
 };
-function setFontSize(sz) {
-  const [xl,lg,bd] = fsSizes[sz];
+const bodySizes = {
+  xs:'clamp(9px,1.8vw,11px)',
+  sm:'clamp(10px,2vw,12px)',
+  md:'clamp(12px,2.8vw,15px)',
+  lg:'clamp(14px,3.5vw,18px)',
+  xl:'clamp(15px,4vw,20px)'
+};
+function setTitleSize(sz) {
+  const [xl,lg] = titleSizes[sz];
   const r = document.documentElement;
   r.style.setProperty('--fs-xl', xl);
   r.style.setProperty('--fs-lg', lg);
-  r.style.setProperty('--fs-body', bd);
-  document.querySelectorAll('.sp-chip[data-fs]').forEach(c => c.classList.toggle('on', c.dataset.fs===sz));
-  try { localStorage.setItem('cn_fs', sz); } catch(e){}
+  document.querySelectorAll('.sp-chip[data-tfs]').forEach(c => c.classList.toggle('on', c.dataset.tfs===sz));
+  try { localStorage.setItem('cn_tfs', sz); } catch(e){}
+}
+function setBodySize(sz) {
+  document.documentElement.style.setProperty('--fs-body', bodySizes[sz]);
+  document.querySelectorAll('.sp-chip[data-bfs]').forEach(c => c.classList.toggle('on', c.dataset.bfs===sz));
+  try { localStorage.setItem('cn_bfs', sz); } catch(e){}
 }
 const titleCols = { dark:'#0f172a', mid:'#334155', light:'#64748b' };
 function setTitleColor(k) {
@@ -740,10 +761,11 @@ function setBodyColor(k) {
     const acc = JSON.parse(localStorage.getItem('cn_acc') || 'null');
     if(acc) { applyAccent(acc.a, acc.d); if(acc.i!=null) document.querySelectorAll('.sp-sw')[acc.i]?.classList.add('on'); }
     else document.querySelectorAll('.sp-sw')[0]?.classList.add('on');
-    setFontSize(localStorage.getItem('cn_fs') || 'md');
+    setTitleSize(localStorage.getItem('cn_tfs') || 'md');
+    setBodySize(localStorage.getItem('cn_bfs') || 'md');
     setTitleColor(localStorage.getItem('cn_tc') || 'dark');
     setBodyColor(localStorage.getItem('cn_bc') || 'dark');
-  } catch(e) { document.querySelectorAll('.sp-sw')[0]?.classList.add('on'); setFontSize('md'); setTitleColor('dark'); setBodyColor('dark'); }
+  } catch(e) { document.querySelectorAll('.sp-sw')[0]?.classList.add('on'); setTitleSize('md'); setBodySize('md'); setTitleColor('dark'); setBodyColor('dark'); }
 })();
 requestAnimationFrame(fitSlides);
 
