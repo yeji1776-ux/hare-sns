@@ -755,3 +755,59 @@ async function saveAllSlides() {
 </body>
 </html>`
 }
+
+export function buildCardNewsHtmlV2(data: CardNewsData, images: string[]): string {
+  let html = buildCardNewsHtml(data)
+  const imgs = images.filter(Boolean).slice(0, 4)
+  if (imgs.length === 0) return html
+
+  // Photo slide CSS
+  const photoCSS = `
+/* V2 Photo Slides */
+.slide.s-photo { background: none !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
+.slide-bg { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; z-index:0; }
+.slide.s-photo::before { background:rgba(0,0,0,0.40) !important; z-index:1; }
+.slide.s-photo .orb { display:none; }
+.slide.s-photo .inner { position:relative; z-index:2; }
+.slide.s-photo .t-xl, .slide.s-photo .t-lg { color:#fff !important; text-shadow:0 2px 12px rgba(0,0,0,0.5); }
+.slide.s-photo .t-body { color:rgba(255,255,255,0.9) !important; }
+.slide.s-photo .tag { background:rgba(0,0,0,0.22); border-color:rgba(255,255,255,0.35); color:#fff !important; }
+.slide.s-photo .loc { color:rgba(255,255,255,0.75) !important; }
+.slide.s-photo .rule { background:linear-gradient(90deg,rgba(255,255,255,0.45),rgba(255,255,255,0)) !important; }
+.slide.s-photo .list-dot { background:#fff !important; }
+.slide.s-photo .list-txt { color:rgba(255,255,255,0.9) !important; }
+.slide.s-photo .list-em { color:#fff !important; }
+.slide.s-photo .big-num { color:#fff !important; }
+.slide.s-photo .big-unit { color:rgba(255,255,255,0.7) !important; }
+.slide.s-photo .hare-table { color:rgba(255,255,255,0.7) !important; }
+`
+  html = html.replace('</style>', photoCSS + '</style>')
+
+  // Replace slide classes and add photo backgrounds
+  if (imgs[0]) {
+    html = html.replace(
+      '<!-- 01 커버 -->\n    <div class="slide s-glass active">',
+      `<!-- 01 커버 -->\n    <div class="slide s-photo active">\n      <img class="slide-bg" src="${imgs[0]}" crossorigin="anonymous">`
+    )
+  }
+  if (imgs[1]) {
+    html = html.replace(
+      '<!-- 03 핵심수치 -->\n    <div class="slide s-deep">',
+      `<!-- 03 핵심수치 -->\n    <div class="slide s-photo">\n      <img class="slide-bg" src="${imgs[1]}" crossorigin="anonymous">`
+    )
+  }
+  if (imgs[2]) {
+    html = html.replace(
+      '<!-- 05 혜택/구성 -->\n    <div class="slide s-glass">',
+      `<!-- 05 혜택/구성 -->\n    <div class="slide s-photo">\n      <img class="slide-bg" src="${imgs[2]}" crossorigin="anonymous">`
+    )
+  }
+  if (imgs[3]) {
+    html = html.replace(
+      '<!-- 07 클로징 -->\n    <div class="slide s-silver">',
+      `<!-- 07 클로징 -->\n    <div class="slide s-photo">\n      <img class="slide-bg" src="${imgs[3]}" crossorigin="anonymous">`
+    )
+  }
+
+  return html
+}

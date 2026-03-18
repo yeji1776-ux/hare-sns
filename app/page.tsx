@@ -10,7 +10,7 @@ interface InstagramOutput { hook: string; caption: string; hashtags: string[]; c
 interface Scene { sceneNumber: number; sceneDescription: string; narration: string; estimatedDuration: string }
 interface ClipVideoScript { scenes: Scene[]; totalEstimatedDuration: string }
 interface ClipTextPost { mainText: string; hashtags: string[] }
-interface ConversionResult { instagram: InstagramOutput; clipVideoScript: ClipVideoScript; clipTextPost: ClipTextPost; cardNewsHtml: string }
+interface ConversionResult { instagram: InstagramOutput; clipVideoScript: ClipVideoScript; clipTextPost: ClipTextPost; cardNewsHtml: string; cardNewsHtmlV2?: string }
 
 interface HistoryItem {
   id: string
@@ -42,6 +42,7 @@ export default function Home() {
   const [historyOpen, setHistoryOpen] = useState(false)
   const iframeContainerRef = useRef<HTMLDivElement>(null)
   const [iframeScale, setIframeScale] = useState<number | null>(null)
+  const [cardVersion, setCardVersion] = useState<'v1' | 'v2'>('v1')
 
   // result가 세팅된 후 DOM이 렌더된 뒤 실행 ([] 이면 result 없을 때 ref가 null이라 scale=1 고정 버그)
   useEffect(() => {
@@ -273,10 +274,20 @@ export default function Home() {
             {/* 카드뉴스 */}
             {tab === 'cardnews' && (
               <div>
-                <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '12px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px', marginBottom: '12px' }}>
+                  <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
+                    {result.cardNewsHtmlV2 && (
+                      <div style={{ display: 'flex', gap: '4px', background: 'rgba(255,255,255,0.6)', borderRadius: '8px', padding: '2px', border: '1px solid rgba(255,255,255,0.8)' }}>
+                        <button onClick={() => setCardVersion('v1')} style={{ padding: '5px 12px', fontSize: '12px', fontWeight: cardVersion==='v1' ? 700 : 400, border: 'none', borderRadius: '6px', cursor: 'pointer', background: cardVersion==='v1' ? '#38bdf8' : 'transparent', color: cardVersion==='v1' ? '#fff' : '#64748b' }}>텍스트</button>
+                        <button onClick={() => setCardVersion('v2')} style={{ padding: '5px 12px', fontSize: '12px', fontWeight: cardVersion==='v2' ? 700 : 400, border: 'none', borderRadius: '6px', cursor: 'pointer', background: cardVersion==='v2' ? '#38bdf8' : 'transparent', color: cardVersion==='v2' ? '#fff' : '#64748b' }}>📷 포토</button>
+                      </div>
+                    )}
+                    <button onClick={() => { const ah=(cardVersion==='v2'&&result.cardNewsHtmlV2)?result.cardNewsHtmlV2:result.cardNewsHtml; const b=new Blob([ah],{type:'text/html'}); const u=URL.createObjectURL(b); window.open(u,'_blank'); setTimeout(()=>URL.revokeObjectURL(u),5000); }} style={{ padding: '6px 12px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.7)', background: 'rgba(209,250,229,0.7)', fontSize: '12px', fontWeight: 600, cursor: 'pointer', color: '#065f46' }}>🖥 편집하기</button>
+                  </div>
                   <button
                     onClick={() => {
-                      const blob = new Blob([result.cardNewsHtml], { type: 'text/html' })
+                      const ah = (cardVersion==='v2'&&result.cardNewsHtmlV2)?result.cardNewsHtmlV2:result.cardNewsHtml
+                      const blob = new Blob([ah], { type: 'text/html' })
                       const a = document.createElement('a')
                       a.href = URL.createObjectURL(blob)
                       a.download = 'cardnews.html'
@@ -305,9 +316,9 @@ export default function Home() {
                     ))}
                   </div>
                 </div>
-                <div ref={iframeContainerRef} style={{ overflow: 'hidden', borderRadius: '12px', height: iframeScale ? `${Math.round(IFRAME_H * iframeScale)}px` : `${IFRAME_H}px` }}>
+                <div ref={iframeContainerRef} style={{ overflow: 'hidden', borderRadius: '12px', width: '100%', height: iframeScale ? `${Math.round(IFRAME_H * iframeScale)}px` : `${IFRAME_H}px` }}>
                   <iframe
-                    srcDoc={result.cardNewsHtml
+                    srcDoc={((cardVersion === 'v2' && result.cardNewsHtmlV2) ? result.cardNewsHtmlV2 : result.cardNewsHtml)
                       .replace('width=device-width', 'width=480')
                       .replace('</head>', '<style>.save-bar{display:none!important}</style></head>')}
                     style={{ width: `${IFRAME_W}px`, height: `${IFRAME_H}px`, border: 'none', display: 'block', transformOrigin: '0 0', transform: iframeScale ? `scale(${iframeScale})` : 'none', visibility: iframeScale ? 'visible' : 'hidden' }}

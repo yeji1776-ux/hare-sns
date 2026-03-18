@@ -45,6 +45,7 @@ export interface ConversionResult {
   clipVideoScript: ClipVideoScript
   clipTextPost: ClipTextPost
   cardNewsHtml: string
+  cardNewsHtmlV2: string
 }
 
 
@@ -134,7 +135,7 @@ ${sponsor}
 }`
 }
 
-import { generateCardNewsData, buildCardNewsHtml } from './cardnews'
+import { generateCardNewsData, buildCardNewsHtml, buildCardNewsHtmlV2 } from './cardnews'
 
 export async function convertBlogPost(
   post: BlogPost,
@@ -148,6 +149,7 @@ export async function convertBlogPost(
   ])
 
   const cardNewsHtml = buildCardNewsHtml(cardNewsData)
+  const cardNewsHtmlV2 = buildCardNewsHtmlV2(cardNewsData, post.images)
 
-  return { instagram, clipVideoScript, clipTextPost, cardNewsHtml }
+  return { instagram, clipVideoScript, clipTextPost, cardNewsHtml, cardNewsHtmlV2 }
 }
