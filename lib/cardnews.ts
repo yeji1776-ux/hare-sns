@@ -131,7 +131,7 @@ body {
 }
 .stage { width:100vw; height:100vh; display:flex; align-items:center; justify-content:center; }
 .deck {
-  position:relative; width:min(94vw,94vh); height:min(94vw,94vh);
+  position:relative; width:min(94vmin,90vh); height:min(94vmin,90vh);
   overflow:hidden; border-radius:40px;
   border:1.5px solid rgba(255,255,255,0.95);
 }
@@ -281,8 +281,9 @@ body {
 
 .save-bar {
   position: fixed; bottom: clamp(56px,10vh,72px); right: clamp(10px,2.5vw,18px);
-  display: flex; flex-direction: column; gap: 6px; z-index: 20;
+  display: none; flex-direction: column; gap: 6px; z-index: 20;
 }
+body.is-standalone .save-bar { display: flex; }
 .save-btn {
   padding: 7px 12px; font-size: 11px; font-weight: 700;
   background: rgba(255,255,255,0.5); border: 1px solid rgba(255,255,255,0.7);
@@ -293,14 +294,6 @@ body {
 .save-btn.saving { opacity: 0.6; cursor: wait; }
 
 @media (max-width: 540px) {
-  .save-bar {
-    flex-direction: row; flex-wrap: wrap; justify-content: center;
-    bottom: 6px; right: auto; left: 50%; transform: translateX(-50%);
-    gap: 4px; padding: 5px 8px;
-    background: rgba(255,255,255,0.55); backdrop-filter: blur(12px);
-    border: 1px solid rgba(255,255,255,0.7); border-radius: 12px;
-    width: max-content; max-width: 96vw;
-  }
   .save-btn { padding: 5px 9px; font-size: 10px; border-radius: 8px; }
   .nav-wrap { bottom: clamp(50px,10vh,64px); }
 }
@@ -599,8 +592,11 @@ function copyText() {
 }
 update();
 
-// ── deck 크기 재계산: clientWidth/Height 기준 (vw/vh가 device-width 기준인 경우 보정) ──
+// ── deck 크기 재계산 (iframe 임베딩 시에만 실행) ──
 (function resizeDeckToFit() {
+  var embedded = false;
+  try { embedded = window.self !== window.top; } catch(e) { embedded = true; }
+  if (!embedded) return;
   function fix() {
     var vw = document.documentElement.clientWidth;
     var vh = document.documentElement.clientHeight;
@@ -612,13 +608,11 @@ update();
   window.addEventListener('resize', fix);
 })();
 
-// ── iframe 감지: save-bar 숨김 (sandbox 환경에서 window.top 접근 SecurityError 대비) ──
-(function hideSaveBarInIframe() {
+// ── standalone 감지: save-bar 표시 (iframe 임베딩에서는 기본 숨김) ──
+(function detectStandalone() {
   var embedded = false;
   try { embedded = window.self !== window.top; } catch(e) { embedded = true; }
-  if (!embedded) return;
-  var bar = document.querySelector('.save-bar');
-  if (bar) bar.style.display = 'none';
+  if (!embedded) document.body.classList.add('is-standalone');
 })();
 
 // Theme switcher
