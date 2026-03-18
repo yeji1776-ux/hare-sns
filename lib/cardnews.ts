@@ -396,9 +396,11 @@ body.is-standalone .save-bar { display: flex; }
   <div class="sp-sec">
     <div class="sp-lbl">글자 크기</div>
     <div class="sp-row3">
-      <button class="sp-chip" data-fs="sm" onclick="setFontSize('sm')">작게</button>
-      <button class="sp-chip on" data-fs="md" onclick="setFontSize('md')">보통</button>
-      <button class="sp-chip" data-fs="lg" onclick="setFontSize('lg')">크게</button>
+      <button class="sp-chip" data-fs="xs" onclick="setFontSize('xs')">극소</button>
+      <button class="sp-chip" data-fs="sm" onclick="setFontSize('sm')">소</button>
+      <button class="sp-chip on" data-fs="md" onclick="setFontSize('md')">중</button>
+      <button class="sp-chip" data-fs="lg" onclick="setFontSize('lg')">대</button>
+      <button class="sp-chip" data-fs="xl" onclick="setFontSize('xl')">극대</button>
     </div>
   </div>
   <div class="sp-divider"></div>
@@ -568,6 +570,7 @@ function go(dir) {
 }
 function goTo(i) { cur = i; update(); }
 document.addEventListener('keydown', e => {
+  if (isEditing) return;
   if(['ArrowRight',' '].includes(e.key)) { e.preventDefault(); go(1); }
   if(['ArrowLeft'].includes(e.key)) { e.preventDefault(); go(-1); }
 });
@@ -705,9 +708,11 @@ function setCustomColor(hex) {
   try { localStorage.setItem('cn_acc', JSON.stringify({a:hex, d:deep})); } catch(e){}
 }
 const fsSizes = {
-  sm:['clamp(22px,6vw,40px)','clamp(18px,5vw,32px)','clamp(11px,2.2vw,13px)'],
+  xs:['clamp(14px,3.5vw,24px)','clamp(12px,3vw,18px)','clamp(9px,1.8vw,11px)'],
+  sm:['clamp(18px,5vw,34px)','clamp(15px,4vw,26px)','clamp(10px,2vw,12px)'],
   md:['clamp(28px,7.5vw,52px)','clamp(22px,6vw,42px)','clamp(12px,2.8vw,15px)'],
-  lg:['clamp(34px,9vw,64px)','clamp(26px,7vw,50px)','clamp(13px,3.2vw,17px)']
+  lg:['clamp(40px,11vw,80px)','clamp(32px,8.5vw,64px)','clamp(14px,3.5vw,18px)'],
+  xl:['clamp(54px,15vw,110px)','clamp(42px,11vw,86px)','clamp(15px,4vw,20px)']
 };
 function setFontSize(sz) {
   const [xl,lg,bd] = fsSizes[sz];
