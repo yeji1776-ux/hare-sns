@@ -776,41 +776,114 @@ function setBodyColor(k) {
 requestAnimationFrame(fitSlides);
 
 // Image save
+// ── Image capture & save ──
+// body 전체를 deck 위치에서 크롭하여 배경 그라디언트까지 정확히 캡처
+async function captureCurrentSlide() {
+  var deck = document.getElementById('deck');
+  var rect = deck.getBoundingClientRect();
+  return await html2canvas(document.body, {
+    x: Math.round(rect.left),
+    y: Math.round(rect.top),
+    width: Math.round(rect.width),
+    height: Math.round(rect.height),
+    scale: 2,
+    useCORS: true,
+    allowTaint: true,
+    backgroundColor: '#ddf0fb',
+    scrollX: 0,
+    scrollY: 0,
+    logging: false
+  });
+}
+
+// Web Share API (모바일 사진첩 저장) → 불가 시 다운로드
+async function shareOrDownload(canvas, filename) {
+  return new Promise(function(resolve, reject) {
+    canvas.toBlob(async function(blob) {
+      try {
+        var file = new File([blob], filename, { type: 'image/png' });
+        if (navigator.share && typeof navigator.canShare === 'function' && navigator.canShare({ files: [file] })) {
+          await navigator.share({ files: [file] });
+        } else {
+          var url = URL.createObjectURL(blob);
+          var a = document.createElement('a');
+          a.href = url; a.download = filename;
+          document.body.appendChild(a); a.click(); document.body.removeChild(a);
+          setTimeout(function() { URL.revokeObjectURL(url); }, 1000);
+        }
+        resolve();
+      } catch(err) { reject(err); }
+    }, 'image/png');
+  });
+}
+
 async function saveCurrentSlide() {
-  const btn = document.getElementById('saveCurrent');
+  var btn = document.getElementById('saveCurrent');
   btn.classList.add('saving');
   btn.textContent = '저장 중...';
   try {
-    const deck = document.getElementById('deck');
-    const canvas = await html2canvas(deck, { scale: 2, useCORS: true, allowTaint: true, backgroundColor: null });
-    const link = document.createElement('a');
-    link.download = 'slide_' + (cur + 1) + '.png';
-    link.href = canvas.toDataURL('image/png');
-    link.click();
-  } catch(e) { alert('저장 실패: ' + e.message); }
+    var canvas = await captureCurrentSlide();
+    await shareOrDownload(canvas, 'cardnews_' + (cur + 1) + '.png');
+  } catch(e) { if (e && e.name !== 'AbortError') alert('저장 실패: ' + e.message); }
   btn.classList.remove('saving');
   btn.textContent = '📷 현재';
 }
 
 async function saveAllSlides() {
-  const btn = document.getElementById('saveAll');
+  var btn = document.getElementById('saveAll');
   btn.classList.add('saving');
-  const total = slides.length;
-  for (let i = 0; i < total; i++) {
+  var total = slides.length;
+  for (var i = 0; i < total; i++) {
     goTo(i);
     btn.textContent = (i+1) + '/' + total + ' 저장 중...';
-    await new Promise(r => setTimeout(r, 400));
-    const deck = document.getElementById('deck');
-    const canvas = await html2canvas(deck, { scale: 2, useCORS: true, allowTaint: true, backgroundColor: null });
-    const link = document.createElement('a');
-    link.download = 'slide_' + (i + 1) + '.png';
-    link.href = canvas.toDataURL('image/png');
-    link.click();
-    await new Promise(r => setTimeout(r, 300));
+    await new Promise(function(r) { setTimeout(r, 450); });
+    try {
+      var canvas = await captureCurrentSlide();
+      await shareOrDownload(canvas, 'cardnews_' + (i + 1) + '.png');
+    } catch(e) { if (e && e.name !== 'AbortError') console.warn('slide ' + (i+1) + ' save failed', e); }
+    await new Promise(function(r) { setTimeout(r, 200); });
   }
   btn.classList.remove('saving');
   btn.textContent = '💾 전체';
 }
+
+// postMessage API — 부모 페이지(iframe 래퍼)에서 저장 트리거
+window.addEventListener('message', async function(e) {
+  if (!e.data || !e.data.type) return;
+  if (e.data.type === 'SAVE_CURRENT') {
+    try {
+      var canvas = await captureCurrentSlide();
+      canvas.toBlob(function(blob) {
+        var reader = new FileReader();
+        reader.onload = function() {
+          (window.parent || window).postMessage({ type: 'SAVE_RESULT', dataUrl: reader.result, slideIndex: cur }, '*');
+        };
+        reader.readAsDataURL(blob);
+      }, 'image/png');
+    } catch(err) {
+      (window.parent || window).postMessage({ type: 'SAVE_ERROR', error: err.message }, '*');
+    }
+  } else if (e.data.type === 'SAVE_ALL') {
+    var total = slides.length;
+    for (var i = 0; i < total; i++) {
+      goTo(i);
+      await new Promise(function(r) { setTimeout(r, 450); });
+      try {
+        var canvas = await captureCurrentSlide();
+        var dataUrl = await new Promise(function(resolve) {
+          canvas.toBlob(function(blob) {
+            var reader = new FileReader();
+            reader.onload = function() { resolve(reader.result); };
+            reader.readAsDataURL(blob);
+          }, 'image/png');
+        });
+        (window.parent || window).postMessage({ type: 'SAVE_RESULT', dataUrl: dataUrl, slideIndex: i, total: total }, '*');
+        await new Promise(function(r) { setTimeout(r, 150); });
+      } catch(err) { console.warn('slide capture failed', err); }
+    }
+    (window.parent || window).postMessage({ type: 'SAVE_DONE', total: total }, '*');
+  }
+});
 </script>
 </body>
 </html>`
