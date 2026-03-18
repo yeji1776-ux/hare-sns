@@ -153,3 +153,26 @@ export async function convertBlogPost(
 
   return { instagram, clipVideoScript, clipTextPost, cardNewsHtml, cardNewsHtmlV2 }
 }
+
+export async function regenerateSection(
+  post: BlogPost,
+  sponsorship: SponsorshipConfig,
+  type: 'cardnews' | 'instagram' | 'clip'
+): Promise<Partial<ConversionResult>> {
+  if (type === 'cardnews') {
+    const cardNewsData = await generateCardNewsData(post, sponsorship)
+    return {
+      cardNewsHtml: buildCardNewsHtml(cardNewsData),
+      cardNewsHtmlV2: buildCardNewsHtmlV2(cardNewsData, post.images),
+    }
+  } else if (type === 'instagram') {
+    const instagram = await callGeminiJson<InstagramOutput>(instagramPrompt(post, sponsorship))
+    return { instagram }
+  } else {
+    const [clipVideoScript, clipTextPost] = await Promise.all([
+      callGeminiJson<ClipVideoScript>(clipVideoPrompt(post, sponsorship)),
+      callGeminiJson<ClipTextPost>(clipTextPrompt(post, sponsorship)),
+    ])
+    return { clipVideoScript, clipTextPost }
+  }
+}

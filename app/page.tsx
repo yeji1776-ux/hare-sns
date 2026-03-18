@@ -42,6 +42,7 @@ export default function Home() {
   const iframeContainerRef = useRef<HTMLDivElement>(null)
   const [iframeContainerW, setIframeContainerW] = useState<number | null>(null)
   const [cardVersion, setCardVersion] = useState<'v1' | 'v2'>('v1')
+  const [regenLoading, setRegenLoading] = useState<{ cardnews: boolean; instagram: boolean; clip: boolean }>({ cardnews: false, instagram: false, clip: false })
 
   useEffect(() => {
     if (!result) return
@@ -105,6 +106,25 @@ export default function Home() {
       setError(e instanceof Error ? e.message : '오류가 발생했습니다.')
     } finally {
       setLoading(false)
+    }
+  }
+
+  async function handleRegen(type: 'cardnews' | 'instagram' | 'clip') {
+    if (!url.trim() || !result) return
+    setRegenLoading(prev => ({ ...prev, [type]: true }))
+    try {
+      const res = await fetch('/api/regenerate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: url.trim(), type }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error ?? '재생성 실패')
+      setResult(prev => prev ? { ...prev, ...data } : prev)
+    } catch (e) {
+      setError(e instanceof Error ? e.message : '재생성 중 오류가 발생했습니다.')
+    } finally {
+      setRegenLoading(prev => ({ ...prev, [type]: false }))
     }
   }
 
@@ -285,17 +305,24 @@ export default function Home() {
                     )}
                     <button onClick={() => { const ah=(cardVersion==='v2'&&result.cardNewsHtmlV2)?result.cardNewsHtmlV2:result.cardNewsHtml; const b=new Blob([ah],{type:'text/html'}); const u=URL.createObjectURL(b); window.open(u,'_blank'); setTimeout(()=>URL.revokeObjectURL(u),5000); }} style={{ padding: '6px 12px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.7)', background: 'rgba(209,250,229,0.7)', fontSize: '12px', fontWeight: 600, cursor: 'pointer', color: '#065f46' }}>🖥 편집하기</button>
                   </div>
-                  <button
-                    onClick={() => {
-                      const ah = (cardVersion==='v2'&&result.cardNewsHtmlV2)?result.cardNewsHtmlV2:result.cardNewsHtml
-                      const blob = new Blob([ah], { type: 'text/html' })
-                      const a = document.createElement('a')
-                      a.href = URL.createObjectURL(blob)
-                      a.download = 'cardnews.html'
-                      a.click()
-                    }}
-                    style={{ padding: '8px 16px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.7)', background: 'rgba(255,255,255,0.5)', fontSize: '13px', fontWeight: 600, cursor: 'pointer', color: '#334155' }}
-                  >⬇️ HTML 다운로드</button>
+                  <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                    <button
+                      onClick={() => handleRegen('cardnews')}
+                      disabled={regenLoading.cardnews}
+                      style={{ padding: '8px 14px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.7)', background: regenLoading.cardnews ? '#94a3b8' : 'rgba(255,255,255,0.5)', fontSize: '13px', fontWeight: 600, cursor: regenLoading.cardnews ? 'not-allowed' : 'pointer', color: '#334155' }}
+                    >{regenLoading.cardnews ? '⏳' : '🔄'} 새로고침</button>
+                    <button
+                      onClick={() => {
+                        const ah = (cardVersion==='v2'&&result.cardNewsHtmlV2)?result.cardNewsHtmlV2:result.cardNewsHtml
+                        const blob = new Blob([ah], { type: 'text/html' })
+                        const a = document.createElement('a')
+                        a.href = URL.createObjectURL(blob)
+                        a.download = 'cardnews.html'
+                        a.click()
+                      }}
+                      style={{ padding: '8px 16px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.7)', background: 'rgba(255,255,255,0.5)', fontSize: '13px', fontWeight: 600, cursor: 'pointer', color: '#334155' }}
+                    >⬇️ HTML 다운로드</button>
+                  </div>
                 </div>
                 <div style={{ background: 'rgba(255,255,255,0.4)', borderRadius: '10px', padding: '12px 16px', marginBottom: '12px', border: '1px solid rgba(255,255,255,0.6)' }}>
                   <p style={{ fontSize: '11px', fontWeight: 700, color: '#64748b', marginBottom: '10px', letterSpacing: '0.05em' }}>카테고리 테마 가이드 (카드뉴스 내 점 클릭으로 변경)</p>
@@ -335,6 +362,14 @@ export default function Home() {
             {/* 인스타그램 */}
             {tab === 'instagram' && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                {/* Regen */}
+                <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                  <button
+                    onClick={() => handleRegen('instagram')}
+                    disabled={regenLoading.instagram}
+                    style={{ padding: '8px 14px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.7)', background: regenLoading.instagram ? '#94a3b8' : 'rgba(255,255,255,0.5)', fontSize: '13px', fontWeight: 600, cursor: regenLoading.instagram ? 'not-allowed' : 'pointer', color: '#334155' }}
+                  >{regenLoading.instagram ? '⏳ 생성 중...' : '🔄 새로고침'}</button>
+                </div>
                 {/* Hook */}
                 <div style={{ background: 'rgba(255,255,255,0.4)', borderRadius: '12px', padding: '16px', border: '1px solid rgba(255,255,255,0.6)' }}>
                   <div style={{ fontSize: '12px', fontWeight: 700, color: '#0284c7', marginBottom: '8px', letterSpacing: '0.1em' }}>HOOK</div>
@@ -386,6 +421,14 @@ export default function Home() {
             {/* 네이버 클립 */}
             {tab === 'clip' && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                {/* Regen */}
+                <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                  <button
+                    onClick={() => handleRegen('clip')}
+                    disabled={regenLoading.clip}
+                    style={{ padding: '8px 14px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.7)', background: regenLoading.clip ? '#94a3b8' : 'rgba(255,255,255,0.5)', fontSize: '13px', fontWeight: 600, cursor: regenLoading.clip ? 'not-allowed' : 'pointer', color: '#334155' }}
+                  >{regenLoading.clip ? '⏳ 생성 중...' : '🔄 새로고침'}</button>
+                </div>
                 {/* Video Script */}
                 <div style={{ background: 'rgba(255,255,255,0.4)', borderRadius: '12px', padding: '16px', border: '1px solid rgba(255,255,255,0.6)' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
