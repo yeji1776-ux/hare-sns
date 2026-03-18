@@ -41,9 +41,11 @@ export default function Home() {
   const [history, setHistory] = useState<HistoryItem[]>([])
   const [historyOpen, setHistoryOpen] = useState(false)
   const iframeContainerRef = useRef<HTMLDivElement>(null)
-  const [iframeScale, setIframeScale] = useState(1)
+  const [iframeScale, setIframeScale] = useState<number | null>(null)
 
+  // result가 세팅된 후 DOM이 렌더된 뒤 실행 ([] 이면 result 없을 때 ref가 null이라 scale=1 고정 버그)
   useEffect(() => {
+    if (!result) return
     const el = iframeContainerRef.current
     if (!el) return
     const update = () => setIframeScale(el.getBoundingClientRect().width / IFRAME_W)
@@ -51,7 +53,7 @@ export default function Home() {
     const obs = new ResizeObserver(update)
     obs.observe(el)
     return () => obs.disconnect()
-  }, [])
+  }, [result])
 
   useEffect(() => {
     try {
@@ -303,12 +305,12 @@ export default function Home() {
                     ))}
                   </div>
                 </div>
-                <div ref={iframeContainerRef} style={{ overflow: 'hidden', borderRadius: '12px', height: `${Math.round(IFRAME_H * iframeScale)}px` }}>
+                <div ref={iframeContainerRef} style={{ overflow: 'hidden', borderRadius: '12px', height: iframeScale ? `${Math.round(IFRAME_H * iframeScale)}px` : `${IFRAME_H}px` }}>
                   <iframe
                     srcDoc={result.cardNewsHtml
                       .replace('width=device-width', 'width=480')
                       .replace('</head>', '<style>.save-bar{display:none!important}</style></head>')}
-                    style={{ width: `${IFRAME_W}px`, height: `${IFRAME_H}px`, border: 'none', display: 'block', transformOrigin: '0 0', transform: `scale(${iframeScale})` }}
+                    style={{ width: `${IFRAME_W}px`, height: `${IFRAME_H}px`, border: 'none', display: 'block', transformOrigin: '0 0', transform: iframeScale ? `scale(${iframeScale})` : 'none', visibility: iframeScale ? 'visible' : 'hidden' }}
                     title="카드뉴스 미리보기"
                   />
                 </div>
