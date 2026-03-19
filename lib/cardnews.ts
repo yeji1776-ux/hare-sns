@@ -234,12 +234,16 @@ body {
 
 .stage { position:relative; }
 .nav-wrap { position:absolute; bottom:clamp(14px,3vh,26px); left:50%; transform:translateX(-50%); display:flex; gap:12px; align-items:center; z-index:10; }
-.nav-btn { width:36px; height:36px; border-radius:50%; border:1px solid rgba(255,255,255,0.6); background:rgba(255,255,255,0.25); backdrop-filter:blur(8px); color:var(--text); cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all .2s; }
-.nav-btn:hover { background:rgba(255,255,255,0.65); transform:scale(1.08); }
-.nav-btn svg { width:14px; height:14px; }
+.nav-btn { width:48px; height:48px; border-radius:50%; border:1.5px solid rgba(255,255,255,0.8); background:rgba(255,255,255,0.55); color:var(--text); cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all .2s; font-size:22px; -webkit-tap-highlight-color:rgba(0,0,0,0.1); }
+.nav-btn:active { background:rgba(255,255,255,0.85); transform:scale(0.93); }
+.nav-btn svg { width:16px; height:16px; }
 .dots { display:flex; gap:5px; align-items:center; }
 .dot { width:5px; height:5px; border-radius:50%; background:rgba(56,189,248,0.28); cursor:pointer; transition:all .3s; }
 .dot.active { width:18px; border-radius:3px; background:var(--accent); opacity:.8; }
+/* 슬라이드 탭 클릭존 — iOS에서 작은 버튼 대신 넓은 영역으로 터치 */
+.tap-prev, .tap-next { position:absolute; top:0; bottom:0; width:42%; z-index:5; cursor:pointer; -webkit-tap-highlight-color:transparent; }
+.tap-prev { left:0; }
+.tap-next { right:0; }
 
 .counter { position:absolute; top:clamp(14px,3vh,22px); right:clamp(14px,3vw,22px); font-size:11px; font-weight:700; color:var(--dim); letter-spacing:.1em; z-index:10; }
 .caption-btn { position:absolute; top:clamp(14px,3vh,22px); left:clamp(14px,3vw,22px); background:rgba(255,255,255,0.45); border:1px solid rgba(255,255,255,0.7); backdrop-filter:blur(8px); padding:6px 12px; border-radius:100px; font-size:11px; font-weight:600; cursor:pointer; color:var(--text); transition:all .2s; z-index:10; }
@@ -538,6 +542,9 @@ body.is-standalone .save-bar { display: flex; }
       </div>
     </div>
 
+    <!-- 탭 클릭존: 왼쪽 탭=이전, 오른쪽 탭=다음 (iOS 터치 대응) -->
+    <div class="tap-prev" onclick="go(-1)"></div>
+    <div class="tap-next" onclick="go(1)"></div>
   </div>
 
   <div class="counter" id="counter">1 / 7</div>
