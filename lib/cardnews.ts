@@ -515,9 +515,20 @@ async function saveCurrentSlide() {
   var deck = document.getElementById('deck');
   var computedFilter = window.getComputedStyle(deck).filter;
   var prevFilter = deck.style.filter;
+  var prevBg = deck.style.background;
+
+  // 테마 hue-rotate 필터를 인라인으로 적용 (부모 CSS 선택자 기반이라 클론 시 사라짐)
   if (computedFilter && computedFilter !== 'none') {
     deck.style.filter = computedFilter;
   }
+  // body의 그라데이션 배경을 deck에 직접 설정해야 backdrop-filter(유리 효과)가 캡처됨
+  deck.style.background = [
+    'radial-gradient(ellipse 80% 60% at 15% 10%, rgba(186,230,253,0.75) 0%, transparent 55%)',
+    'radial-gradient(ellipse 70% 60% at 85% 85%, rgba(203,225,245,0.6) 0%, transparent 55%)',
+    'radial-gradient(ellipse 50% 40% at 60% 30%, rgba(240,248,255,0.5) 0%, transparent 50%)',
+    'linear-gradient(145deg, #eaf6fd 0%, #f4f8fb 45%, #ddeef8 100%)'
+  ].join(',');
+
   try {
     var dataUrl = await htmlToImage.toPng(deck, {
       pixelRatio: 2,
@@ -543,6 +554,7 @@ async function saveCurrentSlide() {
     alert('캡처 실패: ' + (e && e.message ? e.message : e));
   } finally {
     deck.style.filter = prevFilter;
+    deck.style.background = prevBg;
   }
 }
 
