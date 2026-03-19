@@ -105,7 +105,6 @@ export function buildCardNewsHtml(data: CardNewsData): string {
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>${data.placeName}</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
-<script type="module">import * as _hti from 'https://esm.sh/html-to-image@1.11.11';window.htmlToImage=_hti;</script>
 <style>
 :root {
   --accent: #38bdf8;
@@ -512,16 +511,23 @@ function showSaveModal(dataUrl) {
 }
 
 async function saveCurrentSlide() {
+  // 라이브러리를 필요할 때 동적으로 로드 (타이밍 문제 없음, 두 번째부터는 캐시됨)
+  var htmlToImage;
+  try {
+    htmlToImage = await import('https://esm.sh/html-to-image@1.11.11');
+  } catch(e) {
+    alert('캡처 실패: 라이브러리 로드 오류 ' + (e && e.message ? e.message : e));
+    return;
+  }
+
   var deck = document.getElementById('deck');
   var computedFilter = window.getComputedStyle(deck).filter;
   var prevFilter = deck.style.filter;
   var prevBg = deck.style.background;
 
-  // 테마 hue-rotate 필터를 인라인으로 적용 (부모 CSS 선택자 기반이라 클론 시 사라짐)
   if (computedFilter && computedFilter !== 'none') {
     deck.style.filter = computedFilter;
   }
-  // body의 그라데이션 배경을 deck에 직접 설정해야 backdrop-filter(유리 효과)가 캡처됨
   deck.style.background = [
     'radial-gradient(ellipse 80% 60% at 15% 10%, rgba(186,230,253,0.75) 0%, transparent 55%)',
     'radial-gradient(ellipse 70% 60% at 85% 85%, rgba(203,225,245,0.6) 0%, transparent 55%)',
