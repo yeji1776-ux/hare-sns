@@ -105,7 +105,7 @@ export function buildCardNewsHtml(data: CardNewsData): string {
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>${data.placeName}</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.umd.js"></script>
 <style>
 :root {
   --accent: #38bdf8;
