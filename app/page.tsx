@@ -86,54 +86,10 @@ export default function Home() {
     } catch { /* ignore */ }
   }
 
-  // 카드 이미지 저장 — html2canvas로 iframe DOM 직접 캡처 (CDN 의존 없음)
-  async function handleSave() {
-    const iframe = iframeRef.current
-    if (!iframe?.contentDocument || !iframe?.contentWindow) return
-    const deck = iframe.contentDocument.getElementById('deck') as HTMLElement | null
-    if (!deck) return
-
-    // 테마 hue-rotate 필터 인라인 적용
-    const computedFilter = iframe.contentWindow.getComputedStyle(deck).filter
-    const prevFilter = deck.style.filter
-    if (computedFilter && computedFilter !== 'none') deck.style.filter = computedFilter
-
-    // 테마 바(색깔 점) 숨기기
-    const themeBar = deck.querySelector('.theme-bar') as HTMLElement | null
-    if (themeBar) themeBar.style.display = 'none'
-
+  function shareCurrentSlide() {
     try {
-      const { default: html2canvas } = await import('html2canvas')
-      const canvas = await html2canvas(deck, {
-        scale: 2,
-        useCORS: true,
-        allowTaint: true,
-        backgroundColor: null,
-        logging: false,
-      })
-      const dataUrl = canvas.toDataURL('image/png')
-
-      // iOS: 공유 시트, 그 외: 다운로드
-      try {
-        const res = await fetch(dataUrl)
-        const blob = await res.blob()
-        const file = new File([blob], 'card.png', { type: 'image/png' })
-        if (navigator.share && navigator.canShare?.({ files: [file] })) {
-          await navigator.share({ files: [file], title: '카드뉴스' })
-          return
-        }
-      } catch { /* fallback */ }
-
-      const a = document.createElement('a')
-      a.href = dataUrl
-      a.download = 'card.png'
-      a.click()
-    } catch (e) {
-      alert('저장 실패: ' + (e instanceof Error ? e.message : String(e)))
-    } finally {
-      deck.style.filter = prevFilter
-      if (themeBar) themeBar.style.display = ''
-    }
+      iframeRef.current?.contentWindow?.postMessage({ type: 'SHARE_CURRENT' }, '*')
+    } catch { /* ignore */ }
   }
 
   function goSlide(dir: number) {
@@ -297,8 +253,11 @@ export default function Home() {
                   <button onClick={() => callIframe('openModal')} style={{ padding: '8px 14px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.7)', background: 'rgba(255,255,255,0.5)', fontSize: '13px', fontWeight: 600, cursor: 'pointer', color: '#334155' }}>
                     💬 캡션
                   </button>
-                  <button onClick={handleSave} style={{ padding: '8px 14px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.7)', background: '#fce7f3', fontSize: '13px', fontWeight: 600, cursor: 'pointer', color: '#be185d' }}>
+                  <button onClick={() => callIframe('saveCurrentSlide')} style={{ padding: '8px 14px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.7)', background: '#fce7f3', fontSize: '13px', fontWeight: 600, cursor: 'pointer', color: '#be185d' }}>
                     📸 저장
+                  </button>
+                  <button onClick={shareCurrentSlide} style={{ padding: '8px 14px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.7)', background: '#e0f2fe', fontSize: '13px', fontWeight: 600, cursor: 'pointer', color: '#0369a1' }}>
+                    🔗 공유
                   </button>
                   <a href="https://www.instagram.com/hare_table/" target="_blank" rel="noopener noreferrer" style={{ padding: '8px 14px', borderRadius: '8px', border: 'none', background: 'linear-gradient(135deg,#f9a8d4,#c084fc)', fontSize: '13px', fontWeight: 700, color: '#fff', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px', whiteSpace: 'nowrap' }}>📲 내 인스타</a>
                 </div>

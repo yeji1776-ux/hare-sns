@@ -555,6 +555,51 @@ async function saveCurrentSlide() {
   }
 }
 
+async function shareCurrentSlide() {
+  var deck = document.getElementById('deck');
+  var computedFilter = window.getComputedStyle(deck).filter;
+  var prevFilter = deck.style.filter;
+  var prevBg = deck.style.background;
+
+  if (computedFilter && computedFilter !== 'none') {
+    deck.style.filter = computedFilter;
+  }
+  deck.style.background = [
+    'radial-gradient(ellipse 80% 60% at 15% 10%, rgba(186,230,253,0.75) 0%, transparent 55%)',
+    'radial-gradient(ellipse 70% 60% at 85% 85%, rgba(203,225,245,0.6) 0%, transparent 55%)',
+    'radial-gradient(ellipse 50% 40% at 60% 30%, rgba(240,248,255,0.5) 0%, transparent 50%)',
+    'linear-gradient(145deg, #eaf6fd 0%, #f4f8fb 45%, #ddeef8 100%)'
+  ].join(',');
+
+  try {
+    var dataUrl = await domtoimage.toPng(deck, {
+      scale: 2,
+      filter: function(node) {
+        return !node.classList || !node.classList.contains('theme-bar');
+      }
+    });
+
+    var res = await fetch(dataUrl);
+    var blob = await res.blob();
+    var file = new File([blob], 'card.png', { type: 'image/png' });
+
+    if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+      await navigator.share({ files: [file], title: '카드뉴스' });
+    } else {
+      // 데스크탑 fallback: 다운로드
+      var a = document.createElement('a');
+      a.href = dataUrl;
+      a.download = 'card_' + (cur + 1) + '.png';
+      a.click();
+    }
+  } catch(e) {
+    alert('공유 실패: ' + (e && e.message ? e.message : e));
+  } finally {
+    deck.style.filter = prevFilter;
+    deck.style.background = prevBg;
+  }
+}
+
 // postMessage — 부모 페이지 제어
 window.addEventListener('message', function(e) {
   if (!e.data || !e.data.type) return;
@@ -562,6 +607,7 @@ window.addEventListener('message', function(e) {
   if (e.data.type === 'GO_PREV') go(-1);
   if (e.data.type === 'OPEN_CAPTION') openModal();
   if (e.data.type === 'SAVE_CURRENT') saveCurrentSlide();
+  if (e.data.type === 'SHARE_CURRENT') shareCurrentSlide();
 });
 
 update();
