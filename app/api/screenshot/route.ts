@@ -43,6 +43,12 @@ export async function POST(req: Request) {
       await new Promise(r => setTimeout(r, 700))
     }
 
+    // Hide theme bar (color selector dots) — not part of the final card
+    await page.evaluate(() => {
+      const bar = document.querySelector('.theme-bar') as HTMLElement | null
+      if (bar) bar.style.display = 'none'
+    })
+
     const deck = await page.$('#deck')
     if (!deck) throw new Error('#deck not found')
 
