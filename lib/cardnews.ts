@@ -232,7 +232,8 @@ body {
 .loc { margin-top:clamp(12px,3%,20px); font-size:var(--fs-small); color:var(--dim); font-weight:500; display:flex; align-items:center; gap:4px; }
 .s-deep .loc { color:rgba(255,255,255,0.55); }
 
-.nav-wrap { position:fixed; bottom:clamp(14px,3vh,26px); left:50%; transform:translateX(-50%); display:flex; gap:12px; align-items:center; z-index:10; }
+.stage { position:relative; }
+.nav-wrap { position:absolute; bottom:clamp(14px,3vh,26px); left:50%; transform:translateX(-50%); display:flex; gap:12px; align-items:center; z-index:10; }
 .nav-btn { width:36px; height:36px; border-radius:50%; border:1px solid rgba(255,255,255,0.6); background:rgba(255,255,255,0.25); backdrop-filter:blur(8px); color:var(--text); cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all .2s; }
 .nav-btn:hover { background:rgba(255,255,255,0.65); transform:scale(1.08); }
 .nav-btn svg { width:14px; height:14px; }
@@ -240,8 +241,8 @@ body {
 .dot { width:5px; height:5px; border-radius:50%; background:rgba(56,189,248,0.28); cursor:pointer; transition:all .3s; }
 .dot.active { width:18px; border-radius:3px; background:var(--accent); opacity:.8; }
 
-.counter { position:fixed; top:clamp(14px,3vh,22px); right:clamp(14px,3vw,22px); font-size:11px; font-weight:700; color:var(--dim); letter-spacing:.1em; z-index:10; }
-.caption-btn { position:fixed; top:clamp(14px,3vh,22px); left:clamp(14px,3vw,22px); background:rgba(255,255,255,0.45); border:1px solid rgba(255,255,255,0.7); backdrop-filter:blur(8px); padding:6px 12px; border-radius:100px; font-size:11px; font-weight:600; cursor:pointer; color:var(--text); transition:all .2s; z-index:10; }
+.counter { position:absolute; top:clamp(14px,3vh,22px); right:clamp(14px,3vw,22px); font-size:11px; font-weight:700; color:var(--dim); letter-spacing:.1em; z-index:10; }
+.caption-btn { position:absolute; top:clamp(14px,3vh,22px); left:clamp(14px,3vw,22px); background:rgba(255,255,255,0.45); border:1px solid rgba(255,255,255,0.7); backdrop-filter:blur(8px); padding:6px 12px; border-radius:100px; font-size:11px; font-weight:600; cursor:pointer; color:var(--text); transition:all .2s; z-index:10; }
 .caption-btn:hover { background:rgba(255,255,255,0.65); }
 
 .modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.3); backdrop-filter:blur(4px); z-index:100; align-items:center; justify-content:center; padding:20px; }
@@ -303,7 +304,6 @@ body.is-standalone .save-bar { display: flex; }
 
 @media (max-width: 540px) {
   .save-btn { padding: 5px 9px; font-size: 10px; border-radius: 8px; }
-  .nav-wrap { bottom: clamp(50px,10vh,64px); }
 }
 
 /* Edit Mode */
@@ -539,15 +539,15 @@ body.is-standalone .save-bar { display: flex; }
     </div>
 
   </div>
-</div>
 
-<div class="counter" id="counter">1 / 7</div>
-<button class="caption-btn" onclick="openModal()">💬 캡션 복사</button>
+  <div class="counter" id="counter">1 / 7</div>
+  <button class="caption-btn" onclick="openModal()">💬 캡션 복사</button>
 
-<div class="nav-wrap">
-  <button class="nav-btn" onclick="go(-1)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg></button>
-  <div class="dots" id="dots"></div>
-  <button class="nav-btn" onclick="go(1)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></button>
+  <div class="nav-wrap">
+    <button class="nav-btn" onclick="go(-1)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg></button>
+    <div class="dots" id="dots"></div>
+    <button class="nav-btn" onclick="go(1)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></button>
+  </div>
 </div>
 
 <div class="modal" id="modal">
