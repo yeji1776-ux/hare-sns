@@ -948,29 +948,33 @@ export function buildCardNewsHtmlV2(data: CardNewsData, images: string[]): strin
 `
   html = html.replace('</style>', photoCSS + '</style>')
 
+  // onerror: 이미지 로드 실패 시 s-photo → 원래 글래스 스타일로 폴백
+  const fallback = (cls: string) =>
+    `onerror="var s=this.parentElement;s.classList.remove('s-photo');s.classList.add('${cls}');this.remove();"`
+
   // Replace slide classes and add photo backgrounds
   if (imgs[0]) {
     html = html.replace(
       '<!-- 01 커버 -->\n    <div class="slide s-glass active">',
-      `<!-- 01 커버 -->\n    <div class="slide s-photo active">\n      <img class="slide-bg" src="${imgs[0]}" crossorigin="anonymous">`
+      `<!-- 01 커버 -->\n    <div class="slide s-photo active">\n      <img class="slide-bg" src="${imgs[0]}" crossorigin="anonymous" ${fallback('s-glass')}>`
     )
   }
   if (imgs[1]) {
     html = html.replace(
       '<!-- 03 핵심수치 -->\n    <div class="slide s-deep">',
-      `<!-- 03 핵심수치 -->\n    <div class="slide s-photo">\n      <img class="slide-bg" src="${imgs[1]}" crossorigin="anonymous">`
+      `<!-- 03 핵심수치 -->\n    <div class="slide s-photo">\n      <img class="slide-bg" src="${imgs[1]}" crossorigin="anonymous" ${fallback('s-deep')}>`
     )
   }
   if (imgs[2]) {
     html = html.replace(
       '<!-- 05 혜택/구성 -->\n    <div class="slide s-glass">',
-      `<!-- 05 혜택/구성 -->\n    <div class="slide s-photo">\n      <img class="slide-bg" src="${imgs[2]}" crossorigin="anonymous">`
+      `<!-- 05 혜택/구성 -->\n    <div class="slide s-photo">\n      <img class="slide-bg" src="${imgs[2]}" crossorigin="anonymous" ${fallback('s-glass')}>`
     )
   }
   if (imgs[3]) {
     html = html.replace(
       '<!-- 07 클로징 -->\n    <div class="slide s-silver">',
-      `<!-- 07 클로징 -->\n    <div class="slide s-photo">\n      <img class="slide-bg" src="${imgs[3]}" crossorigin="anonymous">`
+      `<!-- 07 클로징 -->\n    <div class="slide s-photo">\n      <img class="slide-bg" src="${imgs[3]}" crossorigin="anonymous" ${fallback('s-silver')}>`
     )
   }
 
