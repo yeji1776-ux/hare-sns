@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { scrapeNaverBlog } from '@/lib/scraper'
 import { regenerateSection } from '@/lib/converter'
 
+export const maxDuration = 60
+
 const defaultSponsorship = {
   enabled: false,
   rawRequirements: '',
