@@ -513,6 +513,13 @@ function showSaveModal(dataUrl) {
 
 async function saveCurrentSlide() {
   var deck = document.getElementById('deck');
+  // 부모 data-theme CSS 선택자로 적용되는 filter를 인라인으로 박아야
+  // html-to-image 클론에서도 색상이 동일하게 나옴
+  var computedFilter = window.getComputedStyle(deck).filter;
+  var prevFilter = deck.style.filter;
+  if (computedFilter && computedFilter !== 'none') {
+    deck.style.filter = computedFilter;
+  }
   try {
     var dataUrl = await htmlToImage.toPng(deck, {
       pixelRatio: 2,
@@ -524,6 +531,8 @@ async function saveCurrentSlide() {
     showSaveModal(dataUrl);
   } catch(e) {
     alert('캡처 실패: ' + (e && e.message ? e.message : e));
+  } finally {
+    deck.style.filter = prevFilter;
   }
 }
 
