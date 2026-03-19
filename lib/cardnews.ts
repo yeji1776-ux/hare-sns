@@ -919,8 +919,12 @@ window.addEventListener('message', async function(e) {
 
 export function buildCardNewsHtmlV2(data: CardNewsData, images: string[]): string {
   let html = buildCardNewsHtml(data)
-  const imgs = images.filter(Boolean).slice(0, 4)
-  if (imgs.length === 0) return html
+  const rawImgs = images.filter(Boolean).slice(0, 4)
+  if (rawImgs.length === 0) return html
+
+  // 네이버 CDN 이미지는 Referer 체크로 차단 → 서버 프록시를 통해 로드
+  const proxy = (src: string) => `/api/proxy-image?url=${encodeURIComponent(src)}`
+  const imgs = rawImgs.map(proxy)
 
   // Photo slide CSS
   const photoCSS = `
