@@ -98,7 +98,6 @@ ${sponsor}
 }
 
 export function buildCardNewsHtml(data: CardNewsData): string {
-  // 하늘+실버 글래스모피즘 HTML 템플릿
   return `<!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -112,7 +111,7 @@ export function buildCardNewsHtml(data: CardNewsData): string {
   --accent: #38bdf8;
   --deep: #0369a1;
   --text: #1e293b;
-  --dim: rgba(30, 41, 59, 0.75);
+  --dim: rgba(30,41,59,0.75);
   --sans: 'Noto Sans KR', sans-serif;
   --fs-xl: clamp(28px,7.5vw,52px);
   --fs-lg: clamp(22px,6vw,42px);
@@ -122,7 +121,7 @@ export function buildCardNewsHtml(data: CardNewsData): string {
   --title-col: #0f172a;
 }
 *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; touch-action:manipulation; -webkit-tap-highlight-color:transparent; }
-html, body { height:100%; overflow:hidden; }
+html, body { width:100%; height:100%; overflow:hidden; }
 body {
   font-family: var(--sans);
   -webkit-font-smoothing: antialiased;
@@ -133,33 +132,34 @@ body {
     radial-gradient(ellipse 50% 40% at 60% 30%, rgba(226,232,240,0.35) 0%, transparent 50%),
     linear-gradient(145deg, #ddf0fb 0%, #e2e8f0 45%, #c8d4e0 100%);
 }
-.stage { width:100vw; height:100vh; display:flex; align-items:center; justify-content:center; }
+
+/* ── Deck ── */
 .deck {
-  position:relative; width:min(94vmin,90vh); height:min(94vmin,90vh);
-  overflow:hidden; border-radius:40px;
+  position:relative;
+  width:min(96vmin,96vh); height:min(96vmin,96vh);
+  overflow:hidden; border-radius:36px;
   border:1.5px solid rgba(255,255,255,0.95);
+  flex-shrink:0;
 }
+
+/* ── Slides ── */
 .slide {
   position:absolute; inset:0;
   display:flex; flex-direction:column; justify-content:center;
   padding:clamp(28px,8%,56px);
   opacity:0; transform:scale(0.97) translateY(12px);
-  transition:opacity .5s cubic-bezier(.4,0,.2,1), transform .5s cubic-bezier(.4,0,.2,1);
+  transition:opacity .45s cubic-bezier(.4,0,.2,1), transform .45s cubic-bezier(.4,0,.2,1);
   pointer-events:none; overflow:hidden; color:var(--text);
 }
 .slide.active { opacity:1; transform:scale(1) translateY(0); pointer-events:auto; z-index:2; }
-.slide.prev { opacity:0; transform:scale(1.03) translateY(-12px); z-index:1; }
-.slide::before {
-  content:''; position:absolute; inset:0;
-  background:linear-gradient(135deg,rgba(255,255,255,0.55) 0%,transparent 42%);
-  pointer-events:none;
-}
+.slide.prev   { opacity:0; transform:scale(1.03) translateY(-12px); z-index:1; }
+.slide::before { content:''; position:absolute; inset:0; background:linear-gradient(135deg,rgba(255,255,255,0.55) 0%,transparent 42%); pointer-events:none; }
 
-.s-glass { background:linear-gradient(135deg,rgba(255,255,255,0.3) 0%,rgba(186,230,253,0.12) 100%); backdrop-filter:blur(36px); -webkit-backdrop-filter:blur(36px); }
+.s-glass  { background:linear-gradient(135deg,rgba(255,255,255,0.3) 0%,rgba(186,230,253,0.12) 100%); backdrop-filter:blur(36px); -webkit-backdrop-filter:blur(36px); }
 .s-silver { background:linear-gradient(135deg,rgba(248,250,252,0.38) 0%,rgba(215,220,228,0.2) 100%); backdrop-filter:blur(36px); -webkit-backdrop-filter:blur(36px); }
-.s-accent { background:linear-gradient(145deg,rgba(186,230,253,0.32), rgba(125,211,252,0.18)); backdrop-filter:blur(44px); -webkit-backdrop-filter:blur(44px); }
-.s-mid { background:linear-gradient(145deg,rgba(226,232,240,0.38), rgba(203,213,225,0.22)); backdrop-filter:blur(44px); -webkit-backdrop-filter:blur(44px); }
-.s-deep { background:linear-gradient(145deg,rgba(2,132,199,0.72), rgba(3,105,161,0.6)); backdrop-filter:blur(44px); -webkit-backdrop-filter:blur(44px); }
+.s-accent { background:linear-gradient(145deg,rgba(186,230,253,0.32),rgba(125,211,252,0.18)); backdrop-filter:blur(44px); -webkit-backdrop-filter:blur(44px); }
+.s-mid    { background:linear-gradient(145deg,rgba(226,232,240,0.38),rgba(203,213,225,0.22)); backdrop-filter:blur(44px); -webkit-backdrop-filter:blur(44px); }
+.s-deep   { background:linear-gradient(145deg,rgba(2,132,199,0.72),rgba(3,105,161,0.6)); backdrop-filter:blur(44px); -webkit-backdrop-filter:blur(44px); }
 
 .orb { position:absolute; border-radius:50%; filter:blur(clamp(32px,8vw,60px)); pointer-events:none; }
 .orb-a { width:70%; aspect-ratio:1; background:rgba(56,189,248,0.55); top:-25%; right:-20%; }
@@ -167,15 +167,7 @@ body {
 .orb-w { width:65%; aspect-ratio:1; background:rgba(255,255,255,0.18); top:-25%; right:-20%; }
 .inner { position:relative; z-index:1; width:100%; }
 
-.tag {
- display:inline-flex; align-items:center; gap:6px;
- background:rgba(255,255,255,0.45); border:1px solid rgba(255,255,255,0.7);
- border-radius:100px; padding:5px 13px;
- font-size:clamp(9px,1.9vw,11px); font-weight:600;
- letter-spacing:.15em; text-transform:uppercase;
- color:var(--accent); backdrop-filter:blur(8px);
- margin-bottom:clamp(10px,2.5%,18px);
-}
+.tag { display:inline-flex; align-items:center; background:rgba(255,255,255,0.45); border:1px solid rgba(255,255,255,0.7); border-radius:100px; padding:5px 13px; font-size:clamp(9px,1.9vw,11px); font-weight:600; letter-spacing:.15em; text-transform:uppercase; color:var(--accent); backdrop-filter:blur(8px); margin-bottom:clamp(10px,2.5%,18px); }
 .s-deep .tag { background:rgba(255,255,255,0.12); border-color:rgba(255,255,255,0.25); color:rgba(255,255,255,0.9); }
 .s-accent .tag, .s-mid .tag { background:rgba(255,255,255,0.55); border-color:rgba(255,255,255,0.8); color:var(--accent); }
 
@@ -195,20 +187,15 @@ body {
 .big-unit { font-size:clamp(11px,2.5vw,15px); font-weight:400; letter-spacing:.2em; color:rgba(255,255,255,0.7); margin-top:8px; display:block; }
 
 .cards { display:grid; grid-template-columns:1fr 1fr; gap:clamp(7px,1.8%,11px); margin-top:clamp(16px,4%,28px); }
-.card {
- background:rgba(255,255,255,0.38); border:1px solid rgba(255,255,255,0.65);
- border-radius:clamp(12px,3%,18px); padding:clamp(12px,3.5%,20px);
- backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);
- position:relative; overflow:hidden;
-}
+.card { background:rgba(255,255,255,0.38); border:1px solid rgba(255,255,255,0.65); border-radius:clamp(12px,3%,18px); padding:clamp(12px,3.5%,20px); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); position:relative; overflow:hidden; }
 .card::before { content:''; position:absolute; top:0; left:0; right:0; height:1px; background:linear-gradient(90deg,rgba(255,255,255,0.8),transparent); }
 .s-deep .card, .s-accent .card, .s-mid .card { background:rgba(255,255,255,0.12); border-color:rgba(255,255,255,0.2); }
+.s-accent .card, .s-mid .card { background:rgba(255,255,255,0.55); border-color:rgba(255,255,255,0.75); }
 .card-icon { font-size:clamp(18px,4.5vw,26px); margin-bottom:clamp(5px,1.5%,9px); }
 .card-title { font-size:var(--fs-content); font-weight:700; color:var(--text); margin-bottom:4px; }
 .card-body { font-size:var(--fs-small); color:rgba(30,41,59,0.8); line-height:1.55; }
 .s-deep .card-title { color:rgba(255,255,255,0.95); }
 .s-deep .card-body { color:rgba(255,255,255,0.8); }
-.s-accent .card, .s-mid .card { background:rgba(255,255,255,0.55); border-color:rgba(255,255,255,0.75); }
 .s-accent .card-title, .s-mid .card-title { color:#0f172a; }
 .s-accent .card-body, .s-mid .card-body { color:rgba(15,23,42,0.75); }
 
@@ -217,12 +204,12 @@ body {
 .list li:last-child { border:none; }
 .s-deep .list li { border-color:rgba(255,255,255,0.12); }
 .list-dot { width:7px; height:7px; border-radius:50%; background:var(--accent); flex-shrink:0; margin-top:6px; }
-.s-deep .list-dot { background:#fff; box-shadow:0 0 6px rgba(255,255,255,0.5); }
+.s-deep .list-dot { background:#fff; }
 .list-txt { flex:1; font-size:var(--fs-content); color:var(--text); line-height:1.6; }
 .s-deep .list-txt { color:rgba(255,255,255,0.9); }
 .list-em { font-weight:700; color:var(--accent); margin-right:4px; }
 .s-deep .list-em { color:#fff; }
-.list-sub { font-size:.82em; color:var(--dim); display:block; margin-top:2px; font-weight:400; }
+.list-sub { font-size:.82em; color:var(--dim); display:block; margin-top:2px; }
 .s-deep .list-sub { color:rgba(255,255,255,0.62); }
 
 .free-row { display:flex; gap:clamp(6px,1.8%,10px); flex-wrap:wrap; margin-top:clamp(12px,3%,20px); }
@@ -231,404 +218,234 @@ body {
 
 .loc { margin-top:clamp(12px,3%,20px); font-size:var(--fs-small); color:var(--dim); font-weight:500; display:flex; align-items:center; gap:4px; }
 .s-deep .loc { color:rgba(255,255,255,0.55); }
+.hare-table { position:absolute; bottom:28px; right:32px; font-size:12px; font-weight:500; opacity:.55; letter-spacing:.05em; color:var(--text); z-index:5; }
 
-.stage { position:relative; }
-.nav-wrap { position:absolute; bottom:clamp(14px,3vh,26px); left:50%; transform:translateX(-50%); display:flex; gap:12px; align-items:center; z-index:10; }
-.nav-btn { width:48px; height:48px; border-radius:50%; border:1.5px solid rgba(255,255,255,0.8); background:rgba(255,255,255,0.55); color:var(--text); cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all .2s; font-size:22px; -webkit-tap-highlight-color:rgba(0,0,0,0.1); }
-.nav-btn:active { background:rgba(255,255,255,0.85); transform:scale(0.93); }
-.nav-btn svg { width:16px; height:16px; }
-.dots { display:flex; gap:5px; align-items:center; }
-.dot { width:5px; height:5px; border-radius:50%; background:rgba(56,189,248,0.28); cursor:pointer; transition:all .3s; }
-.dot.active { width:18px; border-radius:3px; background:var(--accent); opacity:.8; }
-/* 슬라이드 탭 클릭존 — iOS에서 작은 버튼 대신 넓은 영역으로 터치 */
-.tap-prev, .tap-next { position:absolute; top:0; bottom:0; width:42%; z-index:5; cursor:pointer; -webkit-tap-highlight-color:transparent; }
-.tap-prev { left:0; }
-.tap-next { right:0; }
+/* ── 점 내비게이션 ── */
+.dots-bar { position:absolute; bottom:14px; left:50%; transform:translateX(-50%); display:flex; gap:5px; align-items:center; z-index:10; }
+.dot { width:5px; height:5px; border-radius:50%; background:rgba(56,189,248,0.3); transition:all .3s; }
+.dot.active { width:16px; border-radius:3px; background:var(--accent); opacity:.85; }
 
-.counter { position:absolute; top:clamp(14px,3vh,22px); right:clamp(14px,3vw,22px); font-size:11px; font-weight:700; color:var(--dim); letter-spacing:.1em; z-index:10; }
-.caption-btn { position:absolute; top:clamp(14px,3vh,22px); left:clamp(14px,3vw,22px); background:rgba(255,255,255,0.45); border:1px solid rgba(255,255,255,0.7); backdrop-filter:blur(8px); padding:6px 12px; border-radius:100px; font-size:11px; font-weight:600; cursor:pointer; color:var(--text); transition:all .2s; z-index:10; }
-.caption-btn:hover { background:rgba(255,255,255,0.65); }
+/* ── 테마 바 ── */
+.theme-bar { position:absolute; top:12px; left:50%; transform:translateX(-50%); display:flex; gap:6px; align-items:center; z-index:20; background:rgba(255,255,255,0.35); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); border:1px solid rgba(255,255,255,0.65); border-radius:100px; padding:5px 10px; }
+.theme-dot { width:18px; height:18px; border-radius:50%; cursor:pointer; border:2px solid rgba(255,255,255,0.4); transition:all .2s; flex-shrink:0; }
+.theme-dot.active { border-color:#fff; transform:scale(1.25); box-shadow:0 1px 6px rgba(0,0,0,0.18); }
 
-.modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.3); backdrop-filter:blur(4px); z-index:100; align-items:center; justify-content:center; padding:20px; }
+/* ── 테마 필터 ── */
+[data-theme="food"]    .deck { filter:hue-rotate(25deg) saturate(1.1); }
+[data-theme="cafe"]    .deck { filter:hue-rotate(330deg) saturate(1.05); }
+[data-theme="travel"]  .deck { filter:hue-rotate(150deg) saturate(1.1); }
+[data-theme="beauty"]  .deck { filter:hue-rotate(270deg) saturate(1.05); }
+[data-theme="culture"] .deck { filter:hue-rotate(235deg); }
+[data-theme="life"]    .deck { filter:hue-rotate(55deg) saturate(1.1); }
+[data-theme="health"]  .deck { filter:hue-rotate(130deg) saturate(1.1); }
+[data-theme="sky"]     .deck { filter:none; }
+
+/* ── 캡션 모달 ── */
+.modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.28); backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px); z-index:100; align-items:center; justify-content:center; padding:20px; }
 .modal.open { display:flex; }
-.modal-box { background:rgba(248,250,252,0.88); border:1px solid rgba(255,255,255,0.8); backdrop-filter:blur(16px); width:100%; max-width:440px; border-radius:24px; padding:24px; position:relative; }
-.modal-title { font-size:11px; font-weight:600; letter-spacing:.15em; text-transform:uppercase; color:var(--accent); margin-bottom:12px; }
+.modal-box { background:rgba(248,250,252,0.92); border:1px solid rgba(255,255,255,0.8); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); width:100%; max-width:440px; border-radius:24px; padding:24px; }
+.modal-title { font-size:11px; font-weight:600; letter-spacing:.15em; text-transform:uppercase; color:var(--accent); margin-bottom:14px; }
 .caption-section { margin-bottom:16px; }
-.caption-section:last-of-type { margin-bottom:0; }
-.caption-label { font-size:10px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--accent); margin-bottom:6px; opacity:0.8; }
+.caption-label { font-size:10px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--accent); opacity:.8; margin-bottom:6px; }
 .caption-divider { width:100%; height:1px; background:rgba(0,0,0,0.08); margin:14px 0; }
-.modal-text { font-size:13px; line-height:1.85; color:var(--text); white-space:pre-wrap; max-height:28vh; overflow-y:auto; padding-right:8px; }
-.modal-copy { margin-top:8px; width:100%; padding:10px; background:var(--accent); color:#fff; border:none; border-radius:12px; font-size:13px; font-weight:700; cursor:pointer; transition:opacity .2s; }
-.modal-copy:hover { opacity:.85; }
+.modal-text { font-size:13px; line-height:1.85; color:var(--text); white-space:pre-wrap; max-height:26vh; overflow-y:auto; }
+.modal-copy { margin-top:8px; width:100%; padding:10px; background:var(--accent); color:#fff; border:none; border-radius:12px; font-size:13px; font-weight:700; cursor:pointer; }
 .modal-close { margin-top:12px; width:100%; padding:9px; background:transparent; color:var(--dim); border:none; font-size:12px; font-weight:600; cursor:pointer; }
-.hare-table { position: absolute; bottom: 32px; right: 36px; font-size: 13px; font-weight: 500; font-family: sans-serif; opacity: 0.6; letter-spacing: 0.05em; color: var(--text); z-index: 5; }
 
-/* Themes via hue-rotate */
-[data-theme="food"] .deck { filter: hue-rotate(25deg) saturate(1.1); }
-[data-theme="cafe"] .deck { filter: hue-rotate(330deg) saturate(1.05); }
-[data-theme="travel"] .deck { filter: hue-rotate(150deg) saturate(1.1); }
-[data-theme="beauty"] .deck { filter: hue-rotate(270deg) saturate(1.05); }
-[data-theme="culture"] .deck { filter: hue-rotate(235deg); }
-[data-theme="life"] .deck { filter: hue-rotate(55deg) saturate(1.1); }
-[data-theme="health"] .deck { filter: hue-rotate(130deg) saturate(1.1); }
-[data-theme="sky"] .deck { filter: none; }
-
-.theme-bar {
-  position: fixed; top: clamp(10px,2.5vh,18px); left: 50%; transform: translateX(-50%);
-  display: flex; gap: 8px; align-items: center; z-index: 20;
-  background: rgba(255,255,255,0.4); backdrop-filter: blur(12px);
-  border: 1px solid rgba(255,255,255,0.7); border-radius: 100px;
-  padding: 6px 12px;
-}
-.theme-dot {
-  width: 20px; height: 20px; border-radius: 50%; cursor: pointer;
-  border: 2px solid rgba(255,255,255,0.5); transition: all 0.2s;
-  flex-shrink: 0;
-}
-.theme-dot.active { border-color: white; transform: scale(1.25); box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
-.theme-dot:hover { transform: scale(1.15); }
-.theme-label {
-  font-size: 10px; font-weight: 600; color: rgba(30,41,59,0.7);
-  white-space: nowrap; padding: 0 4px;
-}
-
-.save-bar {
-  position: fixed; bottom: clamp(56px,10vh,72px); right: clamp(10px,2.5vw,18px);
-  display: none; flex-direction: column; gap: 6px; z-index: 20;
-}
-body.is-standalone .save-bar { display: flex; }
-.save-btn {
-  padding: 7px 12px; font-size: 11px; font-weight: 700;
-  background: rgba(255,255,255,0.5); border: 1px solid rgba(255,255,255,0.7);
-  backdrop-filter: blur(8px); border-radius: 10px; cursor: pointer;
-  color: rgba(30,41,59,0.8); transition: all 0.2s; white-space: nowrap;
-}
-.save-btn:hover { background: rgba(255,255,255,0.8); }
-.save-btn.saving { opacity: 0.6; cursor: wait; }
-
-@media (max-width: 540px) {
-  .save-btn { padding: 5px 9px; font-size: 10px; border-radius: 8px; }
-}
-
-/* Edit Mode */
-.edit-mode [contenteditable="true"] {
-  outline: 1.5px dashed rgba(56,189,248,0.55);
-  border-radius: 4px;
-  cursor: text;
-  min-width: 20px;
-  display: inline-block;
-}
-.edit-mode [contenteditable="true"]:hover {
-  outline-color: rgba(56,189,248,0.85);
-  background: rgba(255,255,255,0.12);
-}
-.edit-mode [contenteditable="true"]:focus {
-  outline: 2px solid var(--accent);
-  background: rgba(255,255,255,0.18);
-  border-radius: 4px;
-}
-.edit-mode [contenteditable="true"]:empty::before {
-  content: '입력...'; opacity: 0.35; font-style: italic;
-}
-.edit-badge {
-  position: fixed; top: clamp(10px,2.5vh,18px); left: 50%;
-  transform: translateX(-50%);
-  background: var(--accent); color: #fff;
-  font-size: 11px; font-weight: 700; letter-spacing: .08em;
-  padding: 5px 14px; border-radius: 100px; z-index: 30;
-  display: none; pointer-events: none;
-}
-.edit-mode .edit-badge { display: block; }
-.edit-mode .theme-bar { display: none; }
-
-/* Settings Panel */
-.settings-panel {
-  position:fixed; left:-268px; top:50%; transform:translateY(-50%);
-  width:248px; max-height:82vh; overflow-y:auto;
-  background:rgba(248,250,252,0.96); border:1px solid rgba(255,255,255,0.9);
-  backdrop-filter:blur(24px); -webkit-backdrop-filter:blur(24px);
-  border-radius:20px; padding:20px; z-index:24;
-  transition:left 0.35s cubic-bezier(.4,0,.2,1);
-}
-.settings-panel.open { left:10px; }
-.sp-head { font-size:11px; font-weight:700; color:var(--accent); letter-spacing:.12em; text-transform:uppercase; margin-bottom:16px; }
-.sp-sec { margin-bottom:14px; }
-.sp-sec:last-child { margin-bottom:0; }
-.sp-lbl { font-size:10px; font-weight:600; color:rgba(30,41,59,0.4); letter-spacing:.08em; text-transform:uppercase; margin-bottom:8px; }
-.sp-swatches { display:flex; gap:7px; flex-wrap:wrap; align-items:center; }
-.sp-sw { width:22px; height:22px; border-radius:50%; cursor:pointer; border:2.5px solid transparent; transition:all 0.2s; flex-shrink:0; }
-.sp-sw.on { border-color:rgba(30,41,59,0.5); transform:scale(1.2); }
-.sp-sw:hover:not(.on) { transform:scale(1.1); }
-.sp-custom { width:22px; height:22px; border-radius:50%; cursor:pointer; border:2px solid rgba(200,210,220,0.6); padding:0; overflow:hidden; flex-shrink:0; background:none; }
-.sp-row3 { display:flex; gap:5px; }
-.sp-chip { flex:1; padding:6px 4px; font-size:11px; font-weight:600; background:rgba(255,255,255,0.6); border:1px solid rgba(255,255,255,0.8); border-radius:9px; cursor:pointer; color:rgba(30,41,59,0.5); transition:all 0.2s; text-align:center; }
-.sp-chip.on { background:var(--accent); color:#fff; border-color:var(--accent); }
-.sp-chip:hover:not(.on) { background:rgba(255,255,255,0.9); }
-.sp-divider { height:1px; background:rgba(0,0,0,0.07); margin:12px 0; }
+/* ── 저장 모달 ── */
+#saveModal img { touch-action:auto !important; -webkit-touch-callout:default !important; }
 </style>
 </head>
 <body>
-<div class="stage">
+<div class="deck" id="deck">
 
-<div class="theme-bar" id="themeBar">
-  <span class="theme-label">테마</span>
-  <div class="theme-dot active" data-theme="sky" style="background:linear-gradient(135deg,#38bdf8,#0284c7)" title="스터디/오피스" onclick="setTheme('sky')"></div>
-  <div class="theme-dot" data-theme="food" style="background:linear-gradient(135deg,#fb923c,#ea580c)" title="맛집/음식" onclick="setTheme('food')"></div>
-  <div class="theme-dot" data-theme="cafe" style="background:linear-gradient(135deg,#f472b6,#db2777)" title="카페/디저트" onclick="setTheme('cafe')"></div>
-  <div class="theme-dot" data-theme="travel" style="background:linear-gradient(135deg,#2dd4bf,#0d9488)" title="여행/나들이" onclick="setTheme('travel')"></div>
-  <div class="theme-dot" data-theme="beauty" style="background:linear-gradient(135deg,#a78bfa,#7c3aed)" title="뷰티/패션" onclick="setTheme('beauty')"></div>
-  <div class="theme-dot" data-theme="culture" style="background:linear-gradient(135deg,#818cf8,#4338ca)" title="문화/전시" onclick="setTheme('culture')"></div>
-  <div class="theme-dot" data-theme="life" style="background:linear-gradient(135deg,#fbbf24,#ca8a04)" title="라이프/육아" onclick="setTheme('life')"></div>
-  <div class="theme-dot" data-theme="health" style="background:linear-gradient(135deg,#34d399,#059669)" title="헬스/운동" onclick="setTheme('health')"></div>
-</div>
-
-<div class="save-bar">
-  <button class="save-btn" id="saveCurrent" onclick="saveCurrentSlide()">📷 현재</button>
-  <button class="save-btn" id="saveAll" onclick="saveAllSlides()">💾 전체</button>
-  <button class="save-btn" id="editModeBtn" onclick="toggleEditMode()">📝 내용편집</button>
-  <button class="save-btn" onclick="toggleSettings()">🎨 스타일</button>
-</div>
-<div class="edit-badge" id="editBadge">✏ 편집 중 — 텍스트를 클릭해 수정하세요</div>
-
-<div class="settings-panel" id="settingsPanel">
-  <div class="sp-head">스타일 설정</div>
-  <div class="sp-sec">
-    <div class="sp-lbl">주요 색상</div>
-    <div class="sp-swatches">
-      <div class="sp-sw on" style="background:linear-gradient(135deg,#38bdf8,#0284c7)" onclick="setAccentPreset(0,this)" title="하늘"></div>
-      <div class="sp-sw" style="background:linear-gradient(135deg,#f472b6,#db2777)" onclick="setAccentPreset(1,this)" title="핑크"></div>
-      <div class="sp-sw" style="background:linear-gradient(135deg,#fb923c,#ea580c)" onclick="setAccentPreset(2,this)" title="오렌지"></div>
-      <div class="sp-sw" style="background:linear-gradient(135deg,#34d399,#059669)" onclick="setAccentPreset(3,this)" title="민트"></div>
-      <div class="sp-sw" style="background:linear-gradient(135deg,#a78bfa,#7c3aed)" onclick="setAccentPreset(4,this)" title="보라"></div>
-      <div class="sp-sw" style="background:linear-gradient(135deg,#fbbf24,#ca8a04)" onclick="setAccentPreset(5,this)" title="골드"></div>
-      <input type="color" class="sp-custom" id="customColorPicker" value="#38bdf8" oninput="setCustomColor(this.value)" title="직접 선택">
+  <!-- 01 커버 -->
+  <div class="slide s-glass active">
+    <div class="orb orb-a"></div><div class="orb orb-b"></div>
+    <div class="inner">
+      <div class="tag">${data.coverTag}</div>
+      <div class="t-xl">${data.placeName}</div>
+      <div class="rule"></div>
+      <p class="t-body">${data.coverHook}</p>
+      <div class="loc">📍 ${data.coverAddress}</div>
     </div>
-  </div>
-  <div class="sp-divider"></div>
-  <div class="sp-sec">
-    <div class="sp-lbl">제목 크기</div>
-    <div class="sp-row3">
-      <button class="sp-chip" data-tfs="xs" onclick="setTitleSize('xs')">극소</button>
-      <button class="sp-chip" data-tfs="sm" onclick="setTitleSize('sm')">소</button>
-      <button class="sp-chip on" data-tfs="md" onclick="setTitleSize('md')">중</button>
-      <button class="sp-chip" data-tfs="lg" onclick="setTitleSize('lg')">대</button>
-      <button class="sp-chip" data-tfs="xl" onclick="setTitleSize('xl')">극대</button>
-    </div>
-  </div>
-  <div class="sp-sec">
-    <div class="sp-lbl">내용 크기</div>
-    <div class="sp-row3">
-      <button class="sp-chip" data-bfs="xs" onclick="setBodySize('xs')">극소</button>
-      <button class="sp-chip" data-bfs="sm" onclick="setBodySize('sm')">소</button>
-      <button class="sp-chip on" data-bfs="md" onclick="setBodySize('md')">중</button>
-      <button class="sp-chip" data-bfs="lg" onclick="setBodySize('lg')">대</button>
-      <button class="sp-chip" data-bfs="xl" onclick="setBodySize('xl')">극대</button>
-    </div>
-  </div>
-  <div class="sp-divider"></div>
-  <div class="sp-sec">
-    <div class="sp-lbl">제목 색상</div>
-    <div class="sp-row3">
-      <button class="sp-chip on" data-tc="dark" onclick="setTitleColor('dark')">진하게</button>
-      <button class="sp-chip" data-tc="mid" onclick="setTitleColor('mid')">중간</button>
-      <button class="sp-chip" data-tc="light" onclick="setTitleColor('light')">연하게</button>
-    </div>
-  </div>
-  <div class="sp-divider"></div>
-  <div class="sp-sec">
-    <div class="sp-lbl">본문 색상</div>
-    <div class="sp-row3">
-      <button class="sp-chip on" data-bc="dark" onclick="setBodyColor('dark')">진하게</button>
-      <button class="sp-chip" data-bc="mid" onclick="setBodyColor('mid')">중간</button>
-      <button class="sp-chip" data-bc="light" onclick="setBodyColor('light')">연하게</button>
-    </div>
-  </div>
-</div>
-
-  <div class="deck" id="deck">
-
-    <!-- 01 커버 -->
-    <div class="slide s-glass active">
-      <div class="orb orb-a"></div><div class="orb orb-b"></div>
-      <div class="inner">
-        <div class="tag">${data.coverTag}</div>
-        <div class="t-xl">${data.placeName}</div>
-        <div class="rule"></div>
-        <p class="t-body">${data.coverHook}</p>
-        <div class="loc">📍 ${data.coverAddress}</div>
-      </div>
-      <div class="hare-table">@hare_table</div>
-    </div>
-
-    <!-- 02 기본정보 -->
-    <div class="slide s-silver">
-      <div class="orb orb-a" style="opacity:.25;"></div>
-      <div class="inner">
-        <div class="tag">Basic Info</div>
-        <div class="t-lg">이런 곳이에요</div>
-        <ul class="list">
-          <li><div class="list-dot"></div><div class="list-txt"><span class="list-em">위치</span> · ${data.basicInfo.location} <span class="list-sub">${data.basicInfo.locationSub}</span></div></li>
-          <li><div class="list-dot"></div><div class="list-txt"><span class="list-em">운영</span> · ${data.basicInfo.hours} <span class="list-sub">${data.basicInfo.hoursSub}</span></div></li>
-          <li><div class="list-dot"></div><div class="list-txt"><span class="list-em">가격</span> · ${data.basicInfo.price} <span class="list-sub">${data.basicInfo.priceSub}</span></div></li>
-          <li><div class="list-dot"></div><div class="list-txt"><span class="list-em">특징</span> · ${data.basicInfo.feature} <span class="list-sub">${data.basicInfo.featureSub}</span></div></li>
-        </ul>
-      </div>
-    </div>
-
-    <!-- 03 핵심수치 -->
-    <div class="slide s-deep">
-      <div class="orb orb-w"></div>
-      <div class="inner">
-        <div class="tag">Highlight</div>
-        <div class="big-num">${data.highlightNum}</div>
-        <div class="big-unit">${data.highlightUnit}</div>
-        <div class="rule"></div>
-        <p class="t-body">${data.highlightHook}</p>
-      </div>
-    </div>
-
-    <!-- 04 특징 -->
-    <div class="slide s-accent">
-      <div class="orb orb-w"></div>
-      <div class="inner">
-        <div class="tag">Features</div>
-        <div class="t-lg">${data.featureTitle}</div>
-        <div class="cards">
-          ${data.features.map(f => `
-          <div class="card">
-            <div class="card-icon">${f.icon}</div>
-            <div class="card-title">${f.title}</div>
-            <div class="card-body">${f.desc}</div>
-          </div>`).join('')}
-        </div>
-      </div>
-    </div>
-
-    <!-- 05 혜택/구성 -->
-    <div class="slide s-glass">
-      <div class="orb orb-a" style="opacity:.3;"></div><div class="orb orb-b"></div>
-      <div class="inner">
-        <div class="tag">${data.benefitTag}</div>
-        <div class="t-lg">${data.benefitTitle}</div>
-        <div class="free-row">
-          ${data.benefits.map(b => `<div class="free-pill">${b.icon} ${b.text}</div>`).join('')}
-        </div>
-        ${data.benefitSub ? `<p class="t-body" style="margin-top:clamp(12px,3%,18px);">${data.benefitSub}</p>` : ''}
-      </div>
-    </div>
-
-    <!-- 06 총평 -->
-    <div class="slide s-mid">
-      <div class="orb orb-w"></div>
-      <div class="inner">
-        <div class="tag">Review</div>
-        <div class="t-lg">${data.reviewTitle}</div>
-        <div class="rule"></div>
-        <ul class="list">
-          ${data.reviews.map(r => `<li><div class="list-dot"></div><div class="list-txt">${r}</div></li>`).join('')}
-        </ul>
-      </div>
-    </div>
-
-    <!-- 07 클로징 -->
-    <div class="slide s-silver">
-      <div class="orb orb-a" style="opacity:.3;"></div>
-      <div class="inner">
-        <div class="tag">${data.closingArea}</div>
-        <div class="t-xl">${data.closingTitle}</div>
-        <div class="rule"></div>
-        <p class="t-body">${data.closingWord}</p>
-        <div class="loc" style="margin-top:clamp(14px,3.5%,22px);">${data.closingHashtags}</div>
-      </div>
-    </div>
-
-    <!-- 탭 클릭존: 왼쪽 탭=이전, 오른쪽 탭=다음 (iOS 터치 대응) -->
-    <div class="tap-prev" onclick="go(-1)"></div>
-    <div class="tap-next" onclick="go(1)"></div>
+    <div class="hare-table">@hare_table</div>
   </div>
 
-  <div class="counter" id="counter">1 / 7</div>
-  <button class="caption-btn" onclick="openModal()">💬 캡션 복사</button>
+  <!-- 02 기본정보 -->
+  <div class="slide s-silver">
+    <div class="orb orb-a" style="opacity:.25"></div>
+    <div class="inner">
+      <div class="tag">Basic Info</div>
+      <div class="t-lg">이런 곳이에요</div>
+      <ul class="list">
+        <li><div class="list-dot"></div><div class="list-txt"><span class="list-em">위치</span> · ${data.basicInfo.location} <span class="list-sub">${data.basicInfo.locationSub}</span></div></li>
+        <li><div class="list-dot"></div><div class="list-txt"><span class="list-em">운영</span> · ${data.basicInfo.hours} <span class="list-sub">${data.basicInfo.hoursSub}</span></div></li>
+        <li><div class="list-dot"></div><div class="list-txt"><span class="list-em">가격</span> · ${data.basicInfo.price} <span class="list-sub">${data.basicInfo.priceSub}</span></div></li>
+        <li><div class="list-dot"></div><div class="list-txt"><span class="list-em">특징</span> · ${data.basicInfo.feature} <span class="list-sub">${data.basicInfo.featureSub}</span></div></li>
+      </ul>
+    </div>
+  </div>
 
-  <div class="nav-wrap">
-    <button class="nav-btn" onclick="go(-1)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg></button>
-    <div class="dots" id="dots"></div>
-    <button class="nav-btn" onclick="go(1)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></button>
+  <!-- 03 핵심수치 -->
+  <div class="slide s-deep">
+    <div class="orb orb-w"></div>
+    <div class="inner">
+      <div class="tag">Highlight</div>
+      <div class="big-num">${data.highlightNum}</div>
+      <div class="big-unit">${data.highlightUnit}</div>
+      <div class="rule"></div>
+      <p class="t-body">${data.highlightHook}</p>
+    </div>
+  </div>
+
+  <!-- 04 특징 -->
+  <div class="slide s-accent">
+    <div class="orb orb-w"></div>
+    <div class="inner">
+      <div class="tag">Features</div>
+      <div class="t-lg">${data.featureTitle}</div>
+      <div class="cards">
+        ${data.features.map(f => `<div class="card"><div class="card-icon">${f.icon}</div><div class="card-title">${f.title}</div><div class="card-body">${f.desc}</div></div>`).join('')}
+      </div>
+    </div>
+  </div>
+
+  <!-- 05 혜택 -->
+  <div class="slide s-glass">
+    <div class="orb orb-a" style="opacity:.3"></div><div class="orb orb-b"></div>
+    <div class="inner">
+      <div class="tag">${data.benefitTag}</div>
+      <div class="t-lg">${data.benefitTitle}</div>
+      <div class="free-row">
+        ${data.benefits.map(b => `<div class="free-pill">${b.icon} ${b.text}</div>`).join('')}
+      </div>
+      ${data.benefitSub ? `<p class="t-body" style="margin-top:clamp(12px,3%,18px)">${data.benefitSub}</p>` : ''}
+    </div>
+  </div>
+
+  <!-- 06 총평 -->
+  <div class="slide s-mid">
+    <div class="orb orb-w"></div>
+    <div class="inner">
+      <div class="tag">Review</div>
+      <div class="t-lg">${data.reviewTitle}</div>
+      <div class="rule"></div>
+      <ul class="list">
+        ${data.reviews.map(r => `<li><div class="list-dot"></div><div class="list-txt">${r}</div></li>`).join('')}
+      </ul>
+    </div>
+  </div>
+
+  <!-- 07 클로징 -->
+  <div class="slide s-silver">
+    <div class="orb orb-a" style="opacity:.3"></div>
+    <div class="inner">
+      <div class="tag">${data.closingArea}</div>
+      <div class="t-xl">${data.closingTitle}</div>
+      <div class="rule"></div>
+      <p class="t-body">${data.closingWord}</p>
+      <div class="loc" style="margin-top:clamp(14px,3.5%,22px)">${data.closingHashtags}</div>
+    </div>
+  </div>
+
+  <!-- 점 내비게이션 -->
+  <div class="dots-bar" id="dots"></div>
+
+  <!-- 테마 바 -->
+  <div class="theme-bar">
+    <div class="theme-dot active" data-theme="sky"     style="background:linear-gradient(135deg,#38bdf8,#0284c7)" onclick="setTheme('sky')"></div>
+    <div class="theme-dot"        data-theme="food"    style="background:linear-gradient(135deg,#fb923c,#ea580c)" onclick="setTheme('food')"></div>
+    <div class="theme-dot"        data-theme="cafe"    style="background:linear-gradient(135deg,#f472b6,#db2777)" onclick="setTheme('cafe')"></div>
+    <div class="theme-dot"        data-theme="travel"  style="background:linear-gradient(135deg,#2dd4bf,#0d9488)" onclick="setTheme('travel')"></div>
+    <div class="theme-dot"        data-theme="beauty"  style="background:linear-gradient(135deg,#a78bfa,#7c3aed)" onclick="setTheme('beauty')"></div>
+    <div class="theme-dot"        data-theme="culture" style="background:linear-gradient(135deg,#818cf8,#4338ca)" onclick="setTheme('culture')"></div>
+    <div class="theme-dot"        data-theme="life"    style="background:linear-gradient(135deg,#fbbf24,#ca8a04)" onclick="setTheme('life')"></div>
+    <div class="theme-dot"        data-theme="health"  style="background:linear-gradient(135deg,#34d399,#059669)" onclick="setTheme('health')"></div>
   </div>
 </div>
 
+<!-- 캡션 모달 -->
 <div class="modal" id="modal">
   <div class="modal-box">
     <div class="modal-title">Instagram Caption</div>
     <div class="caption-section">
       <div class="caption-label">✂️ 짧은 버전</div>
       <div class="modal-text" id="captionShort">${data.captionShort.replace(/\n/g, '<br>')}</div>
-      <button class="modal-copy" onclick="copyCaption('captionShort', this)">복사하기</button>
+      <button class="modal-copy" onclick="copyCaption('captionShort',this)">복사하기</button>
     </div>
     <div class="caption-divider"></div>
     <div class="caption-section">
       <div class="caption-label">📝 긴 버전</div>
       <div class="modal-text" id="captionLong">${data.captionLong.replace(/\n/g, '<br>')}</div>
-      <button class="modal-copy" onclick="copyCaption('captionLong', this)">복사하기</button>
+      <button class="modal-copy" onclick="copyCaption('captionLong',this)">복사하기</button>
     </div>
     <button class="modal-close" onclick="closeModal()">닫기</button>
   </div>
 </div>
 
 <script>
-const slides = document.querySelectorAll('.slide');
-const dotsEl = document.getElementById('dots');
-const counterEl = document.getElementById('counter');
-let cur = 0;
-slides.forEach((_,i) => {
-  const d = document.createElement('div');
-  d.className = 'dot' + (i===0 ? ' active' : '');
-  d.onclick = () => goTo(i);
+var slides = document.querySelectorAll('.slide');
+var dotsEl = document.getElementById('dots');
+var cur = 0;
+
+// 점 생성
+slides.forEach(function(_, i) {
+  var d = document.createElement('div');
+  d.className = 'dot' + (i === 0 ? ' active' : '');
   dotsEl.appendChild(d);
 });
+
 function update() {
-  slides.forEach((s,i) => {
+  slides.forEach(function(s, i) {
     s.classList.remove('active','prev');
-    if(i===cur) s.classList.add('active');
-    else if(i<cur) s.classList.add('prev');
+    if (i === cur) s.classList.add('active');
+    else if (i < cur) s.classList.add('prev');
   });
-  dotsEl.querySelectorAll('.dot').forEach((d,i) => {
-    d.className = 'dot' + (i===cur ? ' active' : '');
+  dotsEl.querySelectorAll('.dot').forEach(function(d, i) {
+    d.className = 'dot' + (i === cur ? ' active' : '');
   });
-  counterEl.textContent = (cur+1) + ' / ' + slides.length;
+  // 부모 페이지에 현재 슬라이드 알림
+  try { window.parent.postMessage({ type:'SLIDE_CHANGED', cur:cur, total:slides.length }, '*'); } catch(e){}
 }
+
 function go(dir) {
-  const n = cur + dir;
-  if(n<0 || n>=slides.length) return;
-  cur = n; update();
+  var n = cur + dir;
+  if (n < 0 || n >= slides.length) return;
+  cur = n;
+  update();
 }
 function goTo(i) { cur = i; update(); }
-document.addEventListener('keydown', e => {
-  if (isEditing) return;
-  if(['ArrowRight',' '].includes(e.key)) { e.preventDefault(); go(1); }
-  if(['ArrowLeft'].includes(e.key)) { e.preventDefault(); go(-1); }
+
+// 키보드
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); go(1); }
+  if (e.key === 'ArrowLeft') { e.preventDefault(); go(-1); }
 });
-let tx = 0;
-function txHandler(e) { tx = e.changedTouches[0].screenX; }
-function teHandler(e) {
-  const dx = e.changedTouches[0].screenX - tx;
-  if(Math.abs(dx) > 40) go(dx < 0 ? 1 : -1);
-}
-document.addEventListener('touchstart', txHandler);
-document.addEventListener('touchend', teHandler);
+
+// 캡션 모달
 function openModal() { document.getElementById('modal').classList.add('open'); }
 function closeModal() { document.getElementById('modal').classList.remove('open'); }
 function copyCaption(id, btn) {
-  const text = document.getElementById(id).innerText;
-  navigator.clipboard.writeText(text).then(() => {
+  var text = document.getElementById(id).innerText;
+  navigator.clipboard.writeText(text).then(function() {
     btn.textContent = '✓ 복사완료';
     btn.style.background = '#059669';
-    setTimeout(() => { btn.textContent = '복사하기'; btn.style.background = 'var(--accent)'; }, 2000);
+    setTimeout(function() { btn.textContent = '복사하기'; btn.style.background = 'var(--accent)'; }, 2000);
   });
 }
-update();
 
-// ── 슬라이드 내용 자동 축소 (내용이 카드보다 길면 scale-down) ──
+// 테마
+function setTheme(name) {
+  document.body.dataset.theme = name;
+  document.querySelectorAll('.theme-dot').forEach(function(d) {
+    d.classList.toggle('active', d.dataset.theme === name);
+  });
+  try { localStorage.setItem('cn_theme', name); } catch(e){}
+}
+try { setTheme(localStorage.getItem('cn_theme') || 'sky'); } catch(e) { setTheme('sky'); }
+
+// 슬라이드 내용 자동 축소
 function fitSlides() {
   var deck = document.getElementById('deck');
   if (!deck) return;
@@ -638,395 +455,97 @@ function fitSlides() {
     inner.style.transform = '';
     inner.style.transformOrigin = '';
     var cs = getComputedStyle(slide);
-    var padTop = parseFloat(cs.paddingTop) || 28;
-    var padBot = parseFloat(cs.paddingBottom) || 28;
-    var available = deck.offsetHeight - padTop - padBot;
-    if (available > 0 && inner.scrollHeight > available + 2) {
-      var sc = available / inner.scrollHeight;
+    var pad = parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom) || 56;
+    var avail = deck.offsetHeight - pad;
+    if (avail > 0 && inner.scrollHeight > avail + 2) {
+      var sc = avail / inner.scrollHeight;
       inner.style.transform = 'scale(' + sc.toFixed(4) + ')';
       inner.style.transformOrigin = 'top center';
     }
   });
 }
-window.addEventListener('resize', fitSlides);
 
-// ── deck 크기 재계산 (iframe 임베딩 시에만 실행) ──
-(function resizeDeckToFit() {
+// iframe 임베딩 시 deck 크기 맞춤
+(function() {
   var embedded = false;
   try { embedded = window.self !== window.top; } catch(e) { embedded = true; }
   if (!embedded) return;
   function fix() {
-    var vw = document.documentElement.clientWidth;
-    var vh = document.documentElement.clientHeight;
-    var size = Math.min(vw, vh) * 0.96;
+    var size = Math.min(document.documentElement.clientWidth, document.documentElement.clientHeight) * 0.96;
     var deck = document.getElementById('deck');
-    if (deck) {
-      deck.style.width = size + 'px';
-      deck.style.height = size + 'px';
-      fitSlides();
-    }
+    if (deck) { deck.style.width = size + 'px'; deck.style.height = size + 'px'; fitSlides(); }
   }
   fix();
   window.addEventListener('resize', fix);
 })();
 
-// ── standalone 감지: save-bar 표시 (iframe 임베딩에서는 기본 숨김) ──
-(function detectStandalone() {
-  var embedded = false;
-  try { embedded = window.self !== window.top; } catch(e) { embedded = true; }
-  if (!embedded) document.body.classList.add('is-standalone');
-})();
-
-// Theme switcher
-let currentTheme = localStorage.getItem('cardNewsTheme') || 'sky';
-function setTheme(name) {
-  document.body.dataset.theme = name;
-  document.querySelectorAll('.theme-dot').forEach(d => {
-    d.classList.toggle('active', d.dataset.theme === name);
-  });
-  currentTheme = name;
-  try { localStorage.setItem('cardNewsTheme', name); } catch(e) {}
-}
-setTheme(currentTheme);
-
-// Content edit mode
-const editSelectors = ['.t-xl','.t-lg','.t-body','.tag','.card-icon','.card-title','.card-body','.list-txt','.free-pill','.loc','.big-num','.big-unit','.hare-table'];
-let isEditing = false;
-function toggleEditMode() {
-  isEditing = !isEditing;
-  document.body.classList.toggle('edit-mode', isEditing);
-  const btn = document.getElementById('editModeBtn');
-  editSelectors.forEach(sel => {
-    document.querySelectorAll(sel).forEach(el => {
-      el.contentEditable = isEditing ? 'true' : 'false';
-      if(isEditing) el.spellcheck = false;
-    });
-  });
-  if(isEditing) {
-    btn.textContent = '✓ 편집완료';
-    btn.style.cssText = 'background:var(--accent);color:#fff;border-color:var(--accent);';
-    document.removeEventListener('touchstart', txHandler);
-    document.removeEventListener('touchend', teHandler);
-  } else {
-    btn.textContent = '📝 내용편집';
-    btn.style.cssText = '';
-    document.addEventListener('touchstart', txHandler);
-    document.addEventListener('touchend', teHandler);
-  }
-}
-
-// Style settings panel
-function toggleSettings() {
-  document.getElementById('settingsPanel').classList.toggle('open');
-}
-const accentList = [
-  ['#38bdf8','#0284c7'],['#f472b6','#db2777'],['#fb923c','#ea580c'],
-  ['#34d399','#059669'],['#a78bfa','#7c3aed'],['#fbbf24','#ca8a04']
-];
-function applyAccent(a, d) {
-  document.documentElement.style.setProperty('--accent', a);
-  document.documentElement.style.setProperty('--deep', d);
-}
-function setAccentPreset(i, el) {
-  applyAccent(...accentList[i]);
-  document.querySelectorAll('.sp-sw').forEach(s => s.classList.remove('on'));
-  el.classList.add('on');
-  try { localStorage.setItem('cn_acc', JSON.stringify({i, a:accentList[i][0], d:accentList[i][1]})); } catch(e){}
-}
-function setCustomColor(hex) {
-  const r2=parseInt(hex.slice(1,3),16), g2=parseInt(hex.slice(3,5),16), b2=parseInt(hex.slice(5,7),16);
-  const deep='rgb('+Math.floor(r2*.72)+','+Math.floor(g2*.72)+','+Math.floor(b2*.72)+')';
-  applyAccent(hex, deep);
-  document.querySelectorAll('.sp-sw').forEach(s => s.classList.remove('on'));
-  try { localStorage.setItem('cn_acc', JSON.stringify({a:hex, d:deep})); } catch(e){}
-}
-const titleSizes = {
-  xs:['clamp(14px,3.5vw,24px)','clamp(12px,3vw,18px)'],
-  sm:['clamp(18px,5vw,34px)','clamp(15px,4vw,26px)'],
-  md:['clamp(28px,7.5vw,52px)','clamp(22px,6vw,42px)'],
-  lg:['clamp(40px,11vw,80px)','clamp(32px,8.5vw,64px)'],
-  xl:['clamp(54px,15vw,110px)','clamp(42px,11vw,86px)']
-};
-const bodySizes = {
-  xs:['clamp(9px,1.8vw,11px)','clamp(8px,1.6vw,10px)','clamp(7px,1.4vw,9px)'],
-  sm:['clamp(10px,2vw,12px)','clamp(9px,1.8vw,11px)','clamp(8px,1.6vw,10px)'],
-  md:['clamp(12px,2.8vw,15px)','clamp(11px,2.2vw,14px)','clamp(10px,2vw,12px)'],
-  lg:['clamp(14px,3.5vw,18px)','clamp(13px,3vw,16px)','clamp(11px,2.5vw,14px)'],
-  xl:['clamp(15px,4vw,20px)','clamp(14px,3.5vw,18px)','clamp(12px,3vw,16px)']
-};
-function setTitleSize(sz) {
-  const [xl,lg] = titleSizes[sz];
-  const r = document.documentElement;
-  r.style.setProperty('--fs-xl', xl);
-  r.style.setProperty('--fs-lg', lg);
-  document.querySelectorAll('.sp-chip[data-tfs]').forEach(c => c.classList.toggle('on', c.dataset.tfs===sz));
-  try { localStorage.setItem('cn_tfs', sz); } catch(e){}
-}
-function setBodySize(sz) {
-  const [bd,ct,sm] = bodySizes[sz];
-  const r = document.documentElement;
-  r.style.setProperty('--fs-body', bd);
-  r.style.setProperty('--fs-content', ct);
-  r.style.setProperty('--fs-small', sm);
-  document.querySelectorAll('.sp-chip[data-bfs]').forEach(c => c.classList.toggle('on', c.dataset.bfs===sz));
-  try { localStorage.setItem('cn_bfs', sz); } catch(e){}
-}
-const titleCols = { dark:'#0f172a', mid:'#334155', light:'#64748b' };
-function setTitleColor(k) {
-  document.documentElement.style.setProperty('--title-col', titleCols[k]);
-  document.querySelectorAll('.sp-chip[data-tc]').forEach(c => c.classList.toggle('on', c.dataset.tc===k));
-  try { localStorage.setItem('cn_tc', k); } catch(e){}
-}
-const bodyCols = { dark:'rgba(30,41,59,0.85)', mid:'rgba(30,41,59,0.65)', light:'rgba(30,41,59,0.45)' };
-function setBodyColor(k) {
-  document.documentElement.style.setProperty('--dim', bodyCols[k]);
-  document.querySelectorAll('.sp-chip[data-bc]').forEach(c => c.classList.toggle('on', c.dataset.bc===k));
-  try { localStorage.setItem('cn_bc', k); } catch(e){}
-}
-(function loadStyleSettings() {
-  try {
-    const acc = JSON.parse(localStorage.getItem('cn_acc') || 'null');
-    if(acc) { applyAccent(acc.a, acc.d); if(acc.i!=null) document.querySelectorAll('.sp-sw')[acc.i]?.classList.add('on'); }
-    else document.querySelectorAll('.sp-sw')[0]?.classList.add('on');
-    setTitleSize(localStorage.getItem('cn_tfs') || 'md');
-    setBodySize(localStorage.getItem('cn_bfs') || 'md');
-    setTitleColor(localStorage.getItem('cn_tc') || 'dark');
-    setBodyColor(localStorage.getItem('cn_bc') || 'dark');
-  } catch(e) { document.querySelectorAll('.sp-sw')[0]?.classList.add('on'); setTitleSize('md'); setBodySize('md'); setTitleColor('dark'); setBodyColor('dark'); }
-})();
+window.addEventListener('resize', fitSlides);
 requestAnimationFrame(fitSlides);
 
-// Image save
-// ── Image capture & save ──
-// deck에 배경 그라디언트를 직접 적용 후 캡처
-// - 'transparent' 는 html2canvas에서 rgba(0,0,0,0) → 검정으로 렌더링되는 버그 있음
-//   → 명시적 rgba(color, 0) 사용
-// - backdrop-filter 는 html2canvas 미지원 → onclone에서 제거
-// - 최종 캔버스를 불투명 배경 위에 합성 → iOS에서 어둡게 보이는 문제 방지
-async function captureCurrentSlide() {
+// 이미지 저장 — navigator.share 대신 꾹 누르기 모달
+function showSaveModal(dataUrl) {
+  var existing = document.getElementById('saveModal');
+  if (existing) existing.parentNode.removeChild(existing);
+  var ov = document.createElement('div');
+  ov.id = 'saveModal';
+  ov.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:24px;touch-action:pan-y;';
+  var hint = document.createElement('p');
+  hint.style.cssText = 'color:#fff;font-size:15px;font-weight:700;text-align:center;margin:0;';
+  hint.innerHTML = '이미지를 <strong>꾹 눌러서</strong> 사진첩에 저장';
+  var img = document.createElement('img');
+  img.src = dataUrl;
+  img.style.cssText = 'width:100%;max-width:400px;border-radius:20px;display:block;touch-action:auto;-webkit-touch-callout:default;';
+  var btn = document.createElement('button');
+  btn.textContent = '닫기';
+  btn.style.cssText = 'padding:11px 36px;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);color:#fff;border-radius:100px;font-size:15px;font-weight:700;cursor:pointer;';
+  btn.onclick = function() { ov.parentNode && ov.parentNode.removeChild(ov); };
+  ov.appendChild(hint); ov.appendChild(img); ov.appendChild(btn);
+  document.body.appendChild(ov);
+}
+
+async function saveCurrentSlide() {
   var deck = document.getElementById('deck');
   var prevBg = deck.style.background;
-
-  // body 배경을 deck에 직접 적용 (transparent → rgba(,0) 로 교체)
   deck.style.background = [
     'radial-gradient(ellipse 80% 60% at 15% 10%, rgba(186,230,253,0.55) 0%, rgba(186,230,253,0) 55%)',
     'radial-gradient(ellipse 70% 60% at 85% 85%, rgba(148,163,184,0.45) 0%, rgba(148,163,184,0) 55%)',
     'radial-gradient(ellipse 50% 40% at 60% 30%, rgba(226,232,240,0.35) 0%, rgba(226,232,240,0) 50%)',
     'linear-gradient(145deg, #ddf0fb 0%, #e2e8f0 45%, #c8d4e0 100%)'
   ].join(', ');
-
-  var rawCanvas;
   try {
-    rawCanvas = await html2canvas(deck, {
-      scale: 2,
-      useCORS: true,
-      allowTaint: true,
-      backgroundColor: '#ddf0fb',
-      logging: false,
-      onclone: function(cloneDoc) {
-        // backdrop-filter 미지원 → 제거하되, 배경을 더 불투명하게 보정해 frosted glass 느낌 유지
-        var s = cloneDoc.createElement('style');
-        s.textContent = [
-          '* { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }',
-          '.s-glass { background: linear-gradient(135deg, rgba(255,255,255,0.82) 0%, rgba(186,230,253,0.68) 100%) !important; }',
-          '.s-silver { background: linear-gradient(135deg, rgba(248,250,252,0.88) 0%, rgba(215,220,228,0.74) 100%) !important; }',
-          '.s-accent { background: linear-gradient(145deg, rgba(186,230,253,0.80), rgba(125,211,252,0.65)) !important; }',
-          '.s-mid { background: linear-gradient(145deg, rgba(226,232,240,0.84), rgba(203,213,225,0.72)) !important; }',
-          '.s-deep { background: linear-gradient(145deg, rgba(2,132,199,0.92), rgba(3,105,161,0.84)) !important; }',
-          '.card { background: rgba(255,255,255,0.82) !important; }',
-          '.tag { background: rgba(255,255,255,0.84) !important; }'
-        ].join('\n');
-        cloneDoc.head.appendChild(s);
+    var raw = await html2canvas(deck, {
+      scale:2, useCORS:true, allowTaint:true, backgroundColor:'#ddf0fb', logging:false,
+      onclone:function(doc) {
+        var s = doc.createElement('style');
+        s.textContent = '* { backdrop-filter:none!important; -webkit-backdrop-filter:none!important; } .s-glass{background:linear-gradient(135deg,rgba(255,255,255,0.82) 0%,rgba(186,230,253,0.68) 100%)!important} .s-silver{background:linear-gradient(135deg,rgba(248,250,252,0.88) 0%,rgba(215,220,228,0.74) 100%)!important} .s-accent{background:linear-gradient(145deg,rgba(186,230,253,0.80),rgba(125,211,252,0.65))!important} .s-mid{background:linear-gradient(145deg,rgba(226,232,240,0.84),rgba(203,213,225,0.72))!important} .s-deep{background:linear-gradient(145deg,rgba(2,132,199,0.92),rgba(3,105,161,0.84))!important} .card{background:rgba(255,255,255,0.82)!important} .tag{background:rgba(255,255,255,0.84)!important}';
+        doc.head.appendChild(s);
       }
     });
+    var out = document.createElement('canvas');
+    out.width = raw.width; out.height = raw.height;
+    var ctx = out.getContext('2d');
+    ctx.fillStyle = '#ddf0fb';
+    ctx.fillRect(0, 0, out.width, out.height);
+    ctx.drawImage(raw, 0, 0);
+    showSaveModal(out.toDataURL('image/png'));
+  } catch(e) {
+    alert('캡처 실패: ' + (e && e.message ? e.message : e));
   } finally {
     deck.style.background = prevBg;
   }
-
-  // 불투명 배경 위에 합성 → iOS PNG 투명도 문제 방지
-  var out = document.createElement('canvas');
-  out.width = rawCanvas.width;
-  out.height = rawCanvas.height;
-  var ctx = out.getContext('2d');
-  ctx.fillStyle = '#ddf0fb';
-  ctx.fillRect(0, 0, out.width, out.height);
-  ctx.drawImage(rawCanvas, 0, 0);
-  return out;
 }
 
-// 이미지 저장 모달 — navigator.share() 대신 사용 (iOS WebKit 버그: share sheet 닫힌 후 터치 이벤트 깨짐)
-function showSaveModal(items) {
-  var overlay = document.createElement('div');
-  overlay.id = 'saveModal';
-  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.93);z-index:9999;overflow-y:auto;-webkit-overflow-scrolling:touch;display:flex;flex-direction:column;align-items:center;padding:24px 16px 32px;gap:16px;touch-action:pan-y;';
-
-  var hint = document.createElement('p');
-  hint.style.cssText = 'color:#fff;font-size:15px;font-weight:700;text-align:center;margin:0;line-height:1.6;';
-  hint.innerHTML = '이미지를 <strong>꾹 눌러서</strong> 사진첩에 저장';
-  overlay.appendChild(hint);
-
-  items.forEach(function(item, idx) {
-    var wrap = document.createElement('div');
-    wrap.style.cssText = 'width:100%;max-width:420px;';
-    if (items.length > 1) {
-      var lbl = document.createElement('div');
-      lbl.style.cssText = 'color:rgba(255,255,255,0.45);font-size:11px;text-align:center;margin-bottom:6px;';
-      lbl.textContent = (idx + 1) + ' / ' + items.length;
-      wrap.appendChild(lbl);
-    }
-    var img = document.createElement('img');
-    img.src = item.url;
-    // touch-action:auto + -webkit-touch-callout:default → iOS 꾹 누르기 컨텍스트 메뉴 활성화
-    img.style.cssText = 'width:100%;border-radius:20px;display:block;touch-action:auto;-webkit-touch-callout:default;user-select:none;-webkit-user-select:none;';
-    wrap.appendChild(img);
-    overlay.appendChild(wrap);
-  });
-
-  var closeBtn = document.createElement('button');
-  closeBtn.textContent = '닫기';
-  closeBtn.style.cssText = 'margin-top:4px;padding:12px 40px;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.35);color:#fff;border-radius:100px;font-size:15px;font-weight:700;touch-action:manipulation;cursor:pointer;flex-shrink:0;';
-  closeBtn.onclick = function() { overlay.parentNode && overlay.parentNode.removeChild(overlay); };
-  overlay.appendChild(closeBtn);
-
-  document.body.appendChild(overlay);
-}
-
-async function saveCurrentSlide() {
-  var btn = document.getElementById('saveCurrent');
-  if (btn) { btn.classList.add('saving'); btn.textContent = '캡처 중...'; }
-  try {
-    var canvas = await captureCurrentSlide();
-    showSaveModal([{ url: canvas.toDataURL('image/png') }]);
-  } catch(e) { if (e && e.name !== 'AbortError') alert('캡처 실패: ' + (e.message || e)); }
-  if (btn) { btn.classList.remove('saving'); btn.textContent = '📷 현재'; }
-}
-
-async function saveAllSlides() {
-  var btn = document.getElementById('saveAll');
-  if (btn) btn.classList.add('saving');
-  var total = slides.length;
-  var items = [];
-
-  for (var i = 0; i < total; i++) {
-    goTo(i);
-    if (btn) btn.textContent = (i + 1) + '/' + total + ' 캡처 중...';
-    await new Promise(function(r) { setTimeout(r, 400); });
-    try {
-      var canvas = await captureCurrentSlide();
-      items.push({ url: canvas.toDataURL('image/png') });
-    } catch(e) { console.warn('slide ' + (i + 1) + ' capture failed', e); }
-  }
-
-  if (items.length > 0) showSaveModal(items);
-
-  if (btn) { btn.classList.remove('saving'); btn.textContent = '💾 전체'; }
-}
-
-// postMessage API — 부모 페이지(iframe 래퍼)에서 제어
-window.addEventListener('message', async function(e) {
+// postMessage — 부모 페이지 제어
+window.addEventListener('message', function(e) {
   if (!e.data || !e.data.type) return;
-  if (e.data.type === 'GO_NEXT') { go(1); return; }
-  if (e.data.type === 'GO_PREV') { go(-1); return; }
-  if (e.data.type === 'OPEN_CAPTION') { openModal(); return; }
-  if (e.data.type === 'SAVE_CURRENT') {
-    try {
-      var canvas = await captureCurrentSlide();
-      canvas.toBlob(function(blob) {
-        var reader = new FileReader();
-        reader.onload = function() {
-          (window.parent || window).postMessage({ type: 'SAVE_RESULT', dataUrl: reader.result, slideIndex: cur }, '*');
-        };
-        reader.readAsDataURL(blob);
-      }, 'image/png');
-    } catch(err) {
-      (window.parent || window).postMessage({ type: 'SAVE_ERROR', error: err.message }, '*');
-    }
-  } else if (e.data.type === 'SAVE_ALL') {
-    var total = slides.length;
-    for (var i = 0; i < total; i++) {
-      goTo(i);
-      await new Promise(function(r) { setTimeout(r, 450); });
-      try {
-        var canvas = await captureCurrentSlide();
-        var dataUrl = await new Promise(function(resolve) {
-          canvas.toBlob(function(blob) {
-            var reader = new FileReader();
-            reader.onload = function() { resolve(reader.result); };
-            reader.readAsDataURL(blob);
-          }, 'image/png');
-        });
-        (window.parent || window).postMessage({ type: 'SAVE_RESULT', dataUrl: dataUrl, slideIndex: i, total: total }, '*');
-        await new Promise(function(r) { setTimeout(r, 150); });
-      } catch(err) { console.warn('slide capture failed', err); }
-    }
-    (window.parent || window).postMessage({ type: 'SAVE_DONE', total: total }, '*');
-  }
+  if (e.data.type === 'GO_NEXT') go(1);
+  if (e.data.type === 'GO_PREV') go(-1);
+  if (e.data.type === 'OPEN_CAPTION') openModal();
+  if (e.data.type === 'SAVE_CURRENT') saveCurrentSlide();
 });
+
+update();
 </script>
 </body>
 </html>`
-}
-
-export function buildCardNewsHtmlV2(data: CardNewsData, images: string[]): string {
-  let html = buildCardNewsHtml(data)
-  const rawImgs = images.filter(Boolean).slice(0, 4)
-  if (rawImgs.length === 0) return html
-
-  // 네이버 CDN 이미지는 Referer 체크로 차단 → 서버 프록시를 통해 로드
-  const proxy = (src: string) => `/api/proxy-image?url=${encodeURIComponent(src)}`
-  const imgs = rawImgs.map(proxy)
-
-  // Photo slide CSS
-  const photoCSS = `
-/* V2 Photo Slides */
-.slide.s-photo { background: none !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
-.slide-bg { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; z-index:0; }
-.slide.s-photo::before { background:rgba(0,0,0,0.40) !important; z-index:1; }
-.slide.s-photo .orb { display:none; }
-.slide.s-photo .inner { position:relative; z-index:2; }
-.slide.s-photo .t-xl, .slide.s-photo .t-lg { color:#fff !important; text-shadow:0 2px 12px rgba(0,0,0,0.5); }
-.slide.s-photo .t-body { color:rgba(255,255,255,0.9) !important; }
-.slide.s-photo .tag { background:rgba(0,0,0,0.22); border-color:rgba(255,255,255,0.35); color:#fff !important; }
-.slide.s-photo .loc { color:rgba(255,255,255,0.75) !important; }
-.slide.s-photo .rule { background:linear-gradient(90deg,rgba(255,255,255,0.45),rgba(255,255,255,0)) !important; }
-.slide.s-photo .list-dot { background:#fff !important; }
-.slide.s-photo .list-txt { color:rgba(255,255,255,0.9) !important; }
-.slide.s-photo .list-em { color:#fff !important; }
-.slide.s-photo .big-num { color:#fff !important; }
-.slide.s-photo .big-unit { color:rgba(255,255,255,0.7) !important; }
-.slide.s-photo .hare-table { color:rgba(255,255,255,0.7) !important; }
-`
-  html = html.replace('</style>', photoCSS + '</style>')
-
-  // onerror: 이미지 로드 실패 시 s-photo → 원래 글래스 스타일로 폴백
-  const fallback = (cls: string) =>
-    `onerror="var s=this.parentElement;s.classList.remove('s-photo');s.classList.add('${cls}');this.remove();"`
-
-  // Replace slide classes and add photo backgrounds
-  if (imgs[0]) {
-    html = html.replace(
-      '<!-- 01 커버 -->\n    <div class="slide s-glass active">',
-      `<!-- 01 커버 -->\n    <div class="slide s-photo active">\n      <img class="slide-bg" src="${imgs[0]}" crossorigin="anonymous" ${fallback('s-glass')}>`
-    )
-  }
-  if (imgs[1]) {
-    html = html.replace(
-      '<!-- 03 핵심수치 -->\n    <div class="slide s-deep">',
-      `<!-- 03 핵심수치 -->\n    <div class="slide s-photo">\n      <img class="slide-bg" src="${imgs[1]}" crossorigin="anonymous" ${fallback('s-deep')}>`
-    )
-  }
-  if (imgs[2]) {
-    html = html.replace(
-      '<!-- 05 혜택/구성 -->\n    <div class="slide s-glass">',
-      `<!-- 05 혜택/구성 -->\n    <div class="slide s-photo">\n      <img class="slide-bg" src="${imgs[2]}" crossorigin="anonymous" ${fallback('s-glass')}>`
-    )
-  }
-  if (imgs[3]) {
-    html = html.replace(
-      '<!-- 07 클로징 -->\n    <div class="slide s-silver">',
-      `<!-- 07 클로징 -->\n    <div class="slide s-photo">\n      <img class="slide-bg" src="${imgs[3]}" crossorigin="anonymous" ${fallback('s-silver')}>`
-    )
-  }
-
-  return html
 }
