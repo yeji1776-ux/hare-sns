@@ -513,15 +513,17 @@ function showSaveModal(dataUrl) {
 
 async function saveCurrentSlide() {
   var deck = document.getElementById('deck');
-  var bar = deck.querySelector('.theme-bar');
-  if (bar) bar.style.display = 'none';
   try {
-    var dataUrl = await htmlToImage.toPng(deck, { pixelRatio: 2, cacheBust: true });
+    var dataUrl = await htmlToImage.toPng(deck, {
+      pixelRatio: 2,
+      cacheBust: true,
+      filter: function(node) {
+        return !node.classList || !node.classList.contains('theme-bar');
+      }
+    });
     showSaveModal(dataUrl);
   } catch(e) {
     alert('캡처 실패: ' + (e && e.message ? e.message : e));
-  } finally {
-    if (bar) bar.style.display = '';
   }
 }
 
