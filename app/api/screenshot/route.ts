@@ -1,12 +1,6 @@
 import { NextResponse } from 'next/server'
-import chromium from '@sparticuz/chromium-min'
-import puppeteer from 'puppeteer-core'
 
 export const maxDuration = 30
-
-// Chromium 143 binary for Lambda/Vercel (downloaded to /tmp at runtime)
-const CHROMIUM_REMOTE_URL =
-  'https://github.com/Sparticuz/chromium/releases/download/v143.0.0/chromium-v143.0.0-pack.tar'
 
 const LOCAL_CHROME_PATHS: Record<string, string> = {
   darwin: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
@@ -14,24 +8,55 @@ const LOCAL_CHROME_PATHS: Record<string, string> = {
   linux: '/usr/bin/google-chrome',
 }
 
-async function getExecPath(): Promise<string> {
-  const { existsSync } = await import('fs')
-  const p = LOCAL_CHROME_PATHS[process.platform] ?? ''
-  if (p && existsSync(p)) return p
-  return chromium.executablePath(CHROMIUM_REMOTE_URL)
-}
+const CHROMIUM_REMOTE_URL =
+  'https://github.com/Sparticuz/chromium/releases/download/v131.0.0/chromium-v131.0.0-pack.tar'
 
 export async function POST(req: Request) {
   const { html, slideIndex = 0 } = await req.json() as { html: string; slideIndex?: number }
   if (!html) return NextResponse.json({ error: 'html required' }, { status: 400 })
 
-  const executablePath = await getExecPath()
-  const browser = await puppeteer.launch({
-    args: [...chromium.args, '--no-sandbox', '--disable-setuid-sandbox'],
-    defaultViewport: { width: 660, height: 660, deviceScaleFactor: 2 },
-    executablePath,
-    headless: true,
-  })
+  let chromium: typeof import('@sparticuz/chromium-min').default
+  let puppeteer: typeof import('puppeteer-core')
+
+  // Step 1: import modules
+  try {
+    const mod = await import('@sparticuz/chromium-min')
+    chromium = mod.default
+  } catch (e) {
+    return NextResponse.json({ error: `chromium import failed: ${e instanceof Error ? e.message : String(e)}` }, { status: 500 })
+  }
+  try {
+    puppeteer = await import('puppeteer-core')
+  } catch (e) {
+    return NextResponse.json({ error: `puppeteer import failed: ${e instanceof Error ? e.message : String(e)}` }, { status: 500 })
+  }
+
+  // Step 2: resolve executable path
+  let executablePath: string
+  try {
+    const { existsSync } = await import('fs')
+    const local = LOCAL_CHROME_PATHS[process.platform] ?? ''
+    if (local && existsSync(local)) {
+      executablePath = local
+    } else {
+      executablePath = await chromium.executablePath(CHROMIUM_REMOTE_URL)
+    }
+  } catch (e) {
+    return NextResponse.json({ error: `executablePath failed: ${e instanceof Error ? e.message : String(e)}` }, { status: 500 })
+  }
+
+  // Step 3: launch browser
+  let browser: import('puppeteer-core').Browser
+  try {
+    browser = await puppeteer.launch({
+      args: [...chromium.args, '--no-sandbox', '--disable-setuid-sandbox'],
+      defaultViewport: { width: 660, height: 660, deviceScaleFactor: 2 },
+      executablePath,
+      headless: true,
+    })
+  } catch (e) {
+    return NextResponse.json({ error: `browser launch failed: ${e instanceof Error ? e.message : String(e)}` }, { status: 500 })
+  }
 
   const page = await browser.newPage()
   try {
@@ -44,20 +69,21 @@ export async function POST(req: Request) {
       await new Promise(r => setTimeout(r, 700))
     }
 
-    // Hide theme bar (color selector dots)
     await page.evaluate(() => {
       const bar = document.querySelector('.theme-bar') as HTMLElement | null
       if (bar) bar.style.display = 'none'
     })
 
     const deck = await page.$('#deck')
-    if (!deck) throw new Error('#deck not found')
+    if (!deck) return NextResponse.json({ error: '#deck not found in HTML' }, { status: 500 })
 
     const screenshot = await deck.screenshot({ type: 'png' }) as Buffer
 
     return new Response(screenshot.buffer as ArrayBuffer, {
       headers: { 'Content-Type': 'image/png', 'Cache-Control': 'no-store' }
     })
+  } catch (e) {
+    return NextResponse.json({ error: `render failed: ${e instanceof Error ? e.message : String(e)}` }, { status: 500 })
   } finally {
     await page.close()
     await browser.close()
