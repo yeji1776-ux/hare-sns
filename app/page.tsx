@@ -43,6 +43,8 @@ export default function Home() {
   const [curSlide, setCurSlide] = useState(0)
   const [totalSlides] = useState(7)
   const [regenLoading, setRegenLoading] = useState<{ cardnews: boolean; instagram: boolean; clip: boolean }>({ cardnews: false, instagram: false, clip: false })
+  const [isSaving, setIsSaving] = useState(false)
+  const [saveImageUrl, setSaveImageUrl] = useState<string | null>(null)
 
   // iframe 너비 감지
   useEffect(() => {
@@ -129,6 +131,26 @@ export default function Home() {
       setError(e instanceof Error ? e.message : '재생성 중 오류가 발생했습니다.')
     } finally {
       setRegenLoading(prev => ({ ...prev, [type]: false }))
+    }
+  }
+
+  async function handleSave() {
+    if (!result?.cardNewsHtml) return
+    setIsSaving(true)
+    try {
+      const resp = await fetch('/api/screenshot', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ html: result.cardNewsHtml, slideIndex: curSlide })
+      })
+      if (!resp.ok) throw new Error('스크린샷 실패')
+      const blob = await resp.blob()
+      const url = URL.createObjectURL(blob)
+      setSaveImageUrl(url)
+    } catch (e) {
+      alert('저장 실패: ' + (e instanceof Error ? e.message : String(e)))
+    } finally {
+      setIsSaving(false)
     }
   }
 
@@ -247,8 +269,8 @@ export default function Home() {
                   <button onClick={() => callIframe('openModal')} style={{ padding: '8px 14px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.7)', background: 'rgba(255,255,255,0.5)', fontSize: '13px', fontWeight: 600, cursor: 'pointer', color: '#334155' }}>
                     💬 캡션
                   </button>
-                  <button onClick={() => callIframe('saveCurrentSlide')} style={{ padding: '8px 14px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.7)', background: '#fce7f3', fontSize: '13px', fontWeight: 600, cursor: 'pointer', color: '#be185d' }}>
-                    📸 저장
+                  <button onClick={handleSave} disabled={isSaving} style={{ padding: '8px 14px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.7)', background: isSaving ? '#e2e8f0' : '#fce7f3', fontSize: '13px', fontWeight: 600, cursor: isSaving ? 'not-allowed' : 'pointer', color: '#be185d', opacity: isSaving ? 0.7 : 1 }}>
+                    {isSaving ? '⏳ 처리 중...' : '📸 저장'}
                   </button>
                   <a href="https://www.instagram.com/hare_table/" target="_blank" rel="noopener noreferrer" style={{ padding: '8px 14px', borderRadius: '8px', border: 'none', background: 'linear-gradient(135deg,#f9a8d4,#c084fc)', fontSize: '13px', fontWeight: 700, color: '#fff', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px', whiteSpace: 'nowrap' }}>📲 내 인스타</a>
                 </div>
@@ -380,6 +402,27 @@ export default function Home() {
               </div>
             )}
           </div>
+        </div>
+      )}
+      {/* 이미지 저장 모달 */}
+      {saveImageUrl && (
+        <div
+          onClick={() => { URL.revokeObjectURL(saveImageUrl); setSaveImageUrl(null) }}
+          style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.92)', zIndex: 9999, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '16px', padding: '24px', touchAction: 'pan-y' }}
+        >
+          <p style={{ color: '#fff', fontSize: '15px', fontWeight: 700, textAlign: 'center', margin: 0 }}>
+            이미지를 <strong>꾹 눌러서</strong> 사진첩에 저장
+          </p>
+          <img
+            src={saveImageUrl}
+            alt="카드뉴스"
+            onClick={e => e.stopPropagation()}
+            style={{ width: '100%', maxWidth: '400px', borderRadius: '20px', display: 'block', touchAction: 'auto', WebkitTouchCallout: 'default' } as React.CSSProperties}
+          />
+          <button
+            onClick={() => { URL.revokeObjectURL(saveImageUrl); setSaveImageUrl(null) }}
+            style={{ padding: '11px 36px', background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.3)', color: '#fff', borderRadius: '100px', fontSize: '15px', fontWeight: 700, cursor: 'pointer' }}
+          >닫기</button>
         </div>
       )}
     </div>
