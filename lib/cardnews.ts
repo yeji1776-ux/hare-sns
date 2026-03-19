@@ -854,78 +854,72 @@ async function captureCurrentSlide() {
   return out;
 }
 
-// Web Share API (모바일 사진첩 저장) → 불가 시 다운로드
-async function shareOrDownload(canvas, filename) {
-  return new Promise(function(resolve, reject) {
-    canvas.toBlob(async function(blob) {
-      try {
-        var file = new File([blob], filename, { type: 'image/png' });
-        if (navigator.share && typeof navigator.canShare === 'function' && navigator.canShare({ files: [file] })) {
-          await navigator.share({ files: [file] });
-        } else {
-          var url = URL.createObjectURL(blob);
-          var a = document.createElement('a');
-          a.href = url; a.download = filename;
-          document.body.appendChild(a); a.click(); document.body.removeChild(a);
-          setTimeout(function() { URL.revokeObjectURL(url); }, 1000);
-        }
-        resolve();
-      } catch(err) { reject(err); }
-    }, 'image/png');
+// 이미지 저장 모달 — navigator.share() 대신 사용 (iOS WebKit 버그: share sheet 닫힌 후 터치 이벤트 깨짐)
+function showSaveModal(items) {
+  var overlay = document.createElement('div');
+  overlay.id = 'saveModal';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.93);z-index:9999;overflow-y:auto;-webkit-overflow-scrolling:touch;display:flex;flex-direction:column;align-items:center;padding:24px 16px 32px;gap:16px;touch-action:pan-y;';
+
+  var hint = document.createElement('p');
+  hint.style.cssText = 'color:#fff;font-size:15px;font-weight:700;text-align:center;margin:0;line-height:1.6;';
+  hint.innerHTML = '이미지를 <strong>꾹 눌러서</strong> 사진첩에 저장';
+  overlay.appendChild(hint);
+
+  items.forEach(function(item, idx) {
+    var wrap = document.createElement('div');
+    wrap.style.cssText = 'width:100%;max-width:420px;';
+    if (items.length > 1) {
+      var lbl = document.createElement('div');
+      lbl.style.cssText = 'color:rgba(255,255,255,0.45);font-size:11px;text-align:center;margin-bottom:6px;';
+      lbl.textContent = (idx + 1) + ' / ' + items.length;
+      wrap.appendChild(lbl);
+    }
+    var img = document.createElement('img');
+    img.src = item.url;
+    // touch-action:auto + -webkit-touch-callout:default → iOS 꾹 누르기 컨텍스트 메뉴 활성화
+    img.style.cssText = 'width:100%;border-radius:20px;display:block;touch-action:auto;-webkit-touch-callout:default;user-select:none;-webkit-user-select:none;';
+    wrap.appendChild(img);
+    overlay.appendChild(wrap);
   });
+
+  var closeBtn = document.createElement('button');
+  closeBtn.textContent = '닫기';
+  closeBtn.style.cssText = 'margin-top:4px;padding:12px 40px;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.35);color:#fff;border-radius:100px;font-size:15px;font-weight:700;touch-action:manipulation;cursor:pointer;flex-shrink:0;';
+  closeBtn.onclick = function() { overlay.parentNode && overlay.parentNode.removeChild(overlay); };
+  overlay.appendChild(closeBtn);
+
+  document.body.appendChild(overlay);
 }
 
 async function saveCurrentSlide() {
   var btn = document.getElementById('saveCurrent');
-  btn.classList.add('saving');
-  btn.textContent = '저장 중...';
+  if (btn) { btn.classList.add('saving'); btn.textContent = '캡처 중...'; }
   try {
     var canvas = await captureCurrentSlide();
-    await shareOrDownload(canvas, 'cardnews_' + (cur + 1) + '.png');
-  } catch(e) { if (e && e.name !== 'AbortError') alert('저장 실패: ' + e.message); }
-  btn.classList.remove('saving');
-  btn.textContent = '📷 현재';
+    showSaveModal([{ url: canvas.toDataURL('image/png') }]);
+  } catch(e) { if (e && e.name !== 'AbortError') alert('캡처 실패: ' + (e.message || e)); }
+  if (btn) { btn.classList.remove('saving'); btn.textContent = '📷 현재'; }
 }
 
 async function saveAllSlides() {
   var btn = document.getElementById('saveAll');
-  btn.classList.add('saving');
+  if (btn) btn.classList.add('saving');
   var total = slides.length;
-  var files = [];
+  var items = [];
 
-  // 1단계: 모든 슬라이드 캡처
   for (var i = 0; i < total; i++) {
     goTo(i);
-    btn.textContent = (i+1) + '/' + total + ' 캡처 중...';
-    await new Promise(function(r) { setTimeout(r, 500); });
+    if (btn) btn.textContent = (i + 1) + '/' + total + ' 캡처 중...';
+    await new Promise(function(r) { setTimeout(r, 400); });
     try {
       var canvas = await captureCurrentSlide();
-      var blob = await new Promise(function(resolve) { canvas.toBlob(resolve, 'image/png'); });
-      files.push(new File([blob], 'cardnews_' + (i + 1) + '.png', { type: 'image/png' }));
-    } catch(e) { console.warn('slide ' + (i+1) + ' capture failed', e); }
+      items.push({ url: canvas.toDataURL('image/png') });
+    } catch(e) { console.warn('slide ' + (i + 1) + ' capture failed', e); }
   }
 
-  // 2단계: 한 번에 공유 (iOS는 gesture당 1회 share만 허용)
-  btn.textContent = '공유 중...';
-  if (files.length > 0) {
-    try {
-      if (navigator.share && typeof navigator.canShare === 'function' && navigator.canShare({ files: files })) {
-        await navigator.share({ files: files });
-      } else {
-        for (var j = 0; j < files.length; j++) {
-          var url = URL.createObjectURL(files[j]);
-          var a = document.createElement('a');
-          a.href = url; a.download = files[j].name;
-          document.body.appendChild(a); a.click(); document.body.removeChild(a);
-          URL.revokeObjectURL(url);
-          await new Promise(function(r) { setTimeout(r, 300); });
-        }
-      }
-    } catch(e) { if (e && e.name !== 'AbortError') alert('저장 실패: ' + e.message); }
-  }
+  if (items.length > 0) showSaveModal(items);
 
-  btn.classList.remove('saving');
-  btn.textContent = '💾 전체';
+  if (btn) { btn.classList.remove('saving'); btn.textContent = '💾 전체'; }
 }
 
 // postMessage API — 부모 페이지(iframe 래퍼)에서 제어
