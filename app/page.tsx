@@ -44,6 +44,7 @@ export default function Home() {
   const [iframeContainerW, setIframeContainerW] = useState<number | null>(null)
   const [cardVersion, setCardVersion] = useState<'v1' | 'v2'>('v1')
   const [regenLoading, setRegenLoading] = useState<{ cardnews: boolean; instagram: boolean; clip: boolean }>({ cardnews: false, instagram: false, clip: false })
+  const [iframeSrc, setIframeSrc] = useState<string | null>(null)
 
 
   useEffect(() => {
@@ -59,6 +60,18 @@ export default function Home() {
     obs.observe(el)
     return () => obs.disconnect()
   }, [result])
+
+  // srcDoc 대신 blob URL — iOS Safari에서 srcDoc iframe의 postMessage 수신 버그 우회
+  useEffect(() => {
+    if (!result || !iframeContainerW) return
+    const html = ((cardVersion === 'v2' && result.cardNewsHtmlV2) ? result.cardNewsHtmlV2 : result.cardNewsHtml)
+      .replace('width=device-width', `width=${iframeContainerW}`)
+      .replace('</head>', '<style>.save-bar{display:none!important}.nav-wrap{display:none!important}.counter{display:none!important}.caption-btn{display:none!important}</style></head>')
+    const blob = new Blob([html], { type: 'text/html' })
+    const url = URL.createObjectURL(blob)
+    setIframeSrc(url)
+    return () => URL.revokeObjectURL(url)
+  }, [result, cardVersion, iframeContainerW])
 
   useEffect(() => {
     try {
@@ -377,13 +390,11 @@ export default function Home() {
                   </div>
                 </div>
                 <div ref={iframeContainerRef} style={{ overflow: 'hidden', borderRadius: '12px', width: '100%', height: `${iframeContainerW ?? IFRAME_W}px` }}>
-                  {iframeContainerW && (
+                  {iframeSrc && (
                     <iframe
                       ref={iframeRef}
-                      key={`${iframeContainerW}-${cardVersion}`}
-                      srcDoc={((cardVersion === 'v2' && result.cardNewsHtmlV2) ? result.cardNewsHtmlV2 : result.cardNewsHtml)
-                        .replace('width=device-width', `width=${iframeContainerW}`)
-                        .replace('</head>', '<style>.save-bar{display:none!important}.nav-wrap{display:none!important}.counter{display:none!important}.caption-btn{display:none!important}</style></head>')}
+                      key={iframeSrc}
+                      src={iframeSrc}
                       style={{ width: `${iframeContainerW}px`, height: `${iframeContainerW}px`, border: 'none', display: 'block' }}
                       title="카드뉴스 미리보기"
                     />
