@@ -143,7 +143,10 @@ export default function Home() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ html: result.cardNewsHtml, slideIndex: curSlide })
       })
-      if (!resp.ok) throw new Error('스크린샷 실패')
+      if (!resp.ok) {
+        const errJson = await resp.json().catch(() => ({})) as { error?: string }
+        throw new Error(errJson.error ?? `HTTP ${resp.status}`)
+      }
       const blob = await resp.blob()
       const url = URL.createObjectURL(blob)
       setSaveImageUrl(url)
