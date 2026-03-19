@@ -105,6 +105,7 @@ export function buildCardNewsHtml(data: CardNewsData): string {
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>${data.placeName}</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/dom-to-image-more@3.4.0/dist/dom-to-image-more.min.js"></script>
 <style>
 :root {
   --accent: #38bdf8;
@@ -511,15 +512,6 @@ function showSaveModal(dataUrl) {
 }
 
 async function saveCurrentSlide() {
-  // 라이브러리를 필요할 때 동적으로 로드 (타이밍 문제 없음, 두 번째부터는 캐시됨)
-  var htmlToImage;
-  try {
-    htmlToImage = await import('https://esm.sh/html-to-image@1.11.11');
-  } catch(e) {
-    alert('캡처 실패: 라이브러리 로드 오류 ' + (e && e.message ? e.message : e));
-    return;
-  }
-
   var deck = document.getElementById('deck');
   var computedFilter = window.getComputedStyle(deck).filter;
   var prevFilter = deck.style.filter;
@@ -536,9 +528,8 @@ async function saveCurrentSlide() {
   ].join(',');
 
   try {
-    var dataUrl = await htmlToImage.toPng(deck, {
-      pixelRatio: 2,
-      cacheBust: true,
+    var dataUrl = await domtoimage.toPng(deck, {
+      scale: 2,
       filter: function(node) {
         return !node.classList || !node.classList.contains('theme-bar');
       }
