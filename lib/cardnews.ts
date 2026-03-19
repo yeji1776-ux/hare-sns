@@ -32,7 +32,8 @@ export interface CardNewsData {
   closingTitle: string
   closingWord: string
   closingHashtags: string
-  caption: string
+  captionLong: string
+  captionShort: string
 }
 
 function buildSponsorContext(s: SponsorshipConfig): string {
@@ -89,7 +90,8 @@ ${sponsor}
   "closingTitle": "장소명 또는 카테고리 (예: 인생 라떼 맛집)",
   "closingWord": "마지막으로 남기는 감성적인 한 마디",
   "closingHashtags": "대표 해시태그 3~4개",
-  "caption": "인스타그램 본문 캡션 (2~3줄 훅, 매장 정보, 줄바꿈, 해시태그 포함 15개 가량, 생략체/존댓말X 간결하게${s.enabled ? '. 협찬 해시태그/문구 필수 포함' : ''}"
+  "captionLong": "긴 인스타그램 캡션 (2~3줄 감성 훅, 매장 핵심 정보, 줄바꿈, 해시태그 15개 가량, 생략체/존댓말X 간결하게${s.enabled ? '. 협찬 해시태그/문구 필수 포함' : ''})",
+  "captionShort": "짧은 인스타그램 캡션 (훅 1줄 + 핵심 정보 1~2줄 + 해시태그 5~7개, 생략체/존댓말X 간결하게${s.enabled ? '. 협찬 해시태그 필수 포함' : ''})"
 }`
 
   return callGeminiJson<CardNewsData>(prompt)
@@ -246,10 +248,14 @@ body {
 .modal.open { display:flex; }
 .modal-box { background:rgba(248,250,252,0.88); border:1px solid rgba(255,255,255,0.8); backdrop-filter:blur(16px); width:100%; max-width:440px; border-radius:24px; padding:24px; position:relative; }
 .modal-title { font-size:11px; font-weight:600; letter-spacing:.15em; text-transform:uppercase; color:var(--accent); margin-bottom:12px; }
-.modal-text { font-size:13px; line-height:1.85; color:var(--text); white-space:pre-wrap; max-height:50vh; overflow-y:auto; padding-right:8px; }
-.modal-copy { margin-top:14px; width:100%; padding:12px; background:var(--accent); color:#fff; border:none; border-radius:12px; font-size:13px; font-weight:700; cursor:pointer; transition:opacity .2s; }
+.caption-section { margin-bottom:16px; }
+.caption-section:last-of-type { margin-bottom:0; }
+.caption-label { font-size:10px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--accent); margin-bottom:6px; opacity:0.8; }
+.caption-divider { width:100%; height:1px; background:rgba(0,0,0,0.08); margin:14px 0; }
+.modal-text { font-size:13px; line-height:1.85; color:var(--text); white-space:pre-wrap; max-height:28vh; overflow-y:auto; padding-right:8px; }
+.modal-copy { margin-top:8px; width:100%; padding:10px; background:var(--accent); color:#fff; border:none; border-radius:12px; font-size:13px; font-weight:700; cursor:pointer; transition:opacity .2s; }
 .modal-copy:hover { opacity:.85; }
-.modal-close { margin-top:8px; width:100%; padding:9px; background:transparent; color:var(--dim); border:none; font-size:12px; font-weight:600; cursor:pointer; }
+.modal-close { margin-top:12px; width:100%; padding:9px; background:transparent; color:var(--dim); border:none; font-size:12px; font-weight:600; cursor:pointer; }
 .hare-table { position: absolute; bottom: 32px; right: 36px; font-size: 13px; font-weight: 500; font-family: sans-serif; opacity: 0.6; letter-spacing: 0.05em; color: var(--text); z-index: 5; }
 
 /* Themes via hue-rotate */
@@ -547,8 +553,17 @@ body.is-standalone .save-bar { display: flex; }
 <div class="modal" id="modal">
   <div class="modal-box">
     <div class="modal-title">Instagram Caption</div>
-    <div class="modal-text" id="modalText">${data.caption.replace(/\n/g, '<br>')}</div>
-    <button class="modal-copy" onclick="copyText()">복사하기</button>
+    <div class="caption-section">
+      <div class="caption-label">✂️ 짧은 버전</div>
+      <div class="modal-text" id="captionShort">${data.captionShort.replace(/\n/g, '<br>')}</div>
+      <button class="modal-copy" onclick="copyCaption('captionShort', this)">복사하기</button>
+    </div>
+    <div class="caption-divider"></div>
+    <div class="caption-section">
+      <div class="caption-label">📝 긴 버전</div>
+      <div class="modal-text" id="captionLong">${data.captionLong.replace(/\n/g, '<br>')}</div>
+      <button class="modal-copy" onclick="copyCaption('captionLong', this)">복사하기</button>
+    </div>
     <button class="modal-close" onclick="closeModal()">닫기</button>
   </div>
 </div>
@@ -596,10 +611,9 @@ document.addEventListener('touchstart', txHandler);
 document.addEventListener('touchend', teHandler);
 function openModal() { document.getElementById('modal').classList.add('open'); }
 function closeModal() { document.getElementById('modal').classList.remove('open'); }
-function copyText() {
-  const text = document.getElementById('modalText').innerText;
+function copyCaption(id, btn) {
+  const text = document.getElementById(id).innerText;
   navigator.clipboard.writeText(text).then(() => {
-    const btn = document.querySelector('.modal-copy');
     btn.textContent = '✓ 복사완료';
     btn.style.background = '#059669';
     setTimeout(() => { btn.textContent = '복사하기'; btn.style.background = 'var(--accent)'; }, 2000);
