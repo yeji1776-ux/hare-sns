@@ -180,7 +180,7 @@ export default function Home() {
     >{label}</button>
   )
 
-  const glass = { background: 'rgba(255,255,255,0.55)', backdropFilter: 'blur(16px)', border: '1px solid rgba(255,255,255,0.7)', borderRadius: '16px', boxShadow: '0 4px 24px rgba(0,0,0,0.06)' }
+  const glass = { background: 'rgba(255,255,255,0.55)', WebkitBackdropFilter: 'blur(16px)', backdropFilter: 'blur(16px)', border: '1px solid rgba(255,255,255,0.7)', borderRadius: '16px', boxShadow: '0 4px 24px rgba(0,0,0,0.06)' }
 
   return (
     <div style={{ maxWidth: '800px', margin: '0 auto', padding: '24px 16px' }}>
@@ -377,14 +377,14 @@ export default function Home() {
                     ))}
                   </div>
                 </div>
-                <div ref={iframeContainerRef} style={{ overflow: 'hidden', borderRadius: '12px', width: '100%', height: `${iframeContainerW ?? IFRAME_W}px` }}>
+                <div ref={iframeContainerRef} style={{ borderRadius: '12px', width: '100%', height: `${iframeContainerW ?? IFRAME_W}px` }}>
                   {iframeContainerW && (
                     <iframe
                       ref={iframeRef}
                       key={`${iframeContainerW}-${cardVersion}`}
                       srcDoc={((cardVersion === 'v2' && result.cardNewsHtmlV2) ? result.cardNewsHtmlV2 : result.cardNewsHtml)
                         .replace('width=device-width', `width=${iframeContainerW}`)
-                        .replace('</head>', '<style>.save-bar{display:none!important}.nav-wrap{display:none!important}.counter{display:none!important}.caption-btn{display:none!important}</style></head>')}
+                        .replace('</head>', '<style>.save-bar{display:none!important}.nav-wrap{display:none!important}.counter{display:none!important}.caption-btn{display:none!important}*{touch-action:manipulation;-webkit-tap-highlight-color:transparent}img,canvas{touch-action:auto;-webkit-touch-callout:default}</style></head>')}
                       style={{ width: `${iframeContainerW}px`, height: `${iframeContainerW}px`, border: 'none', display: 'block' }}
                       title="카드뉴스 미리보기"
                     />
