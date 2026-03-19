@@ -45,7 +45,6 @@ export interface ConversionResult {
   clipVideoScript: ClipVideoScript
   clipTextPost: ClipTextPost
   cardNewsHtml: string
-  cardNewsHtmlV2: string
 }
 
 
@@ -135,7 +134,7 @@ ${sponsor}
 }`
 }
 
-import { generateCardNewsData, buildCardNewsHtml, buildCardNewsHtmlV2 } from './cardnews'
+import { generateCardNewsData, buildCardNewsHtml } from './cardnews'
 
 export async function convertBlogPost(
   post: BlogPost,
@@ -149,9 +148,8 @@ export async function convertBlogPost(
   ])
 
   const cardNewsHtml = buildCardNewsHtml(cardNewsData)
-  const cardNewsHtmlV2 = buildCardNewsHtmlV2(cardNewsData, post.images)
 
-  return { instagram, clipVideoScript, clipTextPost, cardNewsHtml, cardNewsHtmlV2 }
+  return { instagram, clipVideoScript, clipTextPost, cardNewsHtml }
 }
 
 export async function regenerateSection(
@@ -163,7 +161,6 @@ export async function regenerateSection(
     const cardNewsData = await generateCardNewsData(post, sponsorship)
     return {
       cardNewsHtml: buildCardNewsHtml(cardNewsData),
-      cardNewsHtmlV2: buildCardNewsHtmlV2(cardNewsData, post.images),
     }
   } else if (type === 'instagram') {
     const instagram = await callGeminiJson<InstagramOutput>(instagramPrompt(post, sponsorship))
