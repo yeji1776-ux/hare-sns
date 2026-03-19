@@ -327,7 +327,7 @@ export default function Home() {
                       style={{ padding: '8px 14px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.7)', background: regenLoading.cardnews ? '#94a3b8' : 'rgba(255,255,255,0.5)', fontSize: '13px', fontWeight: 600, cursor: regenLoading.cardnews ? 'not-allowed' : 'pointer', color: '#334155' }}
                     >{regenLoading.cardnews ? '⏳' : '🔄'} 새로고침</button>
                     <button
-                      onClick={() => iframeRef.current?.contentWindow?.postMessage({ type: 'OPEN_CAPTION' }, '*')}
+                      onClick={() => { const win = iframeRef.current?.contentWindow as Window & { openModal?: () => void }; win?.openModal?.() }}
                       style={{ padding: '8px 14px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.7)', background: 'rgba(255,255,255,0.5)', fontSize: '13px', fontWeight: 600, cursor: 'pointer', color: '#334155' }}
                     >💬 캡션</button>
                     <button
