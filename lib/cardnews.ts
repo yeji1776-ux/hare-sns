@@ -127,10 +127,10 @@ body {
   -webkit-font-smoothing: antialiased;
   display:flex; align-items:center; justify-content:center;
   background:
-    radial-gradient(ellipse 80% 60% at 15% 10%, rgba(186,230,253,0.55) 0%, transparent 55%),
-    radial-gradient(ellipse 70% 60% at 85% 85%, rgba(148,163,184,0.45) 0%, transparent 55%),
-    radial-gradient(ellipse 50% 40% at 60% 30%, rgba(226,232,240,0.35) 0%, transparent 50%),
-    linear-gradient(145deg, #ddf0fb 0%, #e2e8f0 45%, #c8d4e0 100%);
+    radial-gradient(ellipse 80% 60% at 15% 10%, rgba(186,230,253,0.75) 0%, transparent 55%),
+    radial-gradient(ellipse 70% 60% at 85% 85%, rgba(203,225,245,0.6) 0%, transparent 55%),
+    radial-gradient(ellipse 50% 40% at 60% 30%, rgba(240,248,255,0.5) 0%, transparent 50%),
+    linear-gradient(145deg, #eaf6fd 0%, #f4f8fb 45%, #ddeef8 100%);
 }
 
 /* ── Deck ── */
@@ -163,16 +163,16 @@ body {
 .slide::before { content:''; position:absolute; inset:0; background:linear-gradient(135deg,rgba(255,255,255,0.68) 0%,transparent 38%); pointer-events:none; z-index:0; }
 .slide::after  { content:''; position:absolute; inset:0; border-radius:inherit; box-shadow:inset 0 1.5px 0 rgba(255,255,255,0.9),inset 0 -1px 0 rgba(0,0,0,0.05),inset 1px 0 0 rgba(255,255,255,0.5),inset -1px 0 0 rgba(255,255,255,0.18); pointer-events:none; z-index:3; }
 
-.s-glass  { background:linear-gradient(135deg,rgba(255,255,255,0.22) 0%,rgba(186,230,253,0.08) 100%); backdrop-filter:blur(44px); -webkit-backdrop-filter:blur(44px); }
-.s-silver { background:linear-gradient(135deg,rgba(248,250,252,0.28) 0%,rgba(215,220,228,0.13) 100%); backdrop-filter:blur(44px); -webkit-backdrop-filter:blur(44px); }
-.s-accent { background:linear-gradient(145deg,rgba(186,230,253,0.24),rgba(125,211,252,0.11)); backdrop-filter:blur(52px); -webkit-backdrop-filter:blur(52px); }
-.s-mid    { background:linear-gradient(145deg,rgba(226,232,240,0.28),rgba(203,213,225,0.15)); backdrop-filter:blur(52px); -webkit-backdrop-filter:blur(52px); }
-.s-deep   { background:linear-gradient(145deg,rgba(2,132,199,0.68),rgba(3,105,161,0.55)); backdrop-filter:blur(52px); -webkit-backdrop-filter:blur(52px); }
+.s-glass  { background:linear-gradient(135deg,rgba(255,255,255,0.42) 0%,rgba(186,230,253,0.18) 100%); backdrop-filter:blur(44px); -webkit-backdrop-filter:blur(44px); }
+.s-silver { background:linear-gradient(135deg,rgba(255,255,255,0.52) 0%,rgba(220,232,242,0.28) 100%); backdrop-filter:blur(44px); -webkit-backdrop-filter:blur(44px); }
+.s-accent { background:linear-gradient(145deg,rgba(186,230,253,0.44),rgba(125,211,252,0.24)); backdrop-filter:blur(52px); -webkit-backdrop-filter:blur(52px); }
+.s-mid    { background:linear-gradient(145deg,rgba(232,242,252,0.48),rgba(210,225,240,0.28)); backdrop-filter:blur(52px); -webkit-backdrop-filter:blur(52px); }
+.s-deep   { background:linear-gradient(145deg,rgba(2,132,199,0.78),rgba(3,105,161,0.65)); backdrop-filter:blur(52px); -webkit-backdrop-filter:blur(52px); }
 
 .orb { position:absolute; border-radius:50%; filter:blur(clamp(32px,8vw,60px)); pointer-events:none; }
-.orb-a { width:70%; aspect-ratio:1; background:rgba(56,189,248,0.65); top:-25%; right:-20%; }
-.orb-b { width:55%; aspect-ratio:1; background:rgba(148,163,184,0.55); bottom:-20%; left:-15%; }
-.orb-w { width:65%; aspect-ratio:1; background:rgba(255,255,255,0.22); top:-25%; right:-20%; }
+.orb-a { width:70%; aspect-ratio:1; background:rgba(56,189,248,0.75); top:-25%; right:-20%; }
+.orb-b { width:55%; aspect-ratio:1; background:rgba(186,220,245,0.65); bottom:-20%; left:-15%; }
+.orb-w { width:65%; aspect-ratio:1; background:rgba(255,255,255,0.35); top:-25%; right:-20%; }
 .inner { position:relative; z-index:1; width:100%; }
 
 .tag { display:inline-flex; align-items:center; background:rgba(255,255,255,0.52); border:1px solid rgba(255,255,255,0.88); border-radius:100px; padding:5px 13px; font-size:clamp(9px,1.9vw,11px); font-weight:600; letter-spacing:.15em; text-transform:uppercase; color:var(--accent); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); margin-bottom:clamp(10px,2.5%,18px); box-shadow:0 2px 10px rgba(0,0,0,0.07),inset 0 1px 0 rgba(255,255,255,1); }
