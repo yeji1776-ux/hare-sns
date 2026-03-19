@@ -817,9 +817,18 @@ async function captureCurrentSlide() {
       backgroundColor: '#ddf0fb',
       logging: false,
       onclone: function(cloneDoc) {
-        // backdrop-filter 는 html2canvas 미지원 → 클론에서 전부 제거
+        // backdrop-filter 미지원 → 제거하되, 배경을 더 불투명하게 보정해 frosted glass 느낌 유지
         var s = cloneDoc.createElement('style');
-        s.textContent = '* { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }';
+        s.textContent = [
+          '* { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }',
+          '.s-glass { background: linear-gradient(135deg, rgba(255,255,255,0.82) 0%, rgba(186,230,253,0.68) 100%) !important; }',
+          '.s-silver { background: linear-gradient(135deg, rgba(248,250,252,0.88) 0%, rgba(215,220,228,0.74) 100%) !important; }',
+          '.s-accent { background: linear-gradient(145deg, rgba(186,230,253,0.80), rgba(125,211,252,0.65)) !important; }',
+          '.s-mid { background: linear-gradient(145deg, rgba(226,232,240,0.84), rgba(203,213,225,0.72)) !important; }',
+          '.s-deep { background: linear-gradient(145deg, rgba(2,132,199,0.92), rgba(3,105,161,0.84)) !important; }',
+          '.card { background: rgba(255,255,255,0.82) !important; }',
+          '.tag { background: rgba(255,255,255,0.84) !important; }'
+        ].join('\n');
         cloneDoc.head.appendChild(s);
       }
     });
@@ -875,16 +884,39 @@ async function saveAllSlides() {
   var btn = document.getElementById('saveAll');
   btn.classList.add('saving');
   var total = slides.length;
+  var files = [];
+
+  // 1단계: 모든 슬라이드 캡처
   for (var i = 0; i < total; i++) {
     goTo(i);
-    btn.textContent = (i+1) + '/' + total + ' 저장 중...';
-    await new Promise(function(r) { setTimeout(r, 450); });
+    btn.textContent = (i+1) + '/' + total + ' 캡처 중...';
+    await new Promise(function(r) { setTimeout(r, 500); });
     try {
       var canvas = await captureCurrentSlide();
-      await shareOrDownload(canvas, 'cardnews_' + (i + 1) + '.png');
-    } catch(e) { if (e && e.name !== 'AbortError') console.warn('slide ' + (i+1) + ' save failed', e); }
-    await new Promise(function(r) { setTimeout(r, 200); });
+      var blob = await new Promise(function(resolve) { canvas.toBlob(resolve, 'image/png'); });
+      files.push(new File([blob], 'cardnews_' + (i + 1) + '.png', { type: 'image/png' }));
+    } catch(e) { console.warn('slide ' + (i+1) + ' capture failed', e); }
   }
+
+  // 2단계: 한 번에 공유 (iOS는 gesture당 1회 share만 허용)
+  btn.textContent = '공유 중...';
+  if (files.length > 0) {
+    try {
+      if (navigator.share && typeof navigator.canShare === 'function' && navigator.canShare({ files: files })) {
+        await navigator.share({ files: files });
+      } else {
+        for (var j = 0; j < files.length; j++) {
+          var url = URL.createObjectURL(files[j]);
+          var a = document.createElement('a');
+          a.href = url; a.download = files[j].name;
+          document.body.appendChild(a); a.click(); document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+          await new Promise(function(r) { setTimeout(r, 300); });
+        }
+      }
+    } catch(e) { if (e && e.name !== 'AbortError') alert('저장 실패: ' + e.message); }
+  }
+
   btn.classList.remove('saving');
   btn.textContent = '💾 전체';
 }
