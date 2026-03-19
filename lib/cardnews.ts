@@ -921,9 +921,12 @@ async function saveAllSlides() {
   btn.textContent = '💾 전체';
 }
 
-// postMessage API — 부모 페이지(iframe 래퍼)에서 저장 트리거
+// postMessage API — 부모 페이지(iframe 래퍼)에서 제어
 window.addEventListener('message', async function(e) {
   if (!e.data || !e.data.type) return;
+  if (e.data.type === 'GO_NEXT') { go(1); return; }
+  if (e.data.type === 'GO_PREV') { go(-1); return; }
+  if (e.data.type === 'OPEN_CAPTION') { openModal(); return; }
   if (e.data.type === 'SAVE_CURRENT') {
     try {
       var canvas = await captureCurrentSlide();
