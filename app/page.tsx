@@ -363,6 +363,12 @@ export default function Home() {
                       }}
                       style={{ padding: '8px 16px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.7)', background: 'rgba(255,255,255,0.5)', fontSize: '13px', fontWeight: 600, cursor: 'pointer', color: '#334155' }}
                     >⬇️ HTML 다운로드</button>
+                    <a
+                      href="https://www.instagram.com/hare_table/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{ padding: '8px 14px', borderRadius: '8px', border: 'none', background: 'linear-gradient(135deg, #f9a8d4, #c084fc)', fontSize: '13px', fontWeight: 700, color: '#fff', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px', whiteSpace: 'nowrap' }}
+                    >📲 내 인스타</a>
                   </div>
                 </div>
                 <div style={{ background: 'rgba(255,255,255,0.4)', borderRadius: '10px', padding: '12px 16px', marginBottom: '12px', border: '1px solid rgba(255,255,255,0.6)' }}>

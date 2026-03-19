@@ -777,23 +777,51 @@ requestAnimationFrame(fitSlides);
 
 // Image save
 // ── Image capture & save ──
-// body 전체를 deck 위치에서 크롭하여 배경 그라디언트까지 정확히 캡처
+// deck에 배경 그라디언트를 직접 적용 후 캡처
+// - 'transparent' 는 html2canvas에서 rgba(0,0,0,0) → 검정으로 렌더링되는 버그 있음
+//   → 명시적 rgba(color, 0) 사용
+// - backdrop-filter 는 html2canvas 미지원 → onclone에서 제거
+// - 최종 캔버스를 불투명 배경 위에 합성 → iOS에서 어둡게 보이는 문제 방지
 async function captureCurrentSlide() {
   var deck = document.getElementById('deck');
-  var rect = deck.getBoundingClientRect();
-  return await html2canvas(document.body, {
-    x: Math.round(rect.left),
-    y: Math.round(rect.top),
-    width: Math.round(rect.width),
-    height: Math.round(rect.height),
-    scale: 2,
-    useCORS: true,
-    allowTaint: true,
-    backgroundColor: '#ddf0fb',
-    scrollX: 0,
-    scrollY: 0,
-    logging: false
-  });
+  var prevBg = deck.style.background;
+
+  // body 배경을 deck에 직접 적용 (transparent → rgba(,0) 로 교체)
+  deck.style.background = [
+    'radial-gradient(ellipse 80% 60% at 15% 10%, rgba(186,230,253,0.55) 0%, rgba(186,230,253,0) 55%)',
+    'radial-gradient(ellipse 70% 60% at 85% 85%, rgba(148,163,184,0.45) 0%, rgba(148,163,184,0) 55%)',
+    'radial-gradient(ellipse 50% 40% at 60% 30%, rgba(226,232,240,0.35) 0%, rgba(226,232,240,0) 50%)',
+    'linear-gradient(145deg, #ddf0fb 0%, #e2e8f0 45%, #c8d4e0 100%)'
+  ].join(', ');
+
+  var rawCanvas;
+  try {
+    rawCanvas = await html2canvas(deck, {
+      scale: 2,
+      useCORS: true,
+      allowTaint: true,
+      backgroundColor: '#ddf0fb',
+      logging: false,
+      onclone: function(cloneDoc) {
+        // backdrop-filter 는 html2canvas 미지원 → 클론에서 전부 제거
+        var s = cloneDoc.createElement('style');
+        s.textContent = '* { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }';
+        cloneDoc.head.appendChild(s);
+      }
+    });
+  } finally {
+    deck.style.background = prevBg;
+  }
+
+  // 불투명 배경 위에 합성 → iOS PNG 투명도 문제 방지
+  var out = document.createElement('canvas');
+  out.width = rawCanvas.width;
+  out.height = rawCanvas.height;
+  var ctx = out.getContext('2d');
+  ctx.fillStyle = '#ddf0fb';
+  ctx.fillRect(0, 0, out.width, out.height);
+  ctx.drawImage(rawCanvas, 0, 0);
+  return out;
 }
 
 // Web Share API (모바일 사진첩 저장) → 불가 시 다운로드
