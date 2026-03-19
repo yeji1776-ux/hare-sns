@@ -490,7 +490,7 @@ function fitSlides() {
 window.addEventListener('resize', fitSlides);
 requestAnimationFrame(fitSlides);
 
-// 이미지 저장 — navigator.share 대신 꾹 누르기 모달
+// 이미지 저장 — iOS는 navigator.share로 사진첩 직접 저장, 그 외는 꾹 누르기 모달
 function showSaveModal(dataUrl) {
   var existing = document.getElementById('saveModal');
   if (existing) existing.parentNode.removeChild(existing);
@@ -513,8 +513,6 @@ function showSaveModal(dataUrl) {
 
 async function saveCurrentSlide() {
   var deck = document.getElementById('deck');
-  // 부모 data-theme CSS 선택자로 적용되는 filter를 인라인으로 박아야
-  // html-to-image 클론에서도 색상이 동일하게 나옴
   var computedFilter = window.getComputedStyle(deck).filter;
   var prevFilter = deck.style.filter;
   if (computedFilter && computedFilter !== 'none') {
@@ -528,6 +526,18 @@ async function saveCurrentSlide() {
         return !node.classList || !node.classList.contains('theme-bar');
       }
     });
+
+    // iOS: navigator.share로 네이티브 공유 시트 열기 → "이미지 저장" 탭 하면 사진첩에 바로 저장
+    try {
+      var res = await fetch(dataUrl);
+      var blob = await res.blob();
+      var file = new File([blob], 'card.png', { type: 'image/png' });
+      if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({ files: [file], title: '카드뉴스' });
+        return;
+      }
+    } catch(shareErr) { /* share 실패 시 모달로 fallback */ }
+
     showSaveModal(dataUrl);
   } catch(e) {
     alert('캡처 실패: ' + (e && e.message ? e.message : e));
