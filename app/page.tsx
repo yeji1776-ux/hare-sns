@@ -44,7 +44,7 @@ export default function Home() {
   const [iframeContainerW, setIframeContainerW] = useState<number | null>(null)
   const [cardVersion, setCardVersion] = useState<'v1' | 'v2'>('v1')
   const [regenLoading, setRegenLoading] = useState<{ cardnews: boolean; instagram: boolean; clip: boolean }>({ cardnews: false, instagram: false, clip: false })
-  const [saveStatus, setSaveStatus] = useState('')
+
 
   useEffect(() => {
     if (!result) return
@@ -69,33 +69,16 @@ export default function Home() {
     }
   }, [])
 
-  useEffect(() => {
-    const handleMessage = (e: MessageEvent) => {
-      if (!e.data?.type) return
-      if (e.data.type === 'SAVE_RESULT') {
-        const { dataUrl, slideIndex, total } = e.data as { dataUrl: string; slideIndex: number; total?: number }
-        const a = document.createElement('a')
-        a.href = dataUrl
-        a.download = `cardnews_${slideIndex + 1}.png`
-        document.body.appendChild(a)
-        a.click()
-        document.body.removeChild(a)
-        if (!total || slideIndex === total - 1) setSaveStatus('')
-      } else if (e.data.type === 'SAVE_DONE') {
-        setSaveStatus('')
-      } else if (e.data.type === 'SAVE_ERROR') {
-        setSaveStatus('')
-      }
-    }
-    window.addEventListener('message', handleMessage)
-    return () => window.removeEventListener('message', handleMessage)
-  }, [])
-
   function handleSaveImage(type: 'current' | 'all') {
     const iframe = iframeRef.current
     if (!iframe?.contentWindow) return
-    setSaveStatus(type === 'all' ? '전체 저장 중...' : '저장 중...')
-    iframe.contentWindow.postMessage({ type: type === 'current' ? 'SAVE_CURRENT' : 'SAVE_ALL' }, '*')
+    // iframe 내부 함수를 직접 호출 — 클릭 user gesture가 유지되어 Web Share API(사진첩 저장)가 작동함
+    const win = iframe.contentWindow as Window & { saveCurrentSlide?: () => void; saveAllSlides?: () => void }
+    if (type === 'current') {
+      win.saveCurrentSlide?.()
+    } else {
+      win.saveAllSlides?.()
+    }
   }
 
   async function handleConvert() {
@@ -344,14 +327,12 @@ export default function Home() {
                     >{regenLoading.cardnews ? '⏳' : '🔄'} 새로고침</button>
                     <button
                       onClick={() => handleSaveImage('current')}
-                      disabled={!!saveStatus}
-                      style={{ padding: '8px 14px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.7)', background: saveStatus && !saveStatus.includes('전체') ? '#e2e8f0' : '#fce7f3', fontSize: '13px', fontWeight: 600, cursor: saveStatus ? 'not-allowed' : 'pointer', color: saveStatus && !saveStatus.includes('전체') ? '#94a3b8' : '#be185d' }}
-                    >{saveStatus && !saveStatus.includes('전체') ? saveStatus : '📸 현재 저장'}</button>
+                      style={{ padding: '8px 14px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.7)', background: '#fce7f3', fontSize: '13px', fontWeight: 600, cursor: 'pointer', color: '#be185d' }}
+                    >📸 현재 저장</button>
                     <button
                       onClick={() => handleSaveImage('all')}
-                      disabled={!!saveStatus}
-                      style={{ padding: '8px 14px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.7)', background: saveStatus?.includes('전체') ? '#e2e8f0' : '#dbeafe', fontSize: '13px', fontWeight: 600, cursor: saveStatus ? 'not-allowed' : 'pointer', color: saveStatus?.includes('전체') ? '#94a3b8' : '#1d4ed8' }}
-                    >{saveStatus?.includes('전체') ? saveStatus : '💾 전체 저장'}</button>
+                      style={{ padding: '8px 14px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.7)', background: '#dbeafe', fontSize: '13px', fontWeight: 600, cursor: 'pointer', color: '#1d4ed8' }}
+                    >💾 전체 저장</button>
                     <button
                       onClick={() => {
                         const ah = (cardVersion==='v2'&&result.cardNewsHtmlV2)?result.cardNewsHtmlV2:result.cardNewsHtml
