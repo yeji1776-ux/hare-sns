@@ -515,24 +515,24 @@ async function saveCurrentSlide() {
   var deck = document.getElementById('deck');
   var prevBg = deck.style.background;
   deck.style.background = [
-    'radial-gradient(ellipse 80% 60% at 15% 10%, rgba(186,230,253,0.55) 0%, rgba(186,230,253,0) 55%)',
-    'radial-gradient(ellipse 70% 60% at 85% 85%, rgba(148,163,184,0.45) 0%, rgba(148,163,184,0) 55%)',
-    'radial-gradient(ellipse 50% 40% at 60% 30%, rgba(226,232,240,0.35) 0%, rgba(226,232,240,0) 50%)',
-    'linear-gradient(145deg, #ddf0fb 0%, #e2e8f0 45%, #c8d4e0 100%)'
+    'radial-gradient(ellipse 80% 60% at 15% 10%, rgba(186,230,253,0.75) 0%, transparent 55%)',
+    'radial-gradient(ellipse 70% 60% at 85% 85%, rgba(203,225,245,0.6) 0%, transparent 55%)',
+    'radial-gradient(ellipse 50% 40% at 60% 30%, rgba(240,248,255,0.5) 0%, transparent 50%)',
+    'linear-gradient(145deg, #eaf6fd 0%, #f4f8fb 45%, #ddeef8 100%)'
   ].join(', ');
   try {
     var raw = await html2canvas(deck, {
-      scale:2, useCORS:true, allowTaint:true, backgroundColor:'#ddf0fb', logging:false,
+      scale:2, useCORS:true, allowTaint:true, backgroundColor:'#eaf6fd', logging:false,
       onclone:function(doc) {
         var s = doc.createElement('style');
-        s.textContent = '* { backdrop-filter:none!important; -webkit-backdrop-filter:none!important; } .s-glass{background:linear-gradient(135deg,rgba(255,255,255,0.82) 0%,rgba(186,230,253,0.68) 100%)!important} .s-silver{background:linear-gradient(135deg,rgba(248,250,252,0.88) 0%,rgba(215,220,228,0.74) 100%)!important} .s-accent{background:linear-gradient(145deg,rgba(186,230,253,0.80),rgba(125,211,252,0.65))!important} .s-mid{background:linear-gradient(145deg,rgba(226,232,240,0.84),rgba(203,213,225,0.72))!important} .s-deep{background:linear-gradient(145deg,rgba(2,132,199,0.92),rgba(3,105,161,0.84))!important} .card{background:rgba(255,255,255,0.82)!important} .tag{background:rgba(255,255,255,0.84)!important}';
+        s.textContent = '* { backdrop-filter:none!important; -webkit-backdrop-filter:none!important; } .s-glass{background:linear-gradient(135deg,rgba(255,255,255,0.93) 0%,rgba(186,230,253,0.88) 100%)!important} .s-silver{background:linear-gradient(135deg,rgba(248,250,252,0.95) 0%,rgba(215,220,228,0.90) 100%)!important} .s-accent{background:linear-gradient(145deg,rgba(186,230,253,0.92),rgba(125,211,252,0.84))!important} .s-mid{background:linear-gradient(145deg,rgba(232,242,252,0.93),rgba(203,213,225,0.87))!important} .s-deep{background:linear-gradient(145deg,rgba(2,132,199,0.96),rgba(3,105,161,0.90))!important} .card{background:rgba(255,255,255,0.92)!important} .tag{background:rgba(255,255,255,0.94)!important} .free-pill{background:rgba(255,255,255,0.92)!important} .theme-bar{background:rgba(255,255,255,0.90)!important}';
         doc.head.appendChild(s);
       }
     });
     var out = document.createElement('canvas');
     out.width = raw.width; out.height = raw.height;
     var ctx = out.getContext('2d');
-    ctx.fillStyle = '#ddf0fb';
+    ctx.fillStyle = '#eaf6fd';
     ctx.fillRect(0, 0, out.width, out.height);
     ctx.drawImage(raw, 0, 0);
     showSaveModal(out.toDataURL('image/png'));
