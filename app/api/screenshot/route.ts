@@ -1,8 +1,12 @@
 import { NextResponse } from 'next/server'
-import chromium from '@sparticuz/chromium'
+import chromium from '@sparticuz/chromium-min'
 import puppeteer from 'puppeteer-core'
 
 export const maxDuration = 30
+
+// Chromium 143 binary for Lambda/Vercel (downloaded to /tmp at runtime)
+const CHROMIUM_REMOTE_URL =
+  'https://github.com/Sparticuz/chromium/releases/download/v143.0.0/chromium-v143.0.0-pack.tar'
 
 const LOCAL_CHROME_PATHS: Record<string, string> = {
   darwin: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
@@ -11,13 +15,10 @@ const LOCAL_CHROME_PATHS: Record<string, string> = {
 }
 
 async function getExecPath(): Promise<string> {
-  if (process.env.VERCEL || process.env.RAILWAY_ENVIRONMENT) {
-    return chromium.executablePath()
-  }
   const { existsSync } = await import('fs')
   const p = LOCAL_CHROME_PATHS[process.platform] ?? ''
   if (p && existsSync(p)) return p
-  return chromium.executablePath()
+  return chromium.executablePath(CHROMIUM_REMOTE_URL)
 }
 
 export async function POST(req: Request) {
@@ -43,7 +44,7 @@ export async function POST(req: Request) {
       await new Promise(r => setTimeout(r, 700))
     }
 
-    // Hide theme bar (color selector dots) — not part of the final card
+    // Hide theme bar (color selector dots)
     await page.evaluate(() => {
       const bar = document.querySelector('.theme-bar') as HTMLElement | null
       if (bar) bar.style.display = 'none'
