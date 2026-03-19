@@ -326,6 +326,10 @@ export default function Home() {
                       style={{ padding: '8px 14px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.7)', background: regenLoading.cardnews ? '#94a3b8' : 'rgba(255,255,255,0.5)', fontSize: '13px', fontWeight: 600, cursor: regenLoading.cardnews ? 'not-allowed' : 'pointer', color: '#334155' }}
                     >{regenLoading.cardnews ? '⏳' : '🔄'} 새로고침</button>
                     <button
+                      onClick={() => { const w = iframeRef.current?.contentWindow as any; w?.openModal?.(); }}
+                      style={{ padding: '8px 14px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.7)', background: 'rgba(255,255,255,0.5)', fontSize: '13px', fontWeight: 600, cursor: 'pointer', color: '#334155' }}
+                    >💬 캡션</button>
+                    <button
                       onClick={() => handleSaveImage('current')}
                       style={{ padding: '8px 14px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.7)', background: '#fce7f3', fontSize: '13px', fontWeight: 600, cursor: 'pointer', color: '#be185d' }}
                     >📸 현재 저장</button>
@@ -372,18 +376,29 @@ export default function Home() {
                     ))}
                   </div>
                 </div>
-                <div ref={iframeContainerRef} style={{ overflow: 'hidden', borderRadius: '12px', width: '100%', height: `${iframeContainerW ?? IFRAME_W}px` }}>
-                  {iframeContainerW && (
-                    <iframe
-                      ref={iframeRef}
-                      key={`${iframeContainerW}-${cardVersion}`}
-                      srcDoc={((cardVersion === 'v2' && result.cardNewsHtmlV2) ? result.cardNewsHtmlV2 : result.cardNewsHtml)
-                        .replace('width=device-width', `width=${iframeContainerW}`)
-                        .replace('</head>', '<style>.save-bar{display:none!important}</style></head>')}
-                      style={{ width: `${iframeContainerW}px`, height: `${iframeContainerW}px`, border: 'none', display: 'block' }}
-                      title="카드뉴스 미리보기"
-                    />
-                  )}
+                <div style={{ position: 'relative' }}>
+                  {/* 부모 페이지 nav 버튼 — iframe touch 가로채기 우회 */}
+                  <button
+                    onClick={() => { const w = iframeRef.current?.contentWindow as any; w?.go?.(-1); }}
+                    style={{ position: 'absolute', left: 0, top: '50%', transform: 'translateY(-50%)', zIndex: 10, width: 40, height: 40, borderRadius: '50%', border: '1px solid rgba(255,255,255,0.7)', background: 'rgba(255,255,255,0.55)', backdropFilter: 'blur(8px)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, color: '#334155', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}
+                  >‹</button>
+                  <button
+                    onClick={() => { const w = iframeRef.current?.contentWindow as any; w?.go?.(1); }}
+                    style={{ position: 'absolute', right: 0, top: '50%', transform: 'translateY(-50%)', zIndex: 10, width: 40, height: 40, borderRadius: '50%', border: '1px solid rgba(255,255,255,0.7)', background: 'rgba(255,255,255,0.55)', backdropFilter: 'blur(8px)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, color: '#334155', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}
+                  >›</button>
+                  <div ref={iframeContainerRef} style={{ overflow: 'hidden', borderRadius: '12px', width: '100%', height: `${iframeContainerW ?? IFRAME_W}px` }}>
+                    {iframeContainerW && (
+                      <iframe
+                        ref={iframeRef}
+                        key={`${iframeContainerW}-${cardVersion}`}
+                        srcDoc={((cardVersion === 'v2' && result.cardNewsHtmlV2) ? result.cardNewsHtmlV2 : result.cardNewsHtml)
+                          .replace('width=device-width', `width=${iframeContainerW}`)
+                          .replace('</head>', '<style>.save-bar{display:none!important}.nav-wrap{display:none!important}.counter{display:none!important}.caption-btn{display:none!important}</style></head>')}
+                        style={{ width: `${iframeContainerW}px`, height: `${iframeContainerW}px`, border: 'none', display: 'block' }}
+                        title="카드뉴스 미리보기"
+                      />
+                    )}
+                  </div>
                 </div>
               </div>
             )}
