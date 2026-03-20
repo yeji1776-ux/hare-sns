@@ -15,7 +15,7 @@ function parseJson<T>(text: string): T {
 
 export async function callGeminiJson<T>(prompt: string): Promise<T> {
   const model = getClient().getGenerativeModel({
-    model: 'gemini-2.0-flash',
+    model: 'gemini-2.0-flash-lite',
     generationConfig: { responseMimeType: 'application/json' },
   })
   const result = await model.generateContent(prompt)
@@ -23,7 +23,7 @@ export async function callGeminiJson<T>(prompt: string): Promise<T> {
 }
 
 export async function callGeminiText(prompt: string): Promise<string> {
-  const model = getClient().getGenerativeModel({ model: 'gemini-2.0-flash' })
+  const model = getClient().getGenerativeModel({ model: 'gemini-2.0-flash-lite' })
   const result = await model.generateContent(prompt)
   return result.response.text()
 }
@@ -36,7 +36,7 @@ export async function streamGeminiText(
 ): Promise<() => void> {
   let cancelled = false
   try {
-    const model = getClient().getGenerativeModel({ model: 'gemini-2.0-flash' })
+    const model = getClient().getGenerativeModel({ model: 'gemini-2.0-flash-lite' })
     const result = await model.generateContentStream(prompt)
     for await (const chunk of result.stream) {
       if (cancelled) break
