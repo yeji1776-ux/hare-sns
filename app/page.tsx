@@ -7,7 +7,7 @@ interface InstagramOutput { hook: string; caption: string; hashtags: string[]; c
 interface Scene { sceneNumber: number; sceneDescription: string; narration: string; estimatedDuration: string }
 interface ClipVideoScript { scenes: Scene[]; totalEstimatedDuration: string }
 interface ClipTextPost { mainText: string; hashtags: string[] }
-interface ConversionResult { instagram: InstagramOutput; clipVideoScript: ClipVideoScript; clipTextPost: ClipTextPost; cardNewsHtml: string; cardNewsImageHtml?: string }
+interface ConversionResult { instagram: InstagramOutput; clipVideoScript: ClipVideoScript; clipTextPost: ClipTextPost; cardNewsHtml: string }
 
 interface HistoryItem {
   id: string
@@ -43,7 +43,6 @@ export default function Home() {
   const [curSlide, setCurSlide] = useState(0)
   const [totalSlides, setTotalSlides] = useState(7)
   const [regenLoading, setRegenLoading] = useState<{ cardnews: boolean; instagram: boolean; clip: boolean }>({ cardnews: false, instagram: false, clip: false })
-  const [cardMode, setCardMode] = useState<'simple' | 'image'>('image')
   const [activeTheme, setActiveTheme] = useState('sky')
   const busyRef = useRef(false)
 
@@ -266,16 +265,6 @@ export default function Home() {
                   <a href="https://www.instagram.com/hare_table/" target="_blank" rel="noopener noreferrer" style={{ padding: '8px 14px', borderRadius: '8px', border: 'none', background: 'linear-gradient(135deg,#f9a8d4,#c084fc)', fontSize: '13px', fontWeight: 700, color: '#fff', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px', whiteSpace: 'nowrap' }}>📲 내 인스타</a>
                 </div>
 
-                {/* 심플/이미지 탭 + 테마 선택 */}
-                {result.cardNewsImageHtml && result.cardNewsImageHtml !== result.cardNewsHtml && (
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
-                    <div style={{ display: 'flex', gap: '2px', background: 'rgba(255,255,255,0.5)', borderRadius: '8px', padding: '2px', border: '1px solid rgba(255,255,255,0.7)' }}>
-                      {([['simple', '심플'], ['image', '🖼️ 이미지']] as const).map(([id, label]) => (
-                        <button key={id} onClick={() => setCardMode(id)} style={{ padding: '6px 14px', fontSize: '12px', fontWeight: cardMode === id ? 700 : 500, border: 'none', borderRadius: '6px', cursor: 'pointer', background: cardMode === id ? '#0284c7' : 'transparent', color: cardMode === id ? '#fff' : '#64748b', transition: 'all 0.15s' }}>{label}</button>
-                      ))}
-                    </div>
-                  </div>
-                )}
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', marginBottom: '12px' }}>
                   <span style={{ fontSize: '11px', fontWeight: 700, color: '#64748b', letterSpacing: '0.03em' }}>테마</span>
                   {[
@@ -300,7 +289,7 @@ export default function Home() {
                       <iframe
                         ref={iframeRef}
                         key={iframeContainerW}
-                        srcDoc={(cardMode === 'image' && result.cardNewsImageHtml ? result.cardNewsImageHtml : result.cardNewsHtml)
+                        srcDoc={result.cardNewsHtml
                           .replace('width=device-width', `width=${iframeContainerW}`)
                           .replace('</head>', `<style>*{touch-action:manipulation;-webkit-tap-highlight-color:transparent}#saveModal img{touch-action:auto!important;-webkit-touch-callout:default!important}.theme-bar{display:none!important}</style></head>`)}
                         style={{ width: `${iframeContainerW}px`, height: `${iframeContainerW}px`, border: 'none', display: 'block', borderRadius: '12px' }}

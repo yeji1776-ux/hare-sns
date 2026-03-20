@@ -97,22 +97,7 @@ ${sponsor}
   return callGeminiJson<CardNewsData>(prompt)
 }
 
-// 공정위 문구 이미지 필터 — 파일명/URL에 흔히 포함되는 키워드
-export function filterAdImages(urls: string[]): string[] {
-  const adKeywords = /공정위|광고|협찬|sponsored|ad_|ftc|disclaimer|공정거래/i
-  return urls.filter(u => !adKeywords.test(u))
-}
-
-function buildImageSlide(url: string): string {
-  return `
-  <div class="slide s-glass">
-    <div class="img-slide" style="background-image:url('${url}')"></div>
-    <div class="hare-table" style="text-shadow:0 1px 4px rgba(0,0,0,0.4);color:#fff">@hare_table</div>
-  </div>`
-}
-
-export function buildCardNewsHtml(data: CardNewsData, images?: string[]): string {
-  const imgs = images && images.length > 0 ? images : []
+export function buildCardNewsHtml(data: CardNewsData): string {
   return `<!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -278,8 +263,6 @@ body {
 /* ── 저장 모달 ── */
 #saveModal img { touch-action:auto !important; -webkit-touch-callout:default !important; }
 
-/* ── 이미지 전용 슬라이드 ── */
-.img-slide { position:absolute; inset:0; background-size:cover; background-position:center; z-index:1; border-radius:inherit; }
 </style>
 </head>
 <body>
@@ -297,8 +280,6 @@ body {
     </div>
     <div class="hare-table">@hare_table</div>
   </div>
-
-  ${imgs.length > 0 ? buildImageSlide(imgs[0]) : ''}
 
   <!-- 02 기본정보 -->
   <div class="slide s-silver">
@@ -327,8 +308,6 @@ body {
     </div>
   </div>
 
-  ${imgs.length > 1 ? buildImageSlide(imgs[1]) : ''}
-
   <!-- 04 특징 -->
   <div class="slide s-accent">
     <div class="orb orb-w"></div>
@@ -340,8 +319,6 @@ body {
       </div>
     </div>
   </div>
-
-  ${imgs.length > 2 ? buildImageSlide(imgs[2]) : ''}
 
   <!-- 05 혜택 -->
   <div class="slide s-glass">
@@ -369,8 +346,6 @@ body {
     </div>
   </div>
 
-  ${imgs.length > 3 ? buildImageSlide(imgs[3]) : ''}
-
   <!-- 07 클로징 -->
   <div class="slide s-silver">
     <div class="orb orb-a" style="opacity:.3"></div>
@@ -382,8 +357,6 @@ body {
       <div class="loc" style="margin-top:clamp(14px,3.5%,22px)">${data.closingHashtags}</div>
     </div>
   </div>
-
-  ${imgs.slice(4).map(u => buildImageSlide(u)).join('')}
 
   <!-- 점 내비게이션 -->
   <div class="dots-bar" id="dots"></div>
