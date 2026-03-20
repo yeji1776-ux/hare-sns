@@ -278,9 +278,9 @@ body {
 
 /* ── 이미지 버전 ── */
 .slide-bg { position:absolute; inset:0; background-size:cover; background-position:center; z-index:0; }
-.slide-bg::after { content:''; position:absolute; inset:0; background:linear-gradient(180deg,rgba(255,255,255,0.55) 0%,rgba(255,255,255,0.85) 60%,rgba(255,255,255,0.95) 100%); }
-.s-deep .slide-bg::after { background:linear-gradient(180deg,rgba(2,132,199,0.4) 0%,rgba(3,105,161,0.75) 50%,rgba(3,105,161,0.92) 100%); }
-.s-accent .slide-bg::after { background:linear-gradient(180deg,rgba(186,230,253,0.3) 0%,rgba(186,230,253,0.7) 50%,rgba(240,248,255,0.92) 100%); }
+.slide-bg::after { content:''; position:absolute; inset:0; background:linear-gradient(180deg,rgba(255,255,255,0.08) 0%,rgba(255,255,255,0.25) 35%,rgba(255,255,255,0.7) 75%,rgba(255,255,255,0.88) 100%); }
+.s-deep .slide-bg::after { background:linear-gradient(180deg,rgba(2,132,199,0.1) 0%,rgba(3,105,161,0.3) 35%,rgba(3,105,161,0.7) 75%,rgba(3,105,161,0.88) 100%); }
+.s-accent .slide-bg::after { background:linear-gradient(180deg,rgba(186,230,253,0.05) 0%,rgba(186,230,253,0.2) 35%,rgba(240,248,255,0.65) 75%,rgba(240,248,255,0.88) 100%); }
 </style>
 </head>
 <body>
