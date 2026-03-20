@@ -204,7 +204,7 @@ export default function Home() {
                     </div>
                     <div style={{ display: 'flex', gap: '6px', flexShrink: 0 }}>
                       <button onClick={() => loadHistory(item)} style={{ padding: '5px 10px', borderRadius: '7px', border: '1px solid rgba(2,132,199,0.4)', background: 'rgba(2,132,199,0.08)', color: '#0284c7', fontSize: '12px', fontWeight: 700, cursor: 'pointer' }}>불러오기</button>
-                      <button onClick={() => deleteHistory(item.id)} style={{ padding: '5px 9px', borderRadius: '7px', border: '1px solid rgba(239,68,68,0.3)', background: 'rgba(239,68,68,0.07)', color: '#ef4444', fontSize: '13px', fontWeight: 700, cursor: 'pointer', lineHeight: 1 }}>×</button>
+                      <button onClick={() => { if (confirm('이 기록을 삭제할까요?')) deleteHistory(item.id) }} style={{ padding: '5px 9px', borderRadius: '7px', border: '1px solid rgba(239,68,68,0.3)', background: 'rgba(239,68,68,0.07)', color: '#ef4444', fontSize: '13px', fontWeight: 700, cursor: 'pointer', lineHeight: 1 }}>×</button>
                     </div>
                   </div>
                 ))}
@@ -220,10 +220,7 @@ export default function Home() {
           <div style={{ flex: 1, minWidth: '200px', position: 'relative' }}>
             <input value={url} onChange={e => setUrl(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleConvert()} placeholder="https://blog.naver.com/아이디/포스트번호" style={{ width: '100%', padding: '12px 40px 12px 16px', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.8)', background: 'rgba(255,255,255,0.7)', fontSize: '14px', outline: 'none', color: '#1e293b', boxSizing: 'border-box' }} />
             {url && (
-              <button onClick={() => {
-                if (result) { if (!confirm('생성된 결과가 있습니다. 정말 삭제할까요?')) return }
-                setUrl(''); setResult(null); setError(''); setCurSlide(0)
-              }} style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', width: '24px', height: '24px', borderRadius: '50%', border: 'none', background: 'rgba(0,0,0,0.1)', color: '#64748b', fontSize: '14px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}>✕</button>
+              <button onClick={() => { setUrl(''); setResult(null); setError(''); setCurSlide(0) }} style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', width: '24px', height: '24px', borderRadius: '50%', border: 'none', background: 'rgba(0,0,0,0.1)', color: '#64748b', fontSize: '14px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}>✕</button>
             )}
           </div>
           <button onClick={handleConvert} disabled={loading || !url.trim()} style={{ padding: '12px 24px', borderRadius: '10px', border: 'none', background: loading || !url.trim() ? '#94a3b8' : 'linear-gradient(145deg,#38bdf8,#0284c7)', color: '#fff', fontWeight: 700, fontSize: '14px', cursor: loading || !url.trim() ? 'not-allowed' : 'pointer', whiteSpace: 'nowrap', boxShadow: '0 4px 12px rgba(2,132,199,0.3)' }}>
