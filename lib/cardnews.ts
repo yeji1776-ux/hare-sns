@@ -531,7 +531,10 @@ function captureDeck() {
     'linear-gradient(145deg, #eaf6fd 0%, #f4f8fb 45%, #ddeef8 100%)'
   ].join(',');
 
+  var rect = deck.getBoundingClientRect();
   return domtoimage.toPng(deck, {
+    width: rect.width,
+    height: rect.height,
     scale: 2,
     filter: function(node) {
       return !node.classList || !node.classList.contains('theme-bar');
