@@ -217,7 +217,15 @@ export default function Home() {
       {/* Input */}
       <div style={{ ...glass, padding: '20px', marginBottom: '24px' }}>
         <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-          <input value={url} onChange={e => setUrl(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleConvert()} placeholder="https://blog.naver.com/아이디/포스트번호" style={{ flex: 1, minWidth: '200px', padding: '12px 16px', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.8)', background: 'rgba(255,255,255,0.7)', fontSize: '14px', outline: 'none', color: '#1e293b' }} />
+          <div style={{ flex: 1, minWidth: '200px', position: 'relative' }}>
+            <input value={url} onChange={e => setUrl(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleConvert()} placeholder="https://blog.naver.com/아이디/포스트번호" style={{ width: '100%', padding: '12px 40px 12px 16px', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.8)', background: 'rgba(255,255,255,0.7)', fontSize: '14px', outline: 'none', color: '#1e293b', boxSizing: 'border-box' }} />
+            {url && (
+              <button onClick={() => {
+                if (result) { if (!confirm('생성된 결과가 있습니다. 정말 삭제할까요?')) return }
+                setUrl(''); setResult(null); setError(''); setCurSlide(0)
+              }} style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', width: '24px', height: '24px', borderRadius: '50%', border: 'none', background: 'rgba(0,0,0,0.1)', color: '#64748b', fontSize: '14px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}>✕</button>
+            )}
+          </div>
           <button onClick={handleConvert} disabled={loading || !url.trim()} style={{ padding: '12px 24px', borderRadius: '10px', border: 'none', background: loading || !url.trim() ? '#94a3b8' : 'linear-gradient(145deg,#38bdf8,#0284c7)', color: '#fff', fontWeight: 700, fontSize: '14px', cursor: loading || !url.trim() ? 'not-allowed' : 'pointer', whiteSpace: 'nowrap', boxShadow: '0 4px 12px rgba(2,132,199,0.3)' }}>
             {loading ? '변환 중...' : '✨ 변환하기'}
           </button>
