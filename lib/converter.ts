@@ -60,10 +60,20 @@ function buildSponsorContext(s: SponsorshipConfig): string {
   return lines.join('')
 }
 
-function instagramPrompt(post: BlogPost, s: SponsorshipConfig): string {
+import { CardNewsData, buildCardNewsHtml } from './cardnews'
+
+interface AllInOneResult {
+  instagram: InstagramOutput
+  clipVideoScript: ClipVideoScript
+  clipTextPost: ClipTextPost
+  cardNews: CardNewsData
+}
+
+function allInOnePrompt(post: BlogPost, s: SponsorshipConfig): string {
   const content = post.content.slice(0, 3000)
   const sponsor = buildSponsorContext(s)
-  return `당신은 인스타그램 콘텐츠 전문가입니다. 아래 네이버 블로그 글을 인스타그램 게시물로 변환해주세요.
+  return `당신은 블로그 글을 여러 SNS 플랫폼용 콘텐츠로 변환하는 전문가입니다.
+아래 블로그 글을 읽고, 인스타그램 + 네이버 클립 + 카드뉴스 콘텐츠를 **한 번에** 생성해주세요.
 
 === 블로그 원문 ===
 제목: ${post.title}
@@ -72,84 +82,76 @@ function instagramPrompt(post: BlogPost, s: SponsorshipConfig): string {
 ${content}
 ${sponsor}
 
-=== 변환 규칙 ===
-1. hook: 팔로워가 멈추게 만드는 강력한 첫 문장 (이모지 포함, 30자 이내)
-2. caption: 본문 캡션 (500-800자, 자연스러운 한국어, 줄바꿈 활용, 이모지 사용)
-3. hashtags: 해시태그 20-30개 (# 포함)${s.enabled && s.requiredHashtags.length > 0 ? `\n   협찬 필수 해시태그 반드시 포함: ${s.requiredHashtags.join(' ')}` : ''}
-4. carouselSlides: 5-7개 슬라이드 (slideNumber, headline 20자 이내, bodyText 50-100자)
-
-반드시 아래 JSON 형식으로만 응답하세요:
+반드시 아래 JSON 구조로만 응답하세요:
 {
-  "hook": "string",
-  "caption": "string",
-  "hashtags": ["#태그1"],
-  "carouselSlides": [{"slideNumber": 1, "headline": "string", "bodyText": "string"}]
-}`
+  "instagram": {
+    "hook": "팔로워가 멈추게 만드는 첫 문장 (이모지 포함, 30자 이내)",
+    "caption": "본문 캡션 (500-800자, 자연스러운 한국어, 줄바꿈, 이모지)",
+    "hashtags": ["#태그1", "#태그2", "...20-30개 (# 포함)${s.enabled && s.requiredHashtags.length > 0 ? `, 협찬 필수: ${s.requiredHashtags.join(' ')}` : ''}"],
+    "carouselSlides": [{"slideNumber": 1, "headline": "20자 이내", "bodyText": "50-100자"}]
+  },
+  "clipVideoScript": {
+    "scenes": [{"sceneNumber": 1, "sceneDescription": "화면 구성", "narration": "구어체 나레이션", "estimatedDuration": "8초"}],
+    "totalEstimatedDuration": "약 70초"
+  },
+  "clipTextPost": {
+    "mainText": "300-500자 핵심 요약 + 이모지",
+    "hashtags": ["#태그1", "...10-15개${s.enabled && s.requiredHashtags.length > 0 ? `, 협찬 필수: ${s.requiredHashtags.join(' ')}` : ''}"]
+  },
+  "cardNews": {
+    "placeName": "장소명 (10자 이내)",
+    "coverTag": "☕️ 카페/디저트 (이모지+카테고리)",
+    "coverHook": "인상적인 훅 (20자 이내)",
+    "coverAddress": "간단한 위치 (예: 연남동)",
+    "basicInfo": {
+      "location": "위치 요약", "locationSub": "보조 설명",
+      "hours": "운영 시간", "hoursSub": "휴무일 등",
+      "price": "가격대", "priceSub": "대표메뉴",
+      "feature": "핵심 특징", "featureSub": "주차, 예약 등"
+    },
+    "highlightNum": "핵심 숫자 (예: 10)",
+    "highlightUnit": "단위 (예: 만원)",
+    "highlightHook": "숫자 임팩트 문장",
+    "featureTitle": "특징 제목",
+    "features": [{"icon": "이모지", "title": "특징명", "desc": "설명"}],
+    "benefitTag": "이용/혜택 안내",
+    "benefitTitle": "알아두면 좋은 정보",
+    "benefits": [{"icon": "이모지", "text": "항목"}],
+    "benefitSub": "보조 설명 1줄",
+    "reviewTitle": "총평 한줄",
+    "reviews": ["포인트1", "포인트2", "포인트3"],
+    "closingArea": "지역명",
+    "closingTitle": "장소명/카테고리",
+    "closingWord": "감성적 마무리 한 마디",
+    "closingHashtags": "대표 해시태그 3~4개",
+    "captionLong": "긴 인스타 캡션 (2~3줄 훅, 핵심 정보, 해시태그 15개${s.enabled ? ', 협찬 문구 포함' : ''})",
+    "captionShort": "짧은 인스타 캡션 (훅 1줄, 정보 1~2줄, 해시태그 5~7개${s.enabled ? ', 협찬 문구 포함' : ''})"
+  }
 }
 
-function clipVideoPrompt(post: BlogPost, s: SponsorshipConfig): string {
-  const content = post.content.slice(0, 3000)
-  const sponsor = buildSponsorContext(s)
-  return `당신은 숏폼 영상 스크립트 전문가입니다. 아래 블로그 글을 네이버 클립(숏폼) 영상 스크립트로 변환해주세요.
-
-=== 블로그 원문 ===
-제목: ${post.title}
-작성자: ${post.author}
-내용:
-${content}
-${sponsor}
-
-=== 변환 규칙 ===
-- 전체 영상 길이: 60-90초, 장면 수: 5-8개
-- 각 장면: sceneNumber, sceneDescription(화면 구성), narration(구어체 한국어), estimatedDuration
-${s.enabled ? '- 협찬 요구사항을 나레이션에 자연스럽게 포함' : ''}
-
-반드시 아래 JSON 형식으로만 응답하세요:
-{
-  "scenes": [{"sceneNumber": 1, "sceneDescription": "string", "narration": "string", "estimatedDuration": "8초"}],
-  "totalEstimatedDuration": "string"
-}`
+세부 규칙:
+- instagram.carouselSlides: 5-7개
+- clipVideoScript.scenes: 5-8개, 총 60-90초
+- cardNews.features: 딱 4개
+- cardNews.benefits: 3~6개
+- cardNews.reviews: 딱 3개
+${s.enabled ? '- 협찬 요구사항을 모든 콘텐츠에 자연스럽게 포함' : ''}`
 }
-
-function clipTextPrompt(post: BlogPost, s: SponsorshipConfig): string {
-  const content = post.content.slice(0, 3000)
-  const sponsor = buildSponsorContext(s)
-  return `당신은 네이버 클립 텍스트 게시글 전문가입니다. 아래 블로그 글을 네이버 클립 텍스트 게시글로 변환해주세요.
-
-=== 블로그 원문 ===
-제목: ${post.title}
-작성자: ${post.author}
-내용:
-${content}
-${sponsor}
-
-=== 변환 규칙 ===
-1. mainText: 300-500자, 핵심 요약 + 시청 유도 + 이모지
-2. hashtags: 10-15개${s.enabled && s.requiredHashtags.length > 0 ? `\n   협찬 필수 해시태그 반드시 포함: ${s.requiredHashtags.join(' ')}` : ''}
-
-반드시 아래 JSON 형식으로만 응답하세요:
-{
-  "mainText": "string",
-  "hashtags": ["#태그1"]
-}`
-}
-
-import { generateCardNewsData, buildCardNewsHtml } from './cardnews'
 
 export async function convertBlogPost(
   post: BlogPost,
   sponsorship: SponsorshipConfig
 ): Promise<ConversionResult> {
-  const [instagram, clipVideoScript, clipTextPost, cardNewsData] = await Promise.all([
-    callGeminiJson<InstagramOutput>(instagramPrompt(post, sponsorship)),
-    callGeminiJson<ClipVideoScript>(clipVideoPrompt(post, sponsorship)),
-    callGeminiJson<ClipTextPost>(clipTextPrompt(post, sponsorship)),
-    generateCardNewsData(post, sponsorship),
-  ])
+  const result = await callGeminiJson<AllInOneResult>(allInOnePrompt(post, sponsorship))
 
-  const cardNewsHtml = buildCardNewsHtml(cardNewsData)
+  const cardNewsHtml = buildCardNewsHtml(result.cardNews)
 
-  return { instagram, clipVideoScript, clipTextPost, cardNewsHtml }
+  return {
+    instagram: result.instagram,
+    clipVideoScript: result.clipVideoScript,
+    clipTextPost: result.clipTextPost,
+    cardNewsHtml,
+  }
 }
 
 export async function regenerateSection(
@@ -157,19 +159,13 @@ export async function regenerateSection(
   sponsorship: SponsorshipConfig,
   type: 'cardnews' | 'instagram' | 'clip'
 ): Promise<Partial<ConversionResult>> {
+  const result = await callGeminiJson<AllInOneResult>(allInOnePrompt(post, sponsorship))
+
   if (type === 'cardnews') {
-    const cardNewsData = await generateCardNewsData(post, sponsorship)
-    return {
-      cardNewsHtml: buildCardNewsHtml(cardNewsData),
-    }
+    return { cardNewsHtml: buildCardNewsHtml(result.cardNews) }
   } else if (type === 'instagram') {
-    const instagram = await callGeminiJson<InstagramOutput>(instagramPrompt(post, sponsorship))
-    return { instagram }
+    return { instagram: result.instagram }
   } else {
-    const [clipVideoScript, clipTextPost] = await Promise.all([
-      callGeminiJson<ClipVideoScript>(clipVideoPrompt(post, sponsorship)),
-      callGeminiJson<ClipTextPost>(clipTextPrompt(post, sponsorship)),
-    ])
-    return { clipVideoScript, clipTextPost }
+    return { clipVideoScript: result.clipVideoScript, clipTextPost: result.clipTextPost }
   }
 }
