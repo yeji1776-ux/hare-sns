@@ -16,14 +16,14 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="ko">
+    <html lang="ko" suppressHydrationWarning>
       <head>
-        <style>{`
+        <style dangerouslySetInnerHTML={{ __html: `
           * { -webkit-tap-highlight-color: rgba(0,0,0,0.08); touch-action: manipulation; }
           button, a, [role="button"] { cursor: pointer; -webkit-appearance: none; }
-        `}</style>
+        ` }} />
       </head>
-      <body style={{ margin: 0, fontFamily: 'system-ui, -apple-system, sans-serif', background: 'linear-gradient(135deg, #f0f9ff 0%, #e2e8f0 40%, #cbd5e1 100%)', minHeight: '100vh' }}>
+      <body suppressHydrationWarning style={{ margin: 0, fontFamily: 'system-ui, -apple-system, sans-serif', background: 'linear-gradient(135deg, #f0f9ff 0%, #e2e8f0 40%, #cbd5e1 100%)', minHeight: '100vh' }}>
         {children}
       </body>
     </html>
