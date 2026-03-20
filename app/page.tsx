@@ -41,7 +41,7 @@ export default function Home() {
   const iframeRef = useRef<HTMLIFrameElement>(null)
   const [iframeContainerW, setIframeContainerW] = useState<number | null>(null)
   const [curSlide, setCurSlide] = useState(0)
-  const [totalSlides] = useState(7)
+  const [totalSlides, setTotalSlides] = useState(7)
   const [regenLoading, setRegenLoading] = useState<{ cardnews: boolean; instagram: boolean; clip: boolean }>({ cardnews: false, instagram: false, clip: false })
   const [cardMode, setCardMode] = useState<'simple' | 'image'>('image')
   const [activeTheme, setActiveTheme] = useState('sky')
@@ -67,6 +67,7 @@ export default function Home() {
     function handler(e: MessageEvent) {
       if (e.data?.type === 'SLIDE_CHANGED') {
         setCurSlide(e.data.cur ?? 0)
+        if (e.data.total) setTotalSlides(e.data.total)
       }
     }
     window.addEventListener('message', handler)

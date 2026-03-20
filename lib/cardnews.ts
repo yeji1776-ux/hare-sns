@@ -103,14 +103,16 @@ export function filterAdImages(urls: string[]): string[] {
   return urls.filter(u => !adKeywords.test(u))
 }
 
+function buildImageSlide(url: string): string {
+  return `
+  <div class="slide s-glass">
+    <div class="img-slide" style="background-image:url('${url}')"></div>
+    <div class="hare-table" style="text-shadow:0 1px 4px rgba(0,0,0,0.4);color:#fff">@hare_table</div>
+  </div>`
+}
+
 export function buildCardNewsHtml(data: CardNewsData, images?: string[]): string {
-  const hasImages = images && images.length > 0
-  // 이미지 할당: 커버(1장), 기본정보(1장), 특징(1장), 혜택(1장), 클로징(1장)
-  const coverImg = hasImages ? images[0] : ''
-  const infoImg = hasImages && images.length > 1 ? images[1] : ''
-  const featureImg = hasImages && images.length > 2 ? images[2] : ''
-  const benefitImg = hasImages && images.length > 3 ? images[3] : ''
-  const closingImg = hasImages && images.length > 4 ? images[4] : coverImg
+  const imgs = images && images.length > 0 ? images : []
   return `<!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -276,11 +278,8 @@ body {
 /* ── 저장 모달 ── */
 #saveModal img { touch-action:auto !important; -webkit-touch-callout:default !important; }
 
-/* ── 이미지 버전 ── */
-.slide-bg { position:absolute; inset:0; background-size:cover; background-position:center; z-index:0; }
-.slide-bg::after { content:''; position:absolute; inset:0; background:linear-gradient(180deg,rgba(255,255,255,0.08) 0%,rgba(255,255,255,0.25) 35%,rgba(255,255,255,0.7) 75%,rgba(255,255,255,0.88) 100%); }
-.s-deep .slide-bg::after { background:linear-gradient(180deg,rgba(2,132,199,0.1) 0%,rgba(3,105,161,0.3) 35%,rgba(3,105,161,0.7) 75%,rgba(3,105,161,0.88) 100%); }
-.s-accent .slide-bg::after { background:linear-gradient(180deg,rgba(186,230,253,0.05) 0%,rgba(186,230,253,0.2) 35%,rgba(240,248,255,0.65) 75%,rgba(240,248,255,0.88) 100%); }
+/* ── 이미지 전용 슬라이드 ── */
+.img-slide { position:absolute; inset:0; background-size:cover; background-position:center; z-index:1; border-radius:inherit; }
 </style>
 </head>
 <body>
@@ -288,7 +287,7 @@ body {
 
   <!-- 01 커버 -->
   <div class="slide s-glass active">
-    ${coverImg ? `<div class="slide-bg" style="background-image:url('${coverImg}')"></div>` : '<div class="orb orb-a"></div><div class="orb orb-b"></div>'}
+    <div class="orb orb-a"></div><div class="orb orb-b"></div>
     <div class="inner">
       <div class="tag">${data.coverTag}</div>
       <div class="t-xl">${data.placeName}</div>
@@ -299,9 +298,11 @@ body {
     <div class="hare-table">@hare_table</div>
   </div>
 
+  ${imgs.length > 0 ? buildImageSlide(imgs[0]) : ''}
+
   <!-- 02 기본정보 -->
   <div class="slide s-silver">
-    ${infoImg ? `<div class="slide-bg" style="background-image:url('${infoImg}')"></div>` : '<div class="orb orb-a" style="opacity:.25"></div>'}
+    <div class="orb orb-a" style="opacity:.25"></div>
     <div class="inner">
       <div class="tag">Basic Info</div>
       <div class="t-lg">이런 곳이에요</div>
@@ -326,9 +327,11 @@ body {
     </div>
   </div>
 
+  ${imgs.length > 1 ? buildImageSlide(imgs[1]) : ''}
+
   <!-- 04 특징 -->
   <div class="slide s-accent">
-    ${featureImg ? `<div class="slide-bg" style="background-image:url('${featureImg}')"></div>` : '<div class="orb orb-w"></div>'}
+    <div class="orb orb-w"></div>
     <div class="inner">
       <div class="tag">Features</div>
       <div class="t-lg">${data.featureTitle}</div>
@@ -338,9 +341,11 @@ body {
     </div>
   </div>
 
+  ${imgs.length > 2 ? buildImageSlide(imgs[2]) : ''}
+
   <!-- 05 혜택 -->
   <div class="slide s-glass">
-    ${benefitImg ? `<div class="slide-bg" style="background-image:url('${benefitImg}')"></div>` : '<div class="orb orb-a" style="opacity:.3"></div><div class="orb orb-b"></div>'}
+    <div class="orb orb-a" style="opacity:.3"></div><div class="orb orb-b"></div>
     <div class="inner">
       <div class="tag">${data.benefitTag}</div>
       <div class="t-lg">${data.benefitTitle}</div>
@@ -364,9 +369,11 @@ body {
     </div>
   </div>
 
+  ${imgs.length > 3 ? buildImageSlide(imgs[3]) : ''}
+
   <!-- 07 클로징 -->
   <div class="slide s-silver">
-    ${closingImg ? `<div class="slide-bg" style="background-image:url('${closingImg}')"></div>` : '<div class="orb orb-a" style="opacity:.3"></div>'}
+    <div class="orb orb-a" style="opacity:.3"></div>
     <div class="inner">
       <div class="tag">${data.closingArea}</div>
       <div class="t-xl">${data.closingTitle}</div>
@@ -375,6 +382,8 @@ body {
       <div class="loc" style="margin-top:clamp(14px,3.5%,22px)">${data.closingHashtags}</div>
     </div>
   </div>
+
+  ${imgs.slice(4).map(u => buildImageSlide(u)).join('')}
 
   <!-- 점 내비게이션 -->
   <div class="dots-bar" id="dots"></div>
