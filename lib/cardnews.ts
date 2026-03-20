@@ -175,7 +175,7 @@ body {
 .orb-w { width:65%; aspect-ratio:1; background:rgba(255,255,255,0.35); top:-25%; right:-20%; }
 .inner { position:relative; z-index:1; width:100%; }
 
-.tag { display:inline-flex; align-items:center; background:rgba(255,255,255,0.52); border:1px solid rgba(255,255,255,0.88); border-radius:100px; padding:5px 13px; font-size:clamp(9px,1.9vw,11px); font-weight:600; letter-spacing:.15em; text-transform:uppercase; color:var(--accent); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); margin-bottom:clamp(10px,2.5%,18px); box-shadow:0 2px 10px rgba(0,0,0,0.07),inset 0 1px 0 rgba(255,255,255,1); }
+.tag { display:inline-flex; align-items:center; background:rgba(255,255,255,0.52); border:1px solid rgba(255,255,255,0.88); border-radius:100px; padding:5px 13px; font-size:clamp(9px,1.9vw,11px); font-weight:600; letter-spacing:.15em; text-transform:uppercase; color:var(--accent); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); margin-bottom:clamp(10px,2.5%,18px); }
 .s-deep .tag { background:rgba(255,255,255,0.12); border-color:rgba(255,255,255,0.25); color:rgba(255,255,255,0.9); }
 .s-accent .tag, .s-mid .tag { background:rgba(255,255,255,0.55); border-color:rgba(255,255,255,0.8); color:var(--accent); }
 
