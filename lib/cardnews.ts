@@ -515,9 +515,12 @@ function captureDeck() {
   return domtoimage.toPng(deck, {
     width: w,
     height: w,
-    scale: 2,
+    scale: 3,
     filter: function(node) {
-      return !node.classList || !node.classList.contains('theme-bar');
+      if (!node.classList) return true;
+      if (node.classList.contains('theme-bar')) return false;
+      if (node.classList.contains('orb')) return false;
+      return true;
     }
   }).finally(function() {
     deck.style.filter = prevFilter;
