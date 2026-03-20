@@ -146,8 +146,8 @@ body {
 /* ── Slides ── */
 .slide {
   position:absolute; inset:0;
-  display:flex; flex-direction:column; justify-content:center;
-  padding:clamp(28px,8%,56px);
+  display:flex; flex-direction:column; justify-content:flex-start;
+  padding:clamp(24px,6%,40px);
   opacity:0; transform:scale(0.97) translateY(12px);
   transition:opacity .45s cubic-bezier(.4,0,.2,1), transform .45s cubic-bezier(.4,0,.2,1);
   pointer-events:none; overflow:hidden; color:var(--text);
