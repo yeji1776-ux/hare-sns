@@ -252,7 +252,7 @@ export default function Home() {
 
           <div style={{ padding: '20px' }}>
             {/* ── 카드뉴스 ── */}
-            {tab === 'cardnews' && (
+            <div style={{ display: tab === 'cardnews' ? 'block' : 'none' }}>
               <div>
                 {/* 액션 버튼 */}
                 <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '12px', alignItems: 'center' }}>
@@ -339,7 +339,7 @@ export default function Home() {
                   {curSlide + 1} / {totalSlides}
                 </div>
               </div>
-            )}
+            </div>
 
             {/* ── 인스타그램 ── */}
             {tab === 'instagram' && (

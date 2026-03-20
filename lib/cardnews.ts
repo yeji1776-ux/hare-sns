@@ -595,7 +595,9 @@ function toggleEdit(on) {
 }
 
 function setFontSize(selector, delta) {
-  document.querySelectorAll(selector).forEach(function(el) {
+  var activeSlide = document.querySelector('.slide.active');
+  if (!activeSlide) return;
+  activeSlide.querySelectorAll(selector).forEach(function(el) {
     var current = parseFloat(window.getComputedStyle(el).fontSize);
     el.style.fontSize = (current + delta) + 'px';
   });
