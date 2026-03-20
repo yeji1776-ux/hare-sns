@@ -91,8 +91,8 @@ ${sponsor}
     "carouselSlides": [{"slideNumber": 1, "headline": "20자 이내", "bodyText": "50-100자"}]
   },
   "clipVideoScript": {
-    "scenes": [{"sceneNumber": 1, "sceneDescription": "화면 구성", "narration": "구어체 나레이션", "estimatedDuration": "8초"}],
-    "totalEstimatedDuration": "약 70초"
+    "scenes": [{"sceneNumber": 1, "sceneDescription": "화면 구성", "narration": "구어체 나레이션", "estimatedDuration": "3초"}],
+    "totalEstimatedDuration": "약 15초"
   },
   "clipTextPost": {
     "mainText": "300-500자 핵심 요약 + 이모지",
@@ -131,7 +131,7 @@ ${sponsor}
 
 세부 규칙:
 - instagram.carouselSlides: 5-7개
-- clipVideoScript.scenes: 5-8개, 총 60-90초
+- clipVideoScript.scenes: 3-5개, 총 15초 이내 (네이버 클립은 15초 숏폼)
 - cardNews.features: 딱 4개
 - cardNews.benefits: 3~6개
 - cardNews.reviews: 딱 3개
