@@ -125,22 +125,14 @@ html, body { width:100%; height:100%; overflow:hidden; }
 body {
   font-family: var(--sans);
   -webkit-font-smoothing: antialiased;
-  display:flex; align-items:center; justify-content:center;
-  background:
-    radial-gradient(ellipse 80% 60% at 15% 10%, rgba(186,230,253,0.75) 0%, transparent 55%),
-    radial-gradient(ellipse 70% 60% at 85% 85%, rgba(203,225,245,0.6) 0%, transparent 55%),
-    radial-gradient(ellipse 50% 40% at 60% 30%, rgba(240,248,255,0.5) 0%, transparent 50%),
-    linear-gradient(145deg, #eaf6fd 0%, #f4f8fb 45%, #ddeef8 100%);
+  background:transparent;
 }
 
 /* ── Deck ── */
 .deck {
   position:relative;
-  width:min(96vmin,96vh); height:min(96vmin,96vh);
-  overflow:hidden; border-radius:36px;
-  border:1.5px solid rgba(255,255,255,0.9);
-  flex-shrink:0;
-  /* box-shadow 제거 — 캡처 시 회색 아티팩트 방지 */
+  width:100vw; height:100vh;
+  overflow:hidden;
 }
 
 /* ── Slides ── */
@@ -472,9 +464,9 @@ function fitSlides() {
   try { embedded = window.self !== window.top; } catch(e) { embedded = true; }
   if (!embedded) return;
   function fix() {
-    var size = Math.min(document.documentElement.clientWidth, document.documentElement.clientHeight) * 0.96;
+    var w = document.documentElement.clientWidth;
     var deck = document.getElementById('deck');
-    if (deck) { deck.style.width = size + 'px'; deck.style.height = size + 'px'; fitSlides(); }
+    if (deck) { deck.style.width = w + 'px'; deck.style.height = w + 'px'; fitSlides(); }
   }
   fix();
   window.addEventListener('resize', fix);
@@ -511,25 +503,14 @@ function captureDeck() {
   var deck = document.getElementById('deck');
   var computedFilter = window.getComputedStyle(deck).filter;
   var prevFilter = deck.style.filter;
-  var prevBg = deck.style.background;
   var prevH = deck.style.height;
-  var prevShadow = deck.style.boxShadow;
 
-  // iframe 내 vh 단위 오류 대비 — 강제 정사각형
   var w = deck.offsetWidth;
   deck.style.height = w + 'px';
-  // 외부 box-shadow 제거 (캡처에 회색으로 나옴)
-  deck.style.boxShadow = 'none';
 
   if (computedFilter && computedFilter !== 'none') {
     deck.style.filter = computedFilter;
   }
-  deck.style.background = [
-    'radial-gradient(ellipse 80% 60% at 15% 10%, rgba(186,230,253,0.75) 0%, transparent 55%)',
-    'radial-gradient(ellipse 70% 60% at 85% 85%, rgba(203,225,245,0.6) 0%, transparent 55%)',
-    'radial-gradient(ellipse 50% 40% at 60% 30%, rgba(240,248,255,0.5) 0%, transparent 50%)',
-    'linear-gradient(145deg, #eaf6fd 0%, #f4f8fb 45%, #ddeef8 100%)'
-  ].join(',');
 
   return domtoimage.toPng(deck, {
     width: w,
@@ -540,9 +521,7 @@ function captureDeck() {
     }
   }).finally(function() {
     deck.style.filter = prevFilter;
-    deck.style.background = prevBg;
     deck.style.height = prevH;
-    deck.style.boxShadow = prevShadow;
   });
 }
 
