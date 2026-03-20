@@ -86,7 +86,7 @@ ${sponsor}
 {
   "instagram": {
     "hook": "팔로워가 멈추게 만드는 첫 문장 (이모지 포함, 30자 이내)",
-    "caption": "본문 캡션 (500-800자, 자연스러운 한국어, 줄바꿈, 이모지)",
+    "caption": "본문 캡션 (500-800자, 자연스러운 한국어, 줄바꿈, 이모지, 마지막에 '자세한 정보는 블로그에서 확인하세요!' + 블로그 URL: ${post.url || '블로그링크'} 포함)",
     "hashtags": ["#태그1", "#태그2", "...딱 5개만 (# 포함)${s.enabled && s.requiredHashtags.length > 0 ? `, 협찬 필수: ${s.requiredHashtags.join(' ')}` : ''}"],
     "carouselSlides": [{"slideNumber": 1, "headline": "20자 이내", "bodyText": "50-100자"}]
   },
