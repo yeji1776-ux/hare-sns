@@ -87,7 +87,7 @@ ${sponsor}
   "instagram": {
     "hook": "팔로워가 멈추게 만드는 첫 문장 (이모지 포함, 30자 이내)",
     "caption": "본문 캡션 (500-800자, 자연스러운 한국어, 줄바꿈, 이모지)",
-    "hashtags": ["#태그1", "#태그2", "...20-30개 (# 포함)${s.enabled && s.requiredHashtags.length > 0 ? `, 협찬 필수: ${s.requiredHashtags.join(' ')}` : ''}"],
+    "hashtags": ["#태그1", "#태그2", "...딱 5개만 (# 포함)${s.enabled && s.requiredHashtags.length > 0 ? `, 협찬 필수: ${s.requiredHashtags.join(' ')}` : ''}"],
     "carouselSlides": [{"slideNumber": 1, "headline": "20자 이내", "bodyText": "50-100자"}]
   },
   "clipVideoScript": {
@@ -124,8 +124,8 @@ ${sponsor}
     "closingTitle": "장소명/카테고리",
     "closingWord": "감성적 마무리 한 마디",
     "closingHashtags": "대표 해시태그 3~4개",
-    "captionLong": "긴 인스타 캡션 (2~3줄 훅, 핵심 정보, 해시태그 15개${s.enabled ? ', 협찬 문구 포함' : ''})",
-    "captionShort": "짧은 인스타 캡션 (훅 1줄, 정보 1~2줄, 해시태그 5~7개${s.enabled ? ', 협찬 문구 포함' : ''})"
+    "captionLong": "긴 인스타 캡션 (2~3줄 훅, 핵심 정보, 해시태그 5개${s.enabled ? ', 협찬 문구 포함' : ''})",
+    "captionShort": "짧은 인스타 캡션 (훅 1줄, 정보 1~2줄, 해시태그 5개${s.enabled ? ', 협찬 문구 포함' : ''})"
   }
 }
 
