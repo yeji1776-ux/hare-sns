@@ -97,14 +97,27 @@ ${sponsor}
   return callGeminiJson<CardNewsData>(prompt)
 }
 
-export function buildCardNewsHtml(data: CardNewsData): string {
+// 공정위 문구 이미지 필터 — 파일명/URL에 흔히 포함되는 키워드
+export function filterAdImages(urls: string[]): string[] {
+  const adKeywords = /공정위|광고|협찬|sponsored|ad_|ftc|disclaimer|공정거래/i
+  return urls.filter(u => !adKeywords.test(u))
+}
+
+export function buildCardNewsHtml(data: CardNewsData, images?: string[]): string {
+  const hasImages = images && images.length > 0
+  // 이미지 할당: 커버(1장), 기본정보(1장), 특징(1장), 혜택(1장), 클로징(1장)
+  const coverImg = hasImages ? images[0] : ''
+  const infoImg = hasImages && images.length > 1 ? images[1] : ''
+  const featureImg = hasImages && images.length > 2 ? images[2] : ''
+  const benefitImg = hasImages && images.length > 3 ? images[3] : ''
+  const closingImg = hasImages && images.length > 4 ? images[4] : coverImg
   return `<!DOCTYPE html>
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>${data.placeName}</title>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet" crossorigin>
 <script src="https://cdn.jsdelivr.net/npm/dom-to-image-more@3.4.0/dist/dom-to-image-more.min.js"></script>
 <style>
 :root {
@@ -262,6 +275,12 @@ body {
 
 /* ── 저장 모달 ── */
 #saveModal img { touch-action:auto !important; -webkit-touch-callout:default !important; }
+
+/* ── 이미지 버전 ── */
+.slide-bg { position:absolute; inset:0; background-size:cover; background-position:center; z-index:0; }
+.slide-bg::after { content:''; position:absolute; inset:0; background:linear-gradient(180deg,rgba(255,255,255,0.55) 0%,rgba(255,255,255,0.85) 60%,rgba(255,255,255,0.95) 100%); }
+.s-deep .slide-bg::after { background:linear-gradient(180deg,rgba(2,132,199,0.4) 0%,rgba(3,105,161,0.75) 50%,rgba(3,105,161,0.92) 100%); }
+.s-accent .slide-bg::after { background:linear-gradient(180deg,rgba(186,230,253,0.3) 0%,rgba(186,230,253,0.7) 50%,rgba(240,248,255,0.92) 100%); }
 </style>
 </head>
 <body>
@@ -269,7 +288,7 @@ body {
 
   <!-- 01 커버 -->
   <div class="slide s-glass active">
-    <div class="orb orb-a"></div><div class="orb orb-b"></div>
+    ${coverImg ? `<div class="slide-bg" style="background-image:url('${coverImg}')"></div>` : '<div class="orb orb-a"></div><div class="orb orb-b"></div>'}
     <div class="inner">
       <div class="tag">${data.coverTag}</div>
       <div class="t-xl">${data.placeName}</div>
@@ -282,7 +301,7 @@ body {
 
   <!-- 02 기본정보 -->
   <div class="slide s-silver">
-    <div class="orb orb-a" style="opacity:.25"></div>
+    ${infoImg ? `<div class="slide-bg" style="background-image:url('${infoImg}')"></div>` : '<div class="orb orb-a" style="opacity:.25"></div>'}
     <div class="inner">
       <div class="tag">Basic Info</div>
       <div class="t-lg">이런 곳이에요</div>
@@ -309,7 +328,7 @@ body {
 
   <!-- 04 특징 -->
   <div class="slide s-accent">
-    <div class="orb orb-w"></div>
+    ${featureImg ? `<div class="slide-bg" style="background-image:url('${featureImg}')"></div>` : '<div class="orb orb-w"></div>'}
     <div class="inner">
       <div class="tag">Features</div>
       <div class="t-lg">${data.featureTitle}</div>
@@ -321,7 +340,7 @@ body {
 
   <!-- 05 혜택 -->
   <div class="slide s-glass">
-    <div class="orb orb-a" style="opacity:.3"></div><div class="orb orb-b"></div>
+    ${benefitImg ? `<div class="slide-bg" style="background-image:url('${benefitImg}')"></div>` : '<div class="orb orb-a" style="opacity:.3"></div><div class="orb orb-b"></div>'}
     <div class="inner">
       <div class="tag">${data.benefitTag}</div>
       <div class="t-lg">${data.benefitTitle}</div>
@@ -347,7 +366,7 @@ body {
 
   <!-- 07 클로징 -->
   <div class="slide s-silver">
-    <div class="orb orb-a" style="opacity:.3"></div>
+    ${closingImg ? `<div class="slide-bg" style="background-image:url('${closingImg}')"></div>` : '<div class="orb orb-a" style="opacity:.3"></div>'}
     <div class="inner">
       <div class="tag">${data.closingArea}</div>
       <div class="t-xl">${data.closingTitle}</div>
@@ -511,7 +530,10 @@ function showSaveModal(dataUrl) {
   document.body.appendChild(ov);
 }
 
-async function saveCurrentSlide() {
+var _busy = false;
+
+function captureDeck() {
+  if (typeof domtoimage === 'undefined') throw new Error('이미지 캡처 라이브러리 로드 실패 — 네트워크를 확인해주세요');
   var deck = document.getElementById('deck');
   var computedFilter = window.getComputedStyle(deck).filter;
   var prevFilter = deck.style.filter;
@@ -527,13 +549,22 @@ async function saveCurrentSlide() {
     'linear-gradient(145deg, #eaf6fd 0%, #f4f8fb 45%, #ddeef8 100%)'
   ].join(',');
 
+  return domtoimage.toPng(deck, {
+    scale: 2,
+    filter: function(node) {
+      return !node.classList || !node.classList.contains('theme-bar');
+    }
+  }).finally(function() {
+    deck.style.filter = prevFilter;
+    deck.style.background = prevBg;
+  });
+}
+
+async function saveCurrentSlide() {
+  if (_busy) return;
+  _busy = true;
   try {
-    var dataUrl = await domtoimage.toPng(deck, {
-      scale: 2,
-      filter: function(node) {
-        return !node.classList || !node.classList.contains('theme-bar');
-      }
-    });
+    var dataUrl = await captureDeck();
 
     // iOS: navigator.share로 네이티브 공유 시트 열기 → "이미지 저장" 탭 하면 사진첩에 바로 저장
     try {
@@ -550,34 +581,16 @@ async function saveCurrentSlide() {
   } catch(e) {
     alert('캡처 실패: ' + (e && e.message ? e.message : e));
   } finally {
-    deck.style.filter = prevFilter;
-    deck.style.background = prevBg;
+    _busy = false;
+    try { window.parent.postMessage({ type: 'SAVE_DONE' }, '*'); } catch(x) {}
   }
 }
 
 async function shareCurrentSlide() {
-  var deck = document.getElementById('deck');
-  var computedFilter = window.getComputedStyle(deck).filter;
-  var prevFilter = deck.style.filter;
-  var prevBg = deck.style.background;
-
-  if (computedFilter && computedFilter !== 'none') {
-    deck.style.filter = computedFilter;
-  }
-  deck.style.background = [
-    'radial-gradient(ellipse 80% 60% at 15% 10%, rgba(186,230,253,0.75) 0%, transparent 55%)',
-    'radial-gradient(ellipse 70% 60% at 85% 85%, rgba(203,225,245,0.6) 0%, transparent 55%)',
-    'radial-gradient(ellipse 50% 40% at 60% 30%, rgba(240,248,255,0.5) 0%, transparent 50%)',
-    'linear-gradient(145deg, #eaf6fd 0%, #f4f8fb 45%, #ddeef8 100%)'
-  ].join(',');
-
+  if (_busy) return;
+  _busy = true;
   try {
-    var dataUrl = await domtoimage.toPng(deck, {
-      scale: 2,
-      filter: function(node) {
-        return !node.classList || !node.classList.contains('theme-bar');
-      }
-    });
+    var dataUrl = await captureDeck();
 
     var res = await fetch(dataUrl);
     var blob = await res.blob();
@@ -586,17 +599,18 @@ async function shareCurrentSlide() {
     if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
       await navigator.share({ files: [file], title: '카드뉴스' });
     } else {
-      // 데스크탑 fallback: 다운로드
       var a = document.createElement('a');
       a.href = dataUrl;
       a.download = 'card_' + (cur + 1) + '.png';
       a.click();
     }
   } catch(e) {
-    alert('공유 실패: ' + (e && e.message ? e.message : e));
+    if (e && e.name !== 'AbortError' && !/cancel/i.test(e.message || '')) {
+      alert('공유 실패: ' + (e && e.message ? e.message : e));
+    }
   } finally {
-    deck.style.filter = prevFilter;
-    deck.style.background = prevBg;
+    _busy = false;
+    try { window.parent.postMessage({ type: 'SHARE_DONE' }, '*'); } catch(x) {}
   }
 }
 
@@ -608,6 +622,7 @@ window.addEventListener('message', function(e) {
   if (e.data.type === 'OPEN_CAPTION') openModal();
   if (e.data.type === 'SAVE_CURRENT') saveCurrentSlide();
   if (e.data.type === 'SHARE_CURRENT') shareCurrentSlide();
+  if (e.data.type === 'SET_THEME' && e.data.theme) setTheme(e.data.theme);
 });
 
 update();
@@ -615,3 +630,4 @@ update();
 </body>
 </html>`
 }
+

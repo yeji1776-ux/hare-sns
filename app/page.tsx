@@ -7,7 +7,7 @@ interface InstagramOutput { hook: string; caption: string; hashtags: string[]; c
 interface Scene { sceneNumber: number; sceneDescription: string; narration: string; estimatedDuration: string }
 interface ClipVideoScript { scenes: Scene[]; totalEstimatedDuration: string }
 interface ClipTextPost { mainText: string; hashtags: string[] }
-interface ConversionResult { instagram: InstagramOutput; clipVideoScript: ClipVideoScript; clipTextPost: ClipTextPost; cardNewsHtml: string }
+interface ConversionResult { instagram: InstagramOutput; clipVideoScript: ClipVideoScript; clipTextPost: ClipTextPost; cardNewsHtml: string; cardNewsImageHtml?: string }
 
 interface HistoryItem {
   id: string
@@ -43,6 +43,9 @@ export default function Home() {
   const [curSlide, setCurSlide] = useState(0)
   const [totalSlides] = useState(7)
   const [regenLoading, setRegenLoading] = useState<{ cardnews: boolean; instagram: boolean; clip: boolean }>({ cardnews: false, instagram: false, clip: false })
+  const [cardMode, setCardMode] = useState<'simple' | 'image'>('image')
+  const [activeTheme, setActiveTheme] = useState('sky')
+  const busyRef = useRef(false)
 
   // iframe 너비 감지
   useEffect(() => {
@@ -262,17 +265,31 @@ export default function Home() {
                   <a href="https://www.instagram.com/hare_table/" target="_blank" rel="noopener noreferrer" style={{ padding: '8px 14px', borderRadius: '8px', border: 'none', background: 'linear-gradient(135deg,#f9a8d4,#c084fc)', fontSize: '13px', fontWeight: 700, color: '#fff', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px', whiteSpace: 'nowrap' }}>📲 내 인스타</a>
                 </div>
 
-                {/* 테마 가이드 */}
-                <div style={{ background: 'rgba(255,255,255,0.4)', borderRadius: '10px', padding: '10px 14px', marginBottom: '12px', border: '1px solid rgba(255,255,255,0.6)' }}>
-                  <p style={{ fontSize: '11px', fontWeight: 700, color: '#64748b', marginBottom: '8px', letterSpacing: '0.05em' }}>카드뉴스 내 점을 눌러 테마 변경</p>
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
-                    {[['#0284c7','📚 스터디'],['#ea580c','🍽️ 맛집'],['#db2777','☕ 카페'],['#0d9488','✈️ 여행'],['#7c3aed','💄 뷰티'],['#4338ca','🎭 문화'],['#ca8a04','🏡 라이프'],['#059669','💪 헬스']].map(([color, label]) => (
-                      <div key={label} style={{ display: 'flex', alignItems: 'center', gap: '5px', background: 'rgba(255,255,255,0.6)', borderRadius: '20px', padding: '3px 9px', border: '1px solid rgba(255,255,255,0.8)' }}>
-                        <div style={{ width: '9px', height: '9px', borderRadius: '50%', background: color, flexShrink: 0 }} />
-                        <span style={{ fontSize: '11px', fontWeight: 500, color: '#334155' }}>{label}</span>
-                      </div>
-                    ))}
+                {/* 심플/이미지 탭 + 테마 선택 */}
+                {result.cardNewsImageHtml && result.cardNewsImageHtml !== result.cardNewsHtml && (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
+                    <div style={{ display: 'flex', gap: '2px', background: 'rgba(255,255,255,0.5)', borderRadius: '8px', padding: '2px', border: '1px solid rgba(255,255,255,0.7)' }}>
+                      {([['simple', '심플'], ['image', '🖼️ 이미지']] as const).map(([id, label]) => (
+                        <button key={id} onClick={() => setCardMode(id)} style={{ padding: '6px 14px', fontSize: '12px', fontWeight: cardMode === id ? 700 : 500, border: 'none', borderRadius: '6px', cursor: 'pointer', background: cardMode === id ? '#0284c7' : 'transparent', color: cardMode === id ? '#fff' : '#64748b', transition: 'all 0.15s' }}>{label}</button>
+                      ))}
+                    </div>
                   </div>
+                )}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', marginBottom: '12px' }}>
+                  <span style={{ fontSize: '11px', fontWeight: 700, color: '#64748b', letterSpacing: '0.03em' }}>테마</span>
+                  {[
+                    { name: 'sky', label: '📚 스터디', bg: 'linear-gradient(135deg,#38bdf8,#0284c7)' },
+                    { name: 'food', label: '🍽️ 맛집', bg: 'linear-gradient(135deg,#fb923c,#ea580c)' },
+                    { name: 'cafe', label: '☕ 카페', bg: 'linear-gradient(135deg,#f472b6,#db2777)' },
+                    { name: 'travel', label: '✈️ 여행', bg: 'linear-gradient(135deg,#2dd4bf,#0d9488)' },
+                    { name: 'beauty', label: '💄 뷰티', bg: 'linear-gradient(135deg,#a78bfa,#7c3aed)' },
+                    { name: 'culture', label: '🎭 문화', bg: 'linear-gradient(135deg,#818cf8,#4338ca)' },
+                    { name: 'life', label: '🏡 라이프', bg: 'linear-gradient(135deg,#fbbf24,#ca8a04)' },
+                    { name: 'health', label: '💪 헬스', bg: 'linear-gradient(135deg,#34d399,#059669)' },
+                  ].map(t => (
+                    <button key={t.name} onClick={() => { setActiveTheme(t.name); try { iframeRef.current?.contentWindow?.postMessage({ type: 'SET_THEME', theme: t.name }, '*') } catch {} }} title={t.label}
+                      style={{ width: '24px', height: '24px', borderRadius: '50%', border: activeTheme === t.name ? '2.5px solid #fff' : '2px solid rgba(255,255,255,0.4)', background: t.bg, cursor: 'pointer', flexShrink: 0, padding: 0, transform: activeTheme === t.name ? 'scale(1.2)' : 'scale(1)', boxShadow: activeTheme === t.name ? '0 2px 8px rgba(0,0,0,0.2)' : '0 1px 3px rgba(0,0,0,0.1)', transition: 'all 0.15s' }} />
+                  ))}
                 </div>
 
                 {/* iframe + 부모 페이지 내비게이션 */}
@@ -282,9 +299,9 @@ export default function Home() {
                       <iframe
                         ref={iframeRef}
                         key={iframeContainerW}
-                        srcDoc={result.cardNewsHtml
+                        srcDoc={(cardMode === 'image' && result.cardNewsImageHtml ? result.cardNewsImageHtml : result.cardNewsHtml)
                           .replace('width=device-width', `width=${iframeContainerW}`)
-                          .replace('</head>', `<style>*{touch-action:manipulation;-webkit-tap-highlight-color:transparent}#saveModal img{touch-action:auto!important;-webkit-touch-callout:default!important}</style></head>`)}
+                          .replace('</head>', `<style>*{touch-action:manipulation;-webkit-tap-highlight-color:transparent}#saveModal img{touch-action:auto!important;-webkit-touch-callout:default!important}.theme-bar{display:none!important}</style></head>`)}
                         style={{ width: `${iframeContainerW}px`, height: `${iframeContainerW}px`, border: 'none', display: 'block', borderRadius: '12px' }}
                         title="카드뉴스 미리보기"
                       />
