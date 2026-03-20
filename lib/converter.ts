@@ -86,8 +86,8 @@ ${sponsor}
 {
   "instagram": {
     "hook": "팔로워가 멈추게 만드는 첫 문장 (이모지 포함, 30자 이내)",
-    "caption": "본문 캡션 (500-800자, 자연스러운 한국어, 줄바꿈, 이모지, 마지막에 '자세한 정보는 블로그에서 확인하세요!' + 블로그 URL: ${post.url || '블로그링크'} 포함)",
-    "hashtags": ["#태그1", "#태그2", "...딱 5개만 (# 포함)${s.enabled && s.requiredHashtags.length > 0 ? `, 협찬 필수: ${s.requiredHashtags.join(' ')}` : ''}"],
+    "caption": "반드시 아래 형식으로 작성:\\n\\n[본문 내용 — 자연스러운 한국어, 이모지, 줄바꿈 활용, 200-400자]\\n\\n자세한 내용은\\n📲 ${post.url || 'https://m.blog.naver.com/hare_table/글번호'}\\n(화면 캡처 후 링크를 꾹 누르면 연결 됩니다🫧)\\n\\n #태그1 #태그2 #태그3 #태그4 #태그5 (딱 5개)",
+    "hashtags": ["#태그1", "#태그2", "...딱 5개만 (# 포함, caption 마지막에도 동일하게 포함)${s.enabled && s.requiredHashtags.length > 0 ? `, 협찬 필수: ${s.requiredHashtags.join(' ')}` : ''}"],
     "carouselSlides": [{"slideNumber": 1, "headline": "20자 이내", "bodyText": "50-100자"}]
   },
   "clipVideoScript": {
@@ -124,8 +124,8 @@ ${sponsor}
     "closingTitle": "장소명/카테고리",
     "closingWord": "감성적 마무리 한 마디",
     "closingHashtags": "대표 해시태그 3~4개",
-    "captionLong": "긴 인스타 캡션 (2~3줄 훅, 핵심 정보, 해시태그 5개${s.enabled ? ', 협찬 문구 포함' : ''})",
-    "captionShort": "짧은 인스타 캡션 (훅 1줄, 정보 1~2줄, 해시태그 5개${s.enabled ? ', 협찬 문구 포함' : ''})"
+    "captionLong": "긴 버전: [본문 300-500자]\\n\\n자세한 내용은\\n📲 ${post.url || '블로그URL'}\\n(화면 캡처 후 링크를 꾹 누르면 연결 됩니다🫧)\\n\\n #태그 5개${s.enabled ? ', 협찬 문구 포함' : ''}",
+    "captionShort": "짧은 버전: [본문 100-200자]\\n\\n자세한 내용은\\n📲 ${post.url || '블로그URL'}\\n(화면 캡처 후 링크를 꾹 누르면 연결 됩니다🫧)\\n\\n #태그 5개${s.enabled ? ', 협찬 문구 포함' : ''}"
   }
 }
 
