@@ -44,6 +44,7 @@ export default function Home() {
   const [totalSlides, setTotalSlides] = useState(7)
   const [regenLoading, setRegenLoading] = useState<{ cardnews: boolean; instagram: boolean; clip: boolean }>({ cardnews: false, instagram: false, clip: false })
   const [activeTheme, setActiveTheme] = useState('sky')
+  const [editMode, setEditMode] = useState(false)
   const busyRef = useRef(false)
 
   // iframe 너비 감지
@@ -285,6 +286,27 @@ export default function Home() {
                     <button key={t.name} onClick={() => { setActiveTheme(t.name); try { iframeRef.current?.contentWindow?.postMessage({ type: 'SET_THEME', theme: t.name }, '*') } catch {} }} title={t.label}
                       style={{ width: '24px', height: '24px', borderRadius: '50%', border: activeTheme === t.name ? '2.5px solid #fff' : '2px solid rgba(255,255,255,0.4)', background: t.bg, cursor: 'pointer', flexShrink: 0, padding: 0, transform: activeTheme === t.name ? 'scale(1.2)' : 'scale(1)', boxShadow: activeTheme === t.name ? '0 2px 8px rgba(0,0,0,0.2)' : '0 1px 3px rgba(0,0,0,0.1)', transition: 'all 0.15s' }} />
                   ))}
+                </div>
+
+                {/* 편집 + 글씨 크기 */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', marginBottom: '12px' }}>
+                  <button onClick={() => { const next = !editMode; setEditMode(next); try { iframeRef.current?.contentWindow?.postMessage({ type: 'TOGGLE_EDIT', on: next }, '*') } catch {} }}
+                    style={{ padding: '6px 14px', fontSize: '12px', fontWeight: 700, border: 'none', borderRadius: '8px', cursor: 'pointer', background: editMode ? '#0284c7' : 'rgba(255,255,255,0.5)', color: editMode ? '#fff' : '#334155', transition: 'all 0.15s' }}>
+                    {editMode ? '✏️ 편집 중' : '✏️ 편집'}
+                  </button>
+                  {editMode && (
+                    <>
+                      <span style={{ fontSize: '11px', fontWeight: 700, color: '#64748b' }}>제목</span>
+                      <button onClick={() => { try { iframeRef.current?.contentWindow?.postMessage({ type: 'SET_FONT_SIZE', selector: '.t-xl,.t-lg', delta: 2 }, '*') } catch {} }} style={{ width: '28px', height: '28px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.7)', background: 'rgba(255,255,255,0.5)', fontSize: '14px', cursor: 'pointer', padding: 0 }}>+</button>
+                      <button onClick={() => { try { iframeRef.current?.contentWindow?.postMessage({ type: 'SET_FONT_SIZE', selector: '.t-xl,.t-lg', delta: -2 }, '*') } catch {} }} style={{ width: '28px', height: '28px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.7)', background: 'rgba(255,255,255,0.5)', fontSize: '14px', cursor: 'pointer', padding: 0 }}>-</button>
+                      <span style={{ fontSize: '11px', fontWeight: 700, color: '#64748b' }}>소제목</span>
+                      <button onClick={() => { try { iframeRef.current?.contentWindow?.postMessage({ type: 'SET_FONT_SIZE', selector: '.tag,.card-title,.list-em', delta: 1 }, '*') } catch {} }} style={{ width: '28px', height: '28px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.7)', background: 'rgba(255,255,255,0.5)', fontSize: '14px', cursor: 'pointer', padding: 0 }}>+</button>
+                      <button onClick={() => { try { iframeRef.current?.contentWindow?.postMessage({ type: 'SET_FONT_SIZE', selector: '.tag,.card-title,.list-em', delta: -1 }, '*') } catch {} }} style={{ width: '28px', height: '28px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.7)', background: 'rgba(255,255,255,0.5)', fontSize: '14px', cursor: 'pointer', padding: 0 }}>-</button>
+                      <span style={{ fontSize: '11px', fontWeight: 700, color: '#64748b' }}>본문</span>
+                      <button onClick={() => { try { iframeRef.current?.contentWindow?.postMessage({ type: 'SET_FONT_SIZE', selector: '.t-body,.card-body,.list-txt,.list-sub,.free-pill,.loc', delta: 1 }, '*') } catch {} }} style={{ width: '28px', height: '28px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.7)', background: 'rgba(255,255,255,0.5)', fontSize: '14px', cursor: 'pointer', padding: 0 }}>+</button>
+                      <button onClick={() => { try { iframeRef.current?.contentWindow?.postMessage({ type: 'SET_FONT_SIZE', selector: '.t-body,.card-body,.list-txt,.list-sub,.free-pill,.loc', delta: -1 }, '*') } catch {} }} style={{ width: '28px', height: '28px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.7)', background: 'rgba(255,255,255,0.5)', fontSize: '14px', cursor: 'pointer', padding: 0 }}>-</button>
+                    </>
+                  )}
                 </div>
 
                 {/* iframe + 부모 페이지 내비게이션 */}

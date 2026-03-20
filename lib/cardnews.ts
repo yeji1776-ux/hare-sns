@@ -232,6 +232,11 @@ body {
 [data-theme="health"]  .deck { filter:hue-rotate(130deg) saturate(1.1); }
 [data-theme="sky"]     .deck { filter:none; }
 
+/* ── 편집 모드 ── */
+[data-edit="true"] [contenteditable] { outline:2px dashed rgba(56,189,248,0.5); outline-offset:2px; border-radius:4px; cursor:text; min-height:1em; }
+[data-edit="true"] [contenteditable]:focus { outline-color:rgba(56,189,248,0.9); background:rgba(255,255,255,0.3); }
+[data-edit="true"] [contenteditable]:empty::before { content:'텍스트 입력'; color:rgba(0,0,0,0.25); }
+
 /* ── 캡션 모달 ── */
 .modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.28); backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px); z-index:100; align-items:center; justify-content:center; padding:20px; }
 .modal.open { display:flex; }
@@ -582,6 +587,21 @@ async function shareCurrentSlide() {
   }
 }
 
+// 편집 모드
+function toggleEdit(on) {
+  document.body.dataset.edit = on ? 'true' : 'false';
+  var els = document.querySelectorAll('.t-xl,.t-lg,.t-body,.tag,.list-txt,.list-em,.list-sub,.card-title,.card-body,.free-pill,.loc,.big-num,.big-unit,.hare-table');
+  els.forEach(function(el) { el.contentEditable = on ? 'true' : 'false'; });
+}
+
+function setFontSize(selector, delta) {
+  document.querySelectorAll(selector).forEach(function(el) {
+    var current = parseFloat(window.getComputedStyle(el).fontSize);
+    el.style.fontSize = (current + delta) + 'px';
+  });
+  fitSlides();
+}
+
 // postMessage — 부모 페이지 제어
 window.addEventListener('message', function(e) {
   if (!e.data || !e.data.type) return;
@@ -591,6 +611,8 @@ window.addEventListener('message', function(e) {
   if (e.data.type === 'SAVE_CURRENT') saveCurrentSlide();
   if (e.data.type === 'SHARE_CURRENT') shareCurrentSlide();
   if (e.data.type === 'SET_THEME' && e.data.theme) setTheme(e.data.theme);
+  if (e.data.type === 'TOGGLE_EDIT') toggleEdit(e.data.on);
+  if (e.data.type === 'SET_FONT_SIZE') setFontSize(e.data.selector, e.data.delta);
 });
 
 update();
