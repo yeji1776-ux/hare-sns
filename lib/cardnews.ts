@@ -520,6 +520,11 @@ function captureDeck() {
   var computedFilter = window.getComputedStyle(deck).filter;
   var prevFilter = deck.style.filter;
   var prevBg = deck.style.background;
+  var prevH = deck.style.height;
+
+  // iframe 내 vh 단위 오류 대비 — 강제 정사각형
+  var w = deck.offsetWidth;
+  deck.style.height = w + 'px';
 
   if (computedFilter && computedFilter !== 'none') {
     deck.style.filter = computedFilter;
@@ -531,10 +536,9 @@ function captureDeck() {
     'linear-gradient(145deg, #eaf6fd 0%, #f4f8fb 45%, #ddeef8 100%)'
   ].join(',');
 
-  var rect = deck.getBoundingClientRect();
   return domtoimage.toPng(deck, {
-    width: rect.width,
-    height: rect.height,
+    width: w,
+    height: w,
     scale: 2,
     filter: function(node) {
       return !node.classList || !node.classList.contains('theme-bar');
@@ -542,6 +546,7 @@ function captureDeck() {
   }).finally(function() {
     deck.style.filter = prevFilter;
     deck.style.background = prevBg;
+    deck.style.height = prevH;
   });
 }
 
