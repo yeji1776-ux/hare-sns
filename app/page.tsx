@@ -4,10 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 
 interface CarouselSlide { slideNumber: number; headline: string; bodyText: string }
 interface InstagramOutput { hook: string; caption: string; hashtags: string[]; carouselSlides: CarouselSlide[] }
-interface Scene { sceneNumber: number; sceneDescription: string; narration: string; estimatedDuration: string }
-interface ClipVideoScript { scenes: Scene[]; totalEstimatedDuration: string }
-interface ClipTextPost { mainText: string; hashtags: string[] }
-interface ConversionResult { instagram: InstagramOutput; clipVideoScript: ClipVideoScript; clipTextPost: ClipTextPost; cardNewsHtml: string }
+interface ConversionResult { instagram: InstagramOutput; cardNewsHtml: string }
 
 interface HistoryItem {
   id: string
@@ -17,7 +14,7 @@ interface HistoryItem {
   result: ConversionResult
 }
 
-type ResultTab = 'cardnews' | 'instagram' | 'clip'
+type ResultTab = 'cardnews' | 'instagram'
 
 function formatDate(iso: string): string {
   const d = new Date(iso)
@@ -42,7 +39,7 @@ export default function Home() {
   const [iframeContainerW, setIframeContainerW] = useState<number | null>(null)
   const [curSlide, setCurSlide] = useState(0)
   const [totalSlides, setTotalSlides] = useState(7)
-  const [regenLoading, setRegenLoading] = useState<{ cardnews: boolean; instagram: boolean; clip: boolean }>({ cardnews: false, instagram: false, clip: false })
+  const [regenLoading, setRegenLoading] = useState<{ cardnews: boolean; instagram: boolean }>({ cardnews: false, instagram: false })
   const [activeTheme, setActiveTheme] = useState('sky')
   const [editMode, setEditMode] = useState(false)
   const busyRef = useRef(false)
@@ -126,7 +123,7 @@ export default function Home() {
     }
   }
 
-  async function handleRegen(type: 'cardnews' | 'instagram' | 'clip') {
+  async function handleRegen(type: 'cardnews' | 'instagram') {
     if (!url.trim() || !result) return
     setRegenLoading(prev => ({ ...prev, [type]: true }))
     try {
@@ -182,7 +179,7 @@ export default function Home() {
           <img src="/favicon.png" alt="hare" style={{ width: '48px', height: '48px', objectFit: 'contain' }} />
           <h1 style={{ fontSize: '28px', fontWeight: 900, color: '#0f172a', margin: 0 }}>hare_table</h1>
         </div>
-        <p style={{ color: '#64748b', fontSize: '14px', margin: 0 }}>네이버 블로그 URL → 인스타그램 & 네이버 클립 자동 변환</p>
+        <p style={{ color: '#64748b', fontSize: '14px', margin: 0 }}>네이버 블로그 URL → 인스타그램 자동 변환</p>
       </div>
 
       {/* History */}
@@ -247,7 +244,6 @@ export default function Home() {
           <div style={{ display: 'flex', borderBottom: '1px solid rgba(255,255,255,0.6)', padding: '0 20px' }}>
             {tabBtn('cardnews', '🖼 카드뉴스')}
             {tabBtn('instagram', '📸 인스타그램')}
-            {tabBtn('clip', '🎬 네이버 클립')}
           </div>
 
           <div style={{ padding: '20px' }}>
@@ -384,44 +380,6 @@ export default function Home() {
               </div>
             )}
 
-            {/* ── 네이버 클립 ── */}
-            {tab === 'clip' && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                  <button onClick={() => handleRegen('clip')} disabled={regenLoading.clip} style={{ padding: '8px 14px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.7)', background: regenLoading.clip ? '#94a3b8' : 'rgba(255,255,255,0.5)', fontSize: '13px', fontWeight: 600, cursor: regenLoading.clip ? 'not-allowed' : 'pointer', color: '#334155' }}>{regenLoading.clip ? '⏳ 생성 중...' : '🔄 새로고침'}</button>
-                </div>
-                <div style={{ background: 'rgba(255,255,255,0.4)', borderRadius: '12px', padding: '16px', border: '1px solid rgba(255,255,255,0.6)' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                    <div style={{ fontSize: '12px', fontWeight: 700, color: '#0284c7', letterSpacing: '0.1em' }}>영상 스크립트</div>
-                    <span style={{ fontSize: '12px', color: '#64748b', fontWeight: 500 }}>총 {result.clipVideoScript.totalEstimatedDuration}</span>
-                  </div>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                    {result.clipVideoScript.scenes.map(scene => (
-                      <div key={scene.sceneNumber} style={{ background: 'rgba(255,255,255,0.5)', borderRadius: '10px', padding: '12px', border: '1px solid rgba(255,255,255,0.7)' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-                          <span style={{ fontSize: '11px', fontWeight: 700, color: '#94a3b8' }}>SCENE {scene.sceneNumber}</span>
-                          <span style={{ fontSize: '11px', color: '#64748b' }}>{scene.estimatedDuration}</span>
-                        </div>
-                        <div style={{ fontSize: '12px', color: '#64748b', marginBottom: '6px' }}>🎥 {scene.sceneDescription}</div>
-                        <div style={{ fontSize: '13px', color: '#1e293b', fontWeight: 500 }}>💬 {scene.narration}</div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-                <div style={{ background: 'rgba(255,255,255,0.4)', borderRadius: '12px', padding: '16px', border: '1px solid rgba(255,255,255,0.6)' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-                    <div style={{ fontSize: '12px', fontWeight: 700, color: '#0284c7', letterSpacing: '0.1em' }}>텍스트 게시글</div>
-                    <button onClick={() => copy(result.clipTextPost.mainText + '\n\n' + result.clipTextPost.hashtags.join(' '), 'cliptext')} style={{ padding: '5px 12px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.7)', background: 'rgba(255,255,255,0.5)', fontSize: '12px', fontWeight: 600, cursor: 'pointer', color: copied === 'cliptext' ? '#059669' : '#334155' }}>{copied === 'cliptext' ? '✓ 복사됨' : '복사'}</button>
-                  </div>
-                  <p style={{ fontSize: '14px', color: '#334155', lineHeight: 1.8, whiteSpace: 'pre-wrap', margin: '0 0 12px' }}>{result.clipTextPost.mainText}</p>
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
-                    {result.clipTextPost.hashtags.map((tag, i) => (
-                      <span key={i} style={{ background: 'rgba(2,132,199,0.1)', color: '#0284c7', padding: '4px 10px', borderRadius: '100px', fontSize: '12px', fontWeight: 600 }}>{tag}</span>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )}
           </div>
         </div>
       )}

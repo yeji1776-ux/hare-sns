@@ -7,6 +7,7 @@ export interface BlogPost {
   images: string[]
   author: string
   url: string
+  placeInfo?: string
 }
 
 function toMobileUrl(url: string): string {
@@ -76,6 +77,32 @@ export async function scrapeNaverBlog(url: string): Promise<BlogPost> {
     content = $('body').text().trim().replace(/\s+/g, ' ')
   }
 
+  // 장소/주소 정보 추출 (네이버 지도 위젯, 장소 카드 등)
+  const placeTexts: string[] = []
+  // SE3 지도 컴포넌트
+  $('.se-map, .se-placesMap, .se-module-map, .se-place').each((_, el) => {
+    const text = $(el).text().trim()
+    if (text.length > 0) placeTexts.push(text)
+  })
+  // OG링크 카드 (장소 링크)
+  $('.se-oglink, .se-module-oglink, .se-section-oglink').each((_, el) => {
+    const text = $(el).text().trim()
+    if (text.length > 0) placeTexts.push(text)
+  })
+  // 장소 관련 data 속성에서 주소 추출
+  $('[data-module="map"] .se-map-info, [class*="map"] [class*="info"], [class*="place"] [class*="info"]').each((_, el) => {
+    const text = $(el).text().trim()
+    if (text.length > 0) placeTexts.push(text)
+  })
+  // a 태그 중 네이버 지도/플레이스 링크
+  $('a[href*="map.naver.com"], a[href*="naver.me"], a[href*="place.naver.com"]').each((_, el) => {
+    const text = $(el).text().trim()
+    if (text.length > 0) placeTexts.push(text)
+    const href = $(el).attr('href') || ''
+    if (href && !placeTexts.includes(href)) placeTexts.push(href)
+  })
+  const placeInfo = placeTexts.length > 0 ? Array.from(new Set(placeTexts)).join('\n') : undefined
+
   const images: string[] = []
   const imgSelectors = ['.se-main-container img', '.post-view img', '#postViewArea img', 'article img']
   for (const selector of imgSelectors) {
@@ -95,5 +122,6 @@ export async function scrapeNaverBlog(url: string): Promise<BlogPost> {
     images: images.slice(0, 20),
     author,
     url: mobileUrl,
+    placeInfo,
   }
 }

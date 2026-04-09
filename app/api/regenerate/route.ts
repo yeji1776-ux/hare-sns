@@ -17,7 +17,7 @@ export async function POST(req: NextRequest) {
   try {
     const { url, type } = await req.json()
     if (!url || !type) return NextResponse.json({ error: '파라미터가 필요합니다.' }, { status: 400 })
-    if (!['cardnews', 'instagram', 'clip'].includes(type)) {
+    if (!['cardnews', 'instagram'].includes(type)) {
       return NextResponse.json({ error: '유효하지 않은 type입니다.' }, { status: 400 })
     }
 

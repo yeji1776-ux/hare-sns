@@ -240,14 +240,16 @@ body {
 /* ── 캡션 모달 ── */
 .modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.28); backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px); z-index:100; align-items:center; justify-content:center; padding:20px; }
 .modal.open { display:flex; }
-.modal-box { background:rgba(248,250,252,0.92); border:1px solid rgba(255,255,255,0.8); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); width:100%; max-width:440px; border-radius:24px; padding:24px; }
+.modal-box { position:relative; background:rgba(248,250,252,0.92); border:1px solid rgba(255,255,255,0.8); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); width:100%; max-width:440px; border-radius:24px; padding:24px; }
 .modal-title { font-size:11px; font-weight:600; letter-spacing:.15em; text-transform:uppercase; color:var(--accent); margin-bottom:14px; }
 .caption-section { margin-bottom:16px; }
 .caption-label { font-size:10px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--accent); opacity:.8; margin-bottom:6px; }
 .caption-divider { width:100%; height:1px; background:rgba(0,0,0,0.08); margin:14px 0; }
-.modal-text { font-size:13px; line-height:1.85; color:var(--text); white-space:pre-wrap; max-height:26vh; overflow-y:auto; }
+.modal-text { font-size:13px; line-height:1.85; color:var(--text); white-space:pre-wrap; max-height:40vh; overflow-y:auto; outline:none; border:1px solid transparent; border-radius:8px; padding:8px; transition:border-color 0.15s; }
+.modal-text:focus { border-color:var(--accent); background:rgba(255,255,255,0.6); }
 .modal-copy { margin-top:8px; width:100%; padding:10px; background:var(--accent); color:#fff; border:none; border-radius:12px; font-size:13px; font-weight:700; cursor:pointer; }
-.modal-close { margin-top:12px; width:100%; padding:9px; background:transparent; color:var(--dim); border:none; font-size:12px; font-weight:600; cursor:pointer; }
+.modal-close-x { position:absolute; top:14px; right:14px; width:32px; height:32px; border-radius:50%; border:none; background:rgba(0,0,0,0.06); color:var(--dim); font-size:18px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+.modal-close-x:active { background:rgba(0,0,0,0.12); }
 
 /* ── 저장 모달 ── */
 #saveModal img { touch-action:auto !important; -webkit-touch-callout:default !important; }
@@ -364,21 +366,15 @@ body {
 </div>
 
 <!-- 캡션 모달 -->
-<div class="modal" id="modal">
+<div class="modal" id="modal" onclick="if(event.target===this)closeModal()">
   <div class="modal-box">
+    <button class="modal-close-x" onclick="closeModal()">✕</button>
     <div class="modal-title">Instagram Caption</div>
     <div class="caption-section">
-      <div class="caption-label">✂️ 짧은 버전</div>
-      <div class="modal-text" id="captionShort">${data.captionShort.replace(/\n/g, '<br>')}</div>
+      <div class="caption-label">✂️ 캡션 (터치하여 수정 가능)</div>
+      <div class="modal-text" id="captionShort" contenteditable="true">${data.captionShort.replace(/\n/g, '<br>')}</div>
       <button class="modal-copy" onclick="copyCaption('captionShort',this)">복사하기</button>
     </div>
-    <div class="caption-divider"></div>
-    <div class="caption-section">
-      <div class="caption-label">📝 긴 버전</div>
-      <div class="modal-text" id="captionLong">${data.captionLong.replace(/\n/g, '<br>')}</div>
-      <button class="modal-copy" onclick="copyCaption('captionLong',this)">복사하기</button>
-    </div>
-    <button class="modal-close" onclick="closeModal()">닫기</button>
   </div>
 </div>
 
@@ -417,8 +413,10 @@ function goTo(i) { cur = i; update(); }
 
 // 키보드
 document.addEventListener('keydown', function(e) {
-  if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); go(1); }
-  if (e.key === 'ArrowLeft') { e.preventDefault(); go(-1); }
+  var editing = e.target.isContentEditable || e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA';
+  if (e.key === 'ArrowRight' && !editing) { e.preventDefault(); go(1); }
+  if (e.key === ' ' && !editing) { e.preventDefault(); go(1); }
+  if (e.key === 'ArrowLeft' && !editing) { e.preventDefault(); go(-1); }
 });
 
 // 캡션 모달

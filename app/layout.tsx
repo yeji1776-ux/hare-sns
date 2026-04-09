@@ -2,14 +2,14 @@ import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title: 'hare_table',
-  description: '네이버 블로그 → 인스타그램 & 네이버 클립 자동 변환',
+  description: '네이버 블로그 → 인스타그램 자동 변환',
   icons: {
     icon: '/favicon.png',
     apple: '/favicon.png',
   },
   openGraph: {
     title: 'hare_table',
-    description: '네이버 블로그 → 인스타그램 & 네이버 클립 자동 변환',
+    description: '네이버 블로그 → 인스타그램 자동 변환',
     images: [{ url: '/favicon.png' }],
   },
 }

@@ -23,27 +23,8 @@ export interface InstagramOutput {
   carouselSlides: CarouselSlide[]
 }
 
-export interface Scene {
-  sceneNumber: number
-  sceneDescription: string
-  narration: string
-  estimatedDuration: string
-}
-
-export interface ClipVideoScript {
-  scenes: Scene[]
-  totalEstimatedDuration: string
-}
-
-export interface ClipTextPost {
-  mainText: string
-  hashtags: string[]
-}
-
 export interface ConversionResult {
   instagram: InstagramOutput
-  clipVideoScript: ClipVideoScript
-  clipTextPost: ClipTextPost
   cardNewsHtml: string
 }
 
@@ -64,23 +45,22 @@ import { CardNewsData, buildCardNewsHtml } from './cardnews'
 
 interface AllInOneResult {
   instagram: InstagramOutput
-  clipVideoScript: ClipVideoScript
-  clipTextPost: ClipTextPost
   cardNews: CardNewsData
 }
 
 function allInOnePrompt(post: BlogPost, s: SponsorshipConfig): string {
   const content = post.content.slice(0, 3000)
   const sponsor = buildSponsorContext(s)
+  const placeSection = post.placeInfo ? `\n=== 장소/주소 정보 ===\n${post.placeInfo}\n` : ''
   return `당신은 블로그 글을 여러 SNS 플랫폼용 콘텐츠로 변환하는 전문가입니다.
-아래 블로그 글을 읽고, 인스타그램 + 네이버 클립 + 카드뉴스 콘텐츠를 **한 번에** 생성해주세요.
+아래 블로그 글을 읽고, 인스타그램 + 카드뉴스 콘텐츠를 **한 번에** 생성해주세요.
 
 === 블로그 원문 ===
 제목: ${post.title}
 작성자: ${post.author}
 내용:
 ${content}
-${sponsor}
+${placeSection}${sponsor}
 
 반드시 아래 JSON 구조로만 응답하세요:
 {
@@ -89,14 +69,6 @@ ${sponsor}
     "caption": "본문 200-400자 (자연스러운 한국어, 이모지) + 줄바꿈 2번 + 자세한 내용은 + 줄바꿈 + 📲 ${post.url || 'https://m.blog.naver.com/hare_table/글번호'} + 줄바꿈 + (화면 캡처 후 링크를 꾹 누르면 연결 됩니다🫧) + 줄바꿈 2번 + 해시태그 5개",
     "hashtags": ["#태그1", "#태그2", "...딱 5개${s.enabled && s.requiredHashtags.length > 0 ? `, 협찬 필수: ${s.requiredHashtags.join(' ')}` : ''}"],
     "carouselSlides": [{"slideNumber": 1, "headline": "20자 이내", "bodyText": "50-100자"}]
-  },
-  "clipVideoScript": {
-    "scenes": [{"sceneNumber": 1, "sceneDescription": "화면 구성", "narration": "구어체 나레이션", "estimatedDuration": "3초"}],
-    "totalEstimatedDuration": "약 15초"
-  },
-  "clipTextPost": {
-    "mainText": "300-500자 핵심 요약 + 이모지",
-    "hashtags": ["#태그1", "...10-15개${s.enabled && s.requiredHashtags.length > 0 ? `, 협찬 필수: ${s.requiredHashtags.join(' ')}` : ''}"]
   },
   "cardNews": {
     "placeName": "장소명 (10자 이내)",
@@ -131,7 +103,6 @@ ${sponsor}
 
 세부 규칙:
 - instagram.carouselSlides: 5-7개
-- clipVideoScript.scenes: 3-5개, 총 15초 이내 (네이버 클립은 15초 숏폼)
 - cardNews.features: 딱 4개
 - cardNews.benefits: 3~6개
 - cardNews.reviews: 딱 3개
@@ -148,8 +119,6 @@ export async function convertBlogPost(
 
   return {
     instagram: result.instagram,
-    clipVideoScript: result.clipVideoScript,
-    clipTextPost: result.clipTextPost,
     cardNewsHtml,
   }
 }
@@ -157,15 +126,13 @@ export async function convertBlogPost(
 export async function regenerateSection(
   post: BlogPost,
   sponsorship: SponsorshipConfig,
-  type: 'cardnews' | 'instagram' | 'clip'
+  type: 'cardnews' | 'instagram'
 ): Promise<Partial<ConversionResult>> {
   const result = await callGeminiJson<AllInOneResult>(allInOnePrompt(post, sponsorship))
 
   if (type === 'cardnews') {
     return { cardNewsHtml: buildCardNewsHtml(result.cardNews) }
-  } else if (type === 'instagram') {
-    return { instagram: result.instagram }
   } else {
-    return { clipVideoScript: result.clipVideoScript, clipTextPost: result.clipTextPost }
+    return { instagram: result.instagram }
   }
 }
