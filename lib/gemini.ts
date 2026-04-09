@@ -13,19 +13,41 @@ function parseJson<T>(text: string): T {
   return JSON.parse(match[0]) as T
 }
 
+const MODELS = ['gemini-2.5-flash', 'gemini-2.0-flash'] as const
+
+async function callWithRetry<T>(
+  prompt: string,
+  config: { responseMimeType?: string },
+  parse: (text: string) => T
+): Promise<T> {
+  for (const modelName of MODELS) {
+    for (let attempt = 0; attempt < 2; attempt++) {
+      try {
+        const model = getClient().getGenerativeModel({
+          model: modelName,
+          generationConfig: config,
+        })
+        const result = await model.generateContent(prompt)
+        return parse(result.response.text())
+      } catch (e: unknown) {
+        const msg = e instanceof Error ? e.message : ''
+        if (msg.includes('503') || msg.includes('429') || msg.includes('overloaded')) {
+          await new Promise(r => setTimeout(r, 2000 * (attempt + 1)))
+          continue
+        }
+        throw e
+      }
+    }
+  }
+  throw new Error('Gemini API가 일시적으로 사용 불가합니다. 잠시 후 다시 시도해주세요.')
+}
+
 export async function callGeminiJson<T>(prompt: string): Promise<T> {
-  const model = getClient().getGenerativeModel({
-    model: 'gemini-2.5-flash',
-    generationConfig: { responseMimeType: 'application/json' },
-  })
-  const result = await model.generateContent(prompt)
-  return parseJson<T>(result.response.text())
+  return callWithRetry<T>(prompt, { responseMimeType: 'application/json' }, (text) => parseJson<T>(text))
 }
 
 export async function callGeminiText(prompt: string): Promise<string> {
-  const model = getClient().getGenerativeModel({ model: 'gemini-2.5-flash' })
-  const result = await model.generateContent(prompt)
-  return result.response.text()
+  return callWithRetry(prompt, {}, (text) => text)
 }
 
 export async function streamGeminiText(
