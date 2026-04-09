@@ -13,7 +13,7 @@ function parseJson<T>(text: string): T {
   return JSON.parse(match[0]) as T
 }
 
-const MODELS = ['gemini-2.5-flash', 'gemini-2.0-flash'] as const
+const MODELS = ['gemini-2.0-flash', 'gemini-2.5-flash'] as const
 
 async function callWithRetry<T>(
   prompt: string,
