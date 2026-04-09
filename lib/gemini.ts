@@ -30,8 +30,8 @@ async function callWithRetry<T>(
         const result = await model.generateContent(prompt)
         return parse(result.response.text())
       } catch (e: unknown) {
-        const msg = e instanceof Error ? e.message : ''
-        if (msg.includes('503') || msg.includes('429') || msg.includes('overloaded')) {
+        const msg = String(e)
+        if (msg.includes('503') || msg.includes('429') || msg.includes('overloaded') || msg.includes('Service Unavailable')) {
           await new Promise(r => setTimeout(r, 2000 * (attempt + 1)))
           continue
         }
